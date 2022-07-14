@@ -1,0 +1,79 @@
+package com.eviive.personalapi.model;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
+
+import static javax.persistence.FetchType.EAGER;
+import static javax.persistence.GenerationType.SEQUENCE;
+import static javax.persistence.InheritanceType.SINGLE_TABLE;
+
+@Entity(name = "API_Project")
+@Table(
+		name = "API_Project",
+		uniqueConstraints = @UniqueConstraint(name = "UK_PROJECT_NAME", columnNames = "name")
+)
+@Inheritance(strategy = SINGLE_TABLE)
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class Project {
+	
+	@Id
+	@SequenceGenerator(
+			name = "api_project_sequence",
+			sequenceName = "api_project_sequence",
+			allocationSize = 1
+	)
+	@GeneratedValue(
+			strategy = SEQUENCE,
+			generator = "api_project_sequence"
+	)
+	@Column(name = "project_id", updatable = false)
+	private Long id;
+	
+	@Column(nullable = false)
+	private String name;
+	
+	@Column(nullable = false)
+	private String description;
+	
+	@Column(name = "repo_url", nullable = false)
+	private String repoURL;
+	
+	@Column(name = "demo_url", nullable = false)
+	private String demoURL;
+	
+	@ManyToMany(fetch = EAGER)
+	@JoinTable(
+			name = "API_Project_Course_Map",
+			joinColumns = @JoinColumn(
+					name = "project_id",
+					referencedColumnName = "project_id",
+					foreignKey = @ForeignKey(name = "FK_Map_Project")
+			),
+			inverseJoinColumns = @JoinColumn(
+					name = "skill_id",
+					referencedColumnName = "skill_id",
+					foreignKey = @ForeignKey(name = "FK_Map_Skill")
+			)
+	)
+	private List<Skill> skills;
+	
+	@Embedded
+	private Image image;
+	
+	private boolean featured;
+	
+	public boolean addSkill(Skill skill) {
+		if (skills == null) {
+			skills = new ArrayList<>();
+		}
+		return skills.add(skill);
+	}
+	
+}
