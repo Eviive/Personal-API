@@ -2,6 +2,7 @@ package com.eviive.personalapi;
 
 import com.eviive.personalapi.model.*;
 import com.eviive.personalapi.service.ProjectService;
+import com.eviive.personalapi.service.RoleService;
 import com.eviive.personalapi.service.SkillService;
 import com.eviive.personalapi.service.UserService;
 import org.springframework.boot.CommandLineRunner;
@@ -26,9 +27,14 @@ public class App {
 	}
 	
 	@Bean
-	CommandLineRunner commandLineRunner(UserService userService, ProjectService projectService, SkillService skillService) {
+	CommandLineRunner commandLineRunner(
+			UserService userService,
+			RoleService roleService,
+			ProjectService projectService,
+			SkillService skillService
+	) {
 		return args -> {
-			userService.saveUser(new ApiUser(
+			userService.save(new ApiUser(
 					null,
 					"Albert VAILLON",
 					"Eviive",
@@ -36,7 +42,7 @@ public class App {
 					new ArrayList<>()
 			));
 			
-			userService.saveUser(new ApiUser(
+			userService.save(new ApiUser(
 					null,
 					"Lilian BAUDRY",
 					"Irophin",
@@ -44,12 +50,11 @@ public class App {
 					new ArrayList<>()
 			));
 			
-			userService.saveRole(new Role(null, "ROLE_ADMIN"));
-			userService.saveRole(new Role(null, "ROLE_USER"));
+			roleService.save(new Role(null, "ROLE_ADMIN"));
+			roleService.save(new Role(null, "ROLE_USER"));
 			
-			userService.addRoleToUser("Eviive", "ROLE_ADMIN");
-			userService.addRoleToUser("Eviive", "ROLE_USER");
-			userService.addRoleToUser("Irophin", "ROLE_USER");
+			userService.addRoleToUser(1L, 1L, 2L);
+			userService.addRoleToUser(2L, 2L);
 			
 			skillService.save(new Skill(null, "Skill 1", "skill1.png"));
 			skillService.save(new Skill(null, "Skill 2", "skill2.png"));
@@ -79,10 +84,8 @@ public class App {
 					true
 			));
 			
-			projectService.addSkillToProject(1L, 1L);
-			projectService.addSkillToProject(1L, 2L);
-			projectService.addSkillToProject(2L, 2L);
-			projectService.addSkillToProject(2L, 3L);
+			projectService.addSkillToProject(1L, 1L, 2L);
+			projectService.addSkillToProject(2L, 2L, 3L);
 		};
 	}
 	

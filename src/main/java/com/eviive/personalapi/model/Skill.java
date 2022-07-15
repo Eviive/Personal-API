@@ -28,10 +28,10 @@ public class Skill {
 			strategy = SEQUENCE,
 			generator = "api_skill_sequence"
 	)
-	@Column(name = "skill_id", updatable = false)
+	@Column(name = "skill_id")
 	private Long id;
 	
-	@Column(nullable = false, unique = true)
+	@Column(nullable = false)
 	private String name;
 	
 	@Column(name = "logo_url", nullable = false)

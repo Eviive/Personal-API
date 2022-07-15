@@ -13,10 +13,10 @@ import javax.persistence.Embeddable;
 @AllArgsConstructor
 public class Image {
 	
-	@Column(name = "image_url")
-	private String URL;
+	@Column(name = "image_url", nullable = false)
+	private String url;
 	
-	@Column(name = "image_description")
+	@Column(name = "image_description", nullable = false)
 	private String description;
 	
 }

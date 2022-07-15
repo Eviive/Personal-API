@@ -1,5 +1,6 @@
 package com.eviive.personalapi.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -8,11 +9,15 @@ import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.fasterxml.jackson.annotation.JsonProperty.Access.READ_ONLY;
 import static javax.persistence.FetchType.EAGER;
 import static javax.persistence.GenerationType.SEQUENCE;
 
 @Entity(name = "API_User")
-@Table(name = "API_User")
+@Table(
+		name = "API_User",
+		uniqueConstraints = @UniqueConstraint(name = "UK_USER_USERNAME", columnNames = "username")
+)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -28,13 +33,16 @@ public class ApiUser {
 			strategy = SEQUENCE,
 			generator = "api_user_sequence"
 	)
-	@Column(name = "user_id", updatable = false)
+	@Column(name = "user_id")
 	private Long id;
 	
+	@Column(nullable = false)
 	private String name;
 	
+	@Column(nullable = false)
 	private String username;
 	
+	@Column(nullable = false)
 	private String password;
 	
 	@ManyToMany(fetch = EAGER)

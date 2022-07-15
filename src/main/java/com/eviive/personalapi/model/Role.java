@@ -9,7 +9,10 @@ import javax.persistence.*;
 import static javax.persistence.GenerationType.SEQUENCE;
 
 @Entity(name = "API_Role")
-@Table(name = "API_Role")
+@Table(
+		name = "API_Role",
+		uniqueConstraints = @UniqueConstraint(name = "UK_ROLE_NAME", columnNames = "name")
+)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -25,9 +28,10 @@ public class Role {
 			strategy = SEQUENCE,
 			generator = "api_role_sequence"
 	)
-	@Column(name = "role_id", updatable = false)
+	@Column(name = "role_id")
 	private Long id;
 	
+	@Column(nullable = false)
 	private String name;
 	
 }

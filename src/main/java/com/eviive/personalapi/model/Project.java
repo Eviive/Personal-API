@@ -33,7 +33,7 @@ public class Project {
 			strategy = SEQUENCE,
 			generator = "api_project_sequence"
 	)
-	@Column(name = "project_id", updatable = false)
+	@Column(name = "project_id")
 	private Long id;
 	
 	@Column(nullable = false)
@@ -50,7 +50,7 @@ public class Project {
 	
 	@ManyToMany(fetch = EAGER)
 	@JoinTable(
-			name = "API_Project_Course_Map",
+			name = "API_Project_Skill_Map",
 			joinColumns = @JoinColumn(
 					name = "project_id",
 					referencedColumnName = "project_id",
@@ -67,7 +67,8 @@ public class Project {
 	@Embedded
 	private Image image;
 	
-	private boolean featured;
+	@Column(nullable = false)
+	private Boolean featured;
 	
 	public boolean addSkill(Skill skill) {
 		if (skills == null) {
