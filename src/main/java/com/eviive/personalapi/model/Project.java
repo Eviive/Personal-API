@@ -2,6 +2,7 @@ package com.eviive.personalapi.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
@@ -21,7 +22,7 @@ import static javax.persistence.InheritanceType.SINGLE_TABLE;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Project {
+public class Project implements IModel {
 	
 	@Id
 	@SequenceGenerator(

@@ -4,7 +4,6 @@ import com.eviive.personalapi.model.ApiUser;
 import com.eviive.personalapi.model.Role;
 import com.eviive.personalapi.repository.RoleRepository;
 import com.eviive.personalapi.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -20,16 +19,20 @@ import java.util.Optional;
 
 @Service
 @Transactional
-@RequiredArgsConstructor
-public class UserService implements BasicService<ApiUser>, UserDetailsService {
+public class UserService extends AbstractService<ApiUser> implements UserDetailsService {
 	
-	private final UserRepository userRepository;
 	private final RoleRepository roleRepository;
 	private final PasswordEncoder passwordEncoder;
 	
+	public UserService(UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
+		super(userRepository);
+		this.roleRepository = roleRepository;
+		this.passwordEncoder = passwordEncoder;
+	}
+	
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		Optional<ApiUser> optApiUser = userRepository.findByUsername(username);
+		Optional<ApiUser> optApiUser = ((UserRepository)getRepository()).findByUsername(username);
 		
 		if (optApiUser.isEmpty()) {
 			throw new UsernameNotFoundException("User " + username + " not found in the DB");
@@ -46,32 +49,17 @@ public class UserService implements BasicService<ApiUser>, UserDetailsService {
 	}
 	
 	@Override
-	public List<ApiUser> findAll() {
-		return userRepository.findAll();
-	}
-	
-	@Override
-	public Optional<ApiUser> findById(Long id) {
-		return userRepository.findById(id);
-	}
-	
-	@Override
 	public ApiUser save(ApiUser apiUser) {
 		apiUser.setPassword(passwordEncoder.encode(apiUser.getPassword()));
-		return userRepository.save(apiUser);
-	}
-	
-	@Override
-	public void deleteById(Long id) {
-		userRepository.deleteById(id);
+		return getRepository().save(apiUser);
 	}
 	
 	public Optional<ApiUser> findByUsername(String username) {
-		return userRepository.findByUsername(username);
+		return ((UserRepository)getRepository()).findByUsername(username);
 	}
 	
 	public void addRoleToUser(Long userId, Long... roleIds) {
-		Optional<ApiUser> optApiUser = userRepository.findById(userId);
+		Optional<ApiUser> optApiUser = getRepository().findById(userId);
 		
 		if (optApiUser.isPresent()) {
 			Optional<Role> optRole;

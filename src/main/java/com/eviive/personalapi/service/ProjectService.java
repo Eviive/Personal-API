@@ -13,38 +13,21 @@ import java.util.Optional;
 
 @Service
 @Transactional
-@RequiredArgsConstructor
-public class ProjectService implements BasicService<Project> {
+public class ProjectService extends AbstractService<Project> {
 	
-	private final ProjectRepository projectRepository;
 	private final SkillRepository skillRepository;
 	
-	@Override
-	public List<Project> findAll() {
-		return projectRepository.findAll();
-	}
-	
-	@Override
-	public Optional<Project> findById(Long id) {
-		return projectRepository.findById(id);
-	}
-	
-	@Override
-	public Project save(Project project) {
-		return projectRepository.save(project);
-	}
-	
-	@Override
-	public void deleteById(Long id) {
-		projectRepository.deleteById(id);
+	public ProjectService(ProjectRepository projectRepository, SkillRepository skillRepository) {
+		super(projectRepository);
+		this.skillRepository = skillRepository;
 	}
 	
 	public List<Project> findAllFeatured() {
-		return projectRepository.findAllByFeaturedIsTrue();
+		return ((ProjectRepository)getRepository()).findAllByFeaturedIsTrue();
 	}
 	
 	public List<Project> findAllNotFeatured() {
-		return projectRepository.findAllByFeaturedIsFalse();
+		return ((ProjectRepository)getRepository()).findAllByFeaturedIsFalse();
 	}
 	
 	public void addSkillToProject(Long projectId, Long... skillIds) {

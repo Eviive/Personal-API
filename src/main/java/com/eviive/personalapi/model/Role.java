@@ -16,7 +16,7 @@ import static javax.persistence.GenerationType.SEQUENCE;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Role {
+public class Role implements IModel {
 	
 	@Id
 	@SequenceGenerator(
