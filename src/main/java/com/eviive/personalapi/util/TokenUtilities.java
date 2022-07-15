@@ -1,4 +1,4 @@
-package com.eviive.personalapi.utils;
+package com.eviive.personalapi.util;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;

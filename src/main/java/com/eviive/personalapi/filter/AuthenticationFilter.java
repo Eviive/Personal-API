@@ -19,7 +19,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static com.eviive.personalapi.utils.TokenUtilities.*;
+import static com.eviive.personalapi.util.TokenUtilities.generateAccessToken;
+import static com.eviive.personalapi.util.TokenUtilities.generateRefreshToken;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RequiredArgsConstructor

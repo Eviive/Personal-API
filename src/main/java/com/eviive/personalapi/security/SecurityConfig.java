@@ -13,7 +13,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
-import static org.springframework.http.HttpMethod.*;
+import static org.springframework.http.HttpMethod.GET;
+import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
 @Configuration
@@ -40,6 +41,9 @@ public class SecurityConfig {
 		http.addFilterAfter(new AuthorizationFilter(), AuthenticationFilter.class);
 		
 		http.authorizeRequests().antMatchers(POST, "/users/login", "/users/refresh-token").permitAll();
+		http.authorizeRequests().antMatchers("/users/**").hasAnyAuthority("ROLE_ADMIN");
+		
+		http.authorizeRequests().antMatchers("/roles/**").hasAnyAuthority("ROLE_ADMIN");
 		
 		http.authorizeRequests().antMatchers(GET, "/projects/**").permitAll();
 		http.authorizeRequests().antMatchers("/projects/**").hasAuthority("ROLE_ADMIN");
