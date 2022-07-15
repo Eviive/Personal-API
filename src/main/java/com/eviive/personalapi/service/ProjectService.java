@@ -14,13 +14,29 @@ import java.util.Optional;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class ProjectService {
+public class ProjectService implements BasicService<Project> {
 	
 	private final ProjectRepository projectRepository;
 	private final SkillRepository skillRepository;
 	
+	@Override
 	public List<Project> findAll() {
 		return projectRepository.findAll();
+	}
+	
+	@Override
+	public Optional<Project> findById(Long id) {
+		return projectRepository.findById(id);
+	}
+	
+	@Override
+	public Project save(Project project) {
+		return projectRepository.save(project);
+	}
+	
+	@Override
+	public void deleteById(Long id) {
+		projectRepository.deleteById(id);
 	}
 	
 	public List<Project> findAllFeatured() {
@@ -29,14 +45,6 @@ public class ProjectService {
 	
 	public List<Project> findAllNotFeatured() {
 		return projectRepository.findAllByFeaturedIsFalse();
-	}
-	
-	public Optional<Project> findById(Long id) {
-		return projectRepository.findById(id);
-	}
-	
-	public Project save(Project project) {
-		return projectRepository.save(project);
 	}
 	
 	public void addSkillToProject(Long projectId, Long... skillIds) {

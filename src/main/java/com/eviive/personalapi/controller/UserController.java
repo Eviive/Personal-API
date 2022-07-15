@@ -1,10 +1,11 @@
 package com.eviive.personalapi.controller;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
-import com.eviive.personalapi.form.RefreshTokenForm;
+import com.eviive.personalapi.mapper.UserMapper;
 import com.eviive.personalapi.model.ApiUser;
 import com.eviive.personalapi.model.Role;
 import com.eviive.personalapi.service.UserService;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -13,14 +14,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static com.eviive.personalapi.utils.TokenUtilities.generateAccessToken;
-import static com.eviive.personalapi.utils.TokenUtilities.verifyToken;
+import static com.eviive.personalapi.util.TokenUtilities.generateAccessToken;
+import static com.eviive.personalapi.util.TokenUtilities.verifyToken;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController
@@ -29,20 +31,30 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 public class UserController implements BasicController<ApiUser> {
 	
 	private final UserService userService;
+	private final UserMapper mapper;
 	
 	@Override
 	public ResponseEntity<List<ApiUser>> findAll() {
-		throw new UnsupportedOperationException();
+		return ResponseEntity.ok().body(userService.findAll());
 	}
 	
 	@Override
 	public ResponseEntity<ApiUser> findById(Long id) {
-		throw new UnsupportedOperationException();
+		Optional<ApiUser> optUser = userService.findById(id);
+		
+		if (optUser.isEmpty()) {
+			return ResponseEntity.notFound().build();
+		}
+		
+		return ResponseEntity.ok().body(optUser.get());
 	}
 	
 	@Override
-	public ResponseEntity<ApiUser> save(ApiUser element, HttpServletRequest req) {
-		throw new UnsupportedOperationException();
+	public ResponseEntity<ApiUser> save(ApiUser user, HttpServletRequest req) {
+		ApiUser createdUser = userService.save(user);
+		URI uri = URI.create(req.getScheme() + "://" + req.getServerName() + ":" + req.getServerPort() + "/users/" + createdUser.getId());
+		
+		return ResponseEntity.created(uri).body(createdUser);
 	}
 	
 	@Override
@@ -51,13 +63,26 @@ public class UserController implements BasicController<ApiUser> {
 	}
 	
 	@Override
-	public ResponseEntity<ApiUser> patch(Long id, Map<String, String> fields) {
-		throw new UnsupportedOperationException();
+	public ResponseEntity<ApiUser> patch(Long id, ApiUser user) {
+		Optional<ApiUser> optUser = userService.findById(id);
+		
+		if (optUser.isEmpty()) {
+			return ResponseEntity.notFound().build();
+		}
+		
+		mapper.map(user, optUser.get());
+		
+		return ResponseEntity.ok().body(userService.save(optUser.get()));
 	}
 	
 	@Override
-	public ResponseEntity<ApiUser> delete(Long id) {
-		throw new UnsupportedOperationException();
+	public ResponseEntity<String> delete(Long id) {
+		if (userService.findById(id).isEmpty()) {
+			return ResponseEntity.notFound().build();
+		}
+		
+		userService.deleteById(id);
+		return ResponseEntity.noContent().build();
 	}
 	
 	@PostMapping(
@@ -97,6 +122,13 @@ public class UserController implements BasicController<ApiUser> {
 		}
 		
 		return ResponseEntity.badRequest().body(body);
+	}
+	
+	@Data
+	private static class RefreshTokenForm {
+		
+		private String refreshToken;
+		
 	}
 	
 }

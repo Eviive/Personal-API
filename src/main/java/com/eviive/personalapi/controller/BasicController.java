@@ -1,12 +1,10 @@
 package com.eviive.personalapi.controller;
 
-import com.eviive.personalapi.model.Project;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
-import java.util.Map;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -39,12 +37,12 @@ public interface BasicController<E> {
 			consumes = APPLICATION_JSON_VALUE,
 			produces = APPLICATION_JSON_VALUE
 	)
-	ResponseEntity<E> patch(@PathVariable("id") Long id, @RequestBody Map<String, String> fields);
+	ResponseEntity<E> patch(@PathVariable("id") Long id, @RequestBody E element);
 	
 	@DeleteMapping(
 			path = "{id}",
 			produces = APPLICATION_JSON_VALUE
 	)
-	ResponseEntity<E> delete(@PathVariable("id") Long id);
+	ResponseEntity<String> delete(@PathVariable("id") Long id);
 	
 }

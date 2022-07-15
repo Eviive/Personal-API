@@ -12,20 +12,28 @@ import java.util.Optional;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class SkillService {
+public class SkillService implements BasicService<Skill> {
 	
 	private final SkillRepository skillRepository;
 	
+	@Override
 	public List<Skill> findAll() {
 		return skillRepository.findAll();
 	}
 	
+	@Override
 	public Optional<Skill> findById(Long id) {
 		return skillRepository.findById(id);
 	}
 	
+	@Override
 	public Skill save(Skill skill) {
 		return skillRepository.save(skill);
+	}
+	
+	@Override
+	public void deleteById(Long id) {
+		skillRepository.deleteById(id);
 	}
 	
 }

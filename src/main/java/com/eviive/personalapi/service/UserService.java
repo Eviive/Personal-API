@@ -21,7 +21,7 @@ import java.util.Optional;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class UserService implements UserDetailsService {
+public class UserService implements BasicService<ApiUser>, UserDetailsService {
 	
 	private final UserRepository userRepository;
 	private final RoleRepository roleRepository;
@@ -45,25 +45,41 @@ public class UserService implements UserDetailsService {
 		return new User(apiUser.getUsername(), apiUser.getPassword(), authorities);
 	}
 	
-	public Optional<ApiUser> findByUsername(String username) {
-		return userRepository.findByUsername(username);
+	@Override
+	public List<ApiUser> findAll() {
+		return userRepository.findAll();
 	}
 	
-	public ApiUser saveUser(ApiUser apiUser) {
+	@Override
+	public Optional<ApiUser> findById(Long id) {
+		return userRepository.findById(id);
+	}
+	
+	@Override
+	public ApiUser save(ApiUser apiUser) {
 		apiUser.setPassword(passwordEncoder.encode(apiUser.getPassword()));
 		return userRepository.save(apiUser);
 	}
 	
-	public Role saveRole(Role role) {
-		return roleRepository.save(role);
+	@Override
+	public void deleteById(Long id) {
+		userRepository.deleteById(id);
 	}
 	
-	public void addRoleToUser(String username, String roleName) {
-		Optional<ApiUser> optApiUser = userRepository.findByUsername(username);
-		Optional<Role> optRole = roleRepository.findByName(roleName);
+	public Optional<ApiUser> findByUsername(String username) {
+		return userRepository.findByUsername(username);
+	}
+	
+	public void addRoleToUser(Long userId, Long... roleIds) {
+		Optional<ApiUser> optApiUser = userRepository.findById(userId);
 		
-		if (optApiUser.isPresent() && optRole.isPresent()) {
-			optApiUser.get().addRole(optRole.get())
+		if (optApiUser.isPresent()) {
+			Optional<Role> optRole;
+			for (Long roleId: roleIds) {
+				optRole = roleRepository.findById(roleId);
+				
+				optRole.ifPresent(optApiUser.get()::addRole);
+			}
 ;		}
 	}
 	
