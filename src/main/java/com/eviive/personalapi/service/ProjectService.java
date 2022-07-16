@@ -30,14 +30,14 @@ public class ProjectService extends AbstractService<Project> {
 	}
 	
 	public void addSkillToProject(Long projectId, Long... skillIds) {
-		Optional<Project> project = findById(projectId);
+		Optional<Project> optProject = findById(projectId);
 		
-		if (project.isPresent()) {
+		if (optProject.isPresent()) {
 			Optional<Skill> optSkill;
 			for (Long skillId: skillIds) {
 				optSkill = skillRepository.findById(skillId);
 				
-				optSkill.ifPresent(project.get()::addSkill);
+				optSkill.ifPresent(s -> optProject.get().addSkill(s));
 			}
 		}
 	}

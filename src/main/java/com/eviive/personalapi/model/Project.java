@@ -1,17 +1,15 @@
 package com.eviive.personalapi.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
-import static javax.persistence.FetchType.EAGER;
 import static javax.persistence.GenerationType.SEQUENCE;
 import static javax.persistence.InheritanceType.SINGLE_TABLE;
 
@@ -22,9 +20,13 @@ import static javax.persistence.InheritanceType.SINGLE_TABLE;
 )
 @Inheritance(strategy = SINGLE_TABLE)
 @Data
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@ToString(exclude = "skills")
 @NoArgsConstructor
 @AllArgsConstructor
 public class Project implements IModel {
+	
+	private static final String entityName = "project";
 	
 	@Id
 	@SequenceGenerator(
@@ -37,9 +39,12 @@ public class Project implements IModel {
 			generator = "api_project_sequence"
 	)
 	@Column(name = "project_id")
+	@Getter(onMethod = @__(@Override))
+	@EqualsAndHashCode.Include
 	private Long id;
 	
 	@Column(nullable = false)
+	@Getter(onMethod = @__(@Override))
 	@NotBlank
 	private String name;
 	
@@ -55,7 +60,7 @@ public class Project implements IModel {
 	@NotBlank
 	private String demoURL;
 	
-	@ManyToMany(fetch = EAGER)
+	@ManyToMany
 	@JoinTable(
 			name = "API_Project_Skill_Map",
 			joinColumns = @JoinColumn(
@@ -70,7 +75,7 @@ public class Project implements IModel {
 			)
 	)
 	@NotNull
-	private List<Skill> skills;
+	private Set<Skill> skills;
 	
 	@Embedded
 	@Valid
@@ -81,11 +86,22 @@ public class Project implements IModel {
 	@NotNull
 	private Boolean featured;
 	
-	public boolean addSkill(Skill skill) {
+	@Override
+	@JsonIgnore
+	public String getEntityName() {
+		return entityName;
+	}
+	
+	public void addSkill(Skill skill) {
 		if (skills == null) {
-			skills = new ArrayList<>();
+			skills = new HashSet<>();
 		}
-		return skills.add(skill);
+		skills.add(skill);
+	}
+	
+	public void removeSkill(Skill skill) {
+		if (skills != null)
+			skills.remove(skill);
 	}
 	
 }

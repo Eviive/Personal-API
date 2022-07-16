@@ -45,12 +45,20 @@ public abstract class AbstractController<E extends IModel> {
 	}
 	
 	@PostMapping(
+			consumes = APPLICATION_JSON_VALUE,
 			produces = APPLICATION_JSON_VALUE
 	)
 	ResponseEntity<E> save(@Valid @RequestBody E element, HttpServletRequest req) {
+		if (isElementInvalid(element)) {
+			return ResponseEntity.badRequest().build();
+		}
+		
 		E createdElement = service.save(element);
-		URI uri = URI.create(req.getScheme() + "://" + req.getServerName() + ":" + req.getServerPort() + "/projects/" + createdElement.getId());
-
+		
+		String createdElementUri = String.format("%s://%s:%s/%ss/%s", req.getScheme(), req.getServerName(), req.getServerPort(), createdElement.getEntityName(), createdElement.getId());
+		
+		URI uri = URI.create(createdElementUri);
+		
 		return ResponseEntity.created(uri).body(createdElement);
 	}
 	
@@ -77,9 +85,13 @@ public abstract class AbstractController<E extends IModel> {
 			produces = APPLICATION_JSON_VALUE
 	)
 	ResponseEntity<String> delete(@PathVariable("id") Long id) {
-		if (service.findById(id).isEmpty()) {
+		Optional<E> optElement = service.findById(id);
+		
+		if (optElement.isEmpty()) {
 			return ResponseEntity.notFound().build();
 		}
+		
+		optElement.ifPresent(IModel::removeDependentElements);
 		
 		service.deleteById(id);
 		return ResponseEntity.noContent().build();
@@ -92,9 +104,17 @@ public abstract class AbstractController<E extends IModel> {
 			return ResponseEntity.notFound().build();
 		}
 		
+		if (isElementInvalid(element)) {
+			return ResponseEntity.badRequest().build();
+		}
+		
 		mapper.map(element, optElement.get());
 		
 		return ResponseEntity.ok().body(service.save(optElement.get()));
+	}
+	
+	protected boolean isElementInvalid(E element) {
+		return false;
 	}
 	
 }

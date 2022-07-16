@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 
 @SpringBootApplication
 public class App {
@@ -39,7 +39,7 @@ public class App {
 					"Albert VAILLON",
 					"Eviive",
 					"12345",
-					new ArrayList<>()
+					new HashSet<>()
 			));
 			
 			userService.save(new ApiUser(
@@ -47,18 +47,18 @@ public class App {
 					"Lilian BAUDRY",
 					"Irophin",
 					"6789",
-					new ArrayList<>()
+					new HashSet<>()
 			));
 			
-			roleService.save(new Role(null, "ROLE_ADMIN"));
-			roleService.save(new Role(null, "ROLE_USER"));
+			roleService.save(new Role(null, "ROLE_ADMIN", new HashSet<>()));
+			roleService.save(new Role(null, "ROLE_USER", new HashSet<>()));
 			
 			userService.addRoleToUser(1L, 1L, 2L);
 			userService.addRoleToUser(2L, 2L);
 			
-			skillService.save(new Skill(null, "Skill 1", "skill1.png"));
-			skillService.save(new Skill(null, "Skill 2", "skill2.png"));
-			skillService.save(new Skill(null, "Skill 3", "skill3.png"));
+			skillService.save(new Skill(null, "Skill 1", "skill1.png", new HashSet<>()));
+			skillService.save(new Skill(null, "Skill 2", "skill2.png", new HashSet<>()));
+			skillService.save(new Skill(null, "Skill 3", "skill3.png", new HashSet<>()));
 			
 			Image image1 = new Image("image1.png", "Image 1's description");
 			projectService.save(new Project(
@@ -67,7 +67,7 @@ public class App {
 					"Project 1's description",
 					"https://github.com/user/Project1",
 					"https://user.github.io/Project1",
-					new ArrayList<>(),
+					new HashSet<>(),
 					image1,
 					false
 			));
@@ -79,7 +79,7 @@ public class App {
 					"Project 2's description",
 					"https://github.com/user/Project2",
 					"https://user.github.io/Project2",
-					new ArrayList<>(),
+					new HashSet<>(),
 					image2,
 					true
 			));

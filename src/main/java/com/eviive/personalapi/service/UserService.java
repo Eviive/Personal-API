@@ -59,14 +59,14 @@ public class UserService extends AbstractService<ApiUser> implements UserDetails
 	}
 	
 	public void addRoleToUser(Long userId, Long... roleIds) {
-		Optional<ApiUser> optApiUser = getRepository().findById(userId);
+		Optional<ApiUser> optUser = getRepository().findById(userId);
 		
-		if (optApiUser.isPresent()) {
+		if (optUser.isPresent()) {
 			Optional<Role> optRole;
 			for (Long roleId: roleIds) {
 				optRole = roleRepository.findById(roleId);
 				
-				optRole.ifPresent(optApiUser.get()::addRole);
+				optRole.ifPresent(r -> optUser.get().addRole(r));
 			}
 ;		}
 	}

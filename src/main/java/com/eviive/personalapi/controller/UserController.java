@@ -30,8 +30,21 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RequestMapping("users")
 public class UserController extends AbstractController<ApiUser> {
 	
-	public UserController(AbstractService<ApiUser> service) {
+	private final AbstractService<Role> roleService;
+	
+	public UserController(AbstractService<ApiUser> service, AbstractService<Role> roleService) {
 		super(service, new ModelMapper<>(ApiUser.class));
+		this.roleService = roleService;
+	}
+	
+	@Override
+	protected boolean isElementInvalid(ApiUser user) {
+		for (Role role: user.getRoles()) {
+			if (!roleService.existsById(role.getId())) {
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	@PostMapping(

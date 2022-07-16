@@ -1,16 +1,14 @@
 package com.eviive.personalapi.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
-import static javax.persistence.FetchType.EAGER;
 import static javax.persistence.GenerationType.SEQUENCE;
 
 @Entity(name = "API_User")
@@ -19,9 +17,13 @@ import static javax.persistence.GenerationType.SEQUENCE;
 		uniqueConstraints = @UniqueConstraint(name = "UK_USER_USERNAME", columnNames = "username")
 )
 @Data
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@ToString(exclude = "roles")
 @NoArgsConstructor
 @AllArgsConstructor
 public class ApiUser implements IModel {
+	
+	private static final String entityName = "user";
 	
 	@Id
 	@SequenceGenerator(
@@ -34,9 +36,12 @@ public class ApiUser implements IModel {
 			generator = "api_user_sequence"
 	)
 	@Column(name = "user_id")
+	@Getter(onMethod = @__(@Override))
+	@EqualsAndHashCode.Include
 	private Long id;
 	
 	@Column(nullable = false)
+	@Getter(onMethod = @__(@Override))
 	@NotBlank
 	private String name;
 	
@@ -48,7 +53,7 @@ public class ApiUser implements IModel {
 	@NotBlank
 	private String password;
 	
-	@ManyToMany(fetch = EAGER)
+	@ManyToMany
 	@JoinTable(
 			name = "API_User_Role_Map",
 			joinColumns = @JoinColumn(
@@ -63,13 +68,24 @@ public class ApiUser implements IModel {
 			)
 	)
 	@NotNull
-	private List<Role> roles;
+	private Set<Role> roles;
 	
-	public boolean addRole(Role role) {
+	@Override
+	@JsonIgnore
+	public String getEntityName() {
+		return entityName;
+	}
+	
+	public void addRole(Role role) {
 		if (roles == null) {
-			roles = new ArrayList<>();
+			roles = new HashSet<>();
 		}
-		return roles.add(role);
+		roles.add(role);
+	}
+	
+	public void removeRole(Role role) {
+		if (roles != null)
+			roles.remove(role);
 	}
 	
 }

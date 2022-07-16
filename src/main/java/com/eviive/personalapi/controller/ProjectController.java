@@ -2,6 +2,8 @@ package com.eviive.personalapi.controller;
 
 import com.eviive.personalapi.mapper.ModelMapper;
 import com.eviive.personalapi.model.Project;
+import com.eviive.personalapi.model.Skill;
+import com.eviive.personalapi.service.AbstractService;
 import com.eviive.personalapi.service.ProjectService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,8 +18,21 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RequestMapping("projects")
 public class ProjectController extends AbstractController<Project> {
 	
-	public ProjectController(ProjectService service) {
+	private final AbstractService<Skill> skillService;
+	
+	public ProjectController(AbstractService<Project> service, AbstractService<Skill> skillService) {
 		super(service, new ModelMapper<>(Project.class));
+		this.skillService = skillService;
+	}
+	
+	@Override
+	protected boolean isElementInvalid(Project project) {
+		for (Skill skill: project.getSkills()) {
+			if (!skillService.existsById(skill.getId())) {
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	@GetMapping(

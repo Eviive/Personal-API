@@ -1,11 +1,11 @@
 package com.eviive.personalapi.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import java.util.Set;
 
 import static javax.persistence.GenerationType.SEQUENCE;
 
@@ -15,9 +15,13 @@ import static javax.persistence.GenerationType.SEQUENCE;
 		uniqueConstraints = @UniqueConstraint(name = "UK_SKILL_NAME", columnNames = "name")
 )
 @Data
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@ToString(exclude = "projects")
 @NoArgsConstructor
 @AllArgsConstructor
 public class Skill implements IModel {
+	
+	private static final String entityName = "skill";
 	
 	@Id
 	@SequenceGenerator(
@@ -30,9 +34,12 @@ public class Skill implements IModel {
 			generator = "api_skill_sequence"
 	)
 	@Column(name = "skill_id")
+	@Getter(onMethod = @__(@Override))
+	@EqualsAndHashCode.Include
 	private Long id;
 	
 	@Column(nullable = false)
+	@Getter(onMethod = @__(@Override))
 	@NotBlank
 	private String name;
 	
@@ -40,4 +47,20 @@ public class Skill implements IModel {
 	@NotBlank
 	private String logoURL;
 	
+	@ManyToMany(mappedBy = "skills")
+	@JsonIgnore
+	private Set<Project> projects;
+	
+	@Override
+	@JsonIgnore
+	public String getEntityName() {
+		return entityName;
+	}
+	
+	@Override
+	public void removeDependentElements() {
+		for (Project project: projects) {
+			project.removeSkill(this);
+		}
+	}
 }

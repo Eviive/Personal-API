@@ -1,11 +1,11 @@
 package com.eviive.personalapi.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import java.util.Set;
 
 import static javax.persistence.GenerationType.SEQUENCE;
 
@@ -15,9 +15,13 @@ import static javax.persistence.GenerationType.SEQUENCE;
 		uniqueConstraints = @UniqueConstraint(name = "UK_ROLE_NAME", columnNames = "name")
 )
 @Data
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@ToString(exclude = "users")
 @NoArgsConstructor
 @AllArgsConstructor
 public class Role implements IModel {
+	
+	private static final String entityName = "role";
 	
 	@Id
 	@SequenceGenerator(
@@ -30,10 +34,30 @@ public class Role implements IModel {
 			generator = "api_role_sequence"
 	)
 	@Column(name = "role_id")
+	@Getter(onMethod = @__(@Override))
+	@EqualsAndHashCode.Include
 	private Long id;
 	
 	@Column(nullable = false)
+	@Getter(onMethod = @__(@Override))
 	@NotBlank
 	private String name;
+	
+	@ManyToMany(mappedBy = "roles")
+	@JsonIgnore
+	private Set<ApiUser> users;
+	
+	@Override
+	@JsonIgnore
+	public String getEntityName() {
+		return entityName;
+	}
+	
+	@Override
+	public void removeDependentElements() {
+		for (ApiUser user: users) {
+			user.removeRole(this);
+		}
+	}
 	
 }

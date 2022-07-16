@@ -2,12 +2,12 @@ package com.eviive.personalapi.model;
 
 public interface IModel {
 	
-	Long getId();
+	String getEntityName();
 	
-	void setId(Long id);
+	Long getId();
 	
 	String getName();
 	
-	void setName(String name);
+	default void removeDependentElements() {}
 	
 }
