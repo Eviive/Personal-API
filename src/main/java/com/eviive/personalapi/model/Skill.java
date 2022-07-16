@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 
 import static javax.persistence.GenerationType.SEQUENCE;
 
@@ -32,9 +33,11 @@ public class Skill implements IModel {
 	private Long id;
 	
 	@Column(nullable = false)
+	@NotBlank
 	private String name;
 	
 	@Column(name = "logo_url", nullable = false)
+	@NotBlank
 	private String logoURL;
 	
 }

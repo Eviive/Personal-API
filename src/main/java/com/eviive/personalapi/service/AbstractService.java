@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,7 +23,7 @@ public abstract class AbstractService<E extends IModel> {
 		return repository.findById(id);
 	}
 	
-	public E save(E element) {
+	public E save(@Valid E element) {
 		return repository.save(element);
 	}
 	

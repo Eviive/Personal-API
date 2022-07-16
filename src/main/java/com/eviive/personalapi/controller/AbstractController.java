@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 import java.net.URI;
 import java.util.List;
 import java.util.Optional;
@@ -46,7 +47,7 @@ public abstract class AbstractController<E extends IModel> {
 	@PostMapping(
 			produces = APPLICATION_JSON_VALUE
 	)
-	ResponseEntity<E> save(@RequestBody E element, HttpServletRequest req) {
+	ResponseEntity<E> save(@Valid @RequestBody E element, HttpServletRequest req) {
 		E createdElement = service.save(element);
 		URI uri = URI.create(req.getScheme() + "://" + req.getServerName() + ":" + req.getServerPort() + "/projects/" + createdElement.getId());
 
@@ -54,11 +55,12 @@ public abstract class AbstractController<E extends IModel> {
 	}
 	
 	@PutMapping(
+			path = "{id}",
 			consumes = APPLICATION_JSON_VALUE,
 			produces = APPLICATION_JSON_VALUE
 	)
-	ResponseEntity<E> update() {
-		throw new UnsupportedOperationException();
+	ResponseEntity<E> update(@PathVariable("id") Long id, @Valid @RequestBody E element) {
+		return mapElement(id, element);
 	}
 	
 	@PatchMapping(
@@ -67,15 +69,7 @@ public abstract class AbstractController<E extends IModel> {
 			produces = APPLICATION_JSON_VALUE
 	)
 	ResponseEntity<E> patch(@PathVariable("id") Long id, @RequestBody E element) {
-		Optional<E> optElement = service.findById(id);
-		
-		if (optElement.isEmpty()) {
-			return ResponseEntity.notFound().build();
-		}
-		
-		mapper.map(element, optElement.get());
-		
-		return ResponseEntity.ok().body(service.save(optElement.get()));
+		return mapElement(id, element);
 	}
 	
 	@DeleteMapping(
@@ -89,6 +83,18 @@ public abstract class AbstractController<E extends IModel> {
 		
 		service.deleteById(id);
 		return ResponseEntity.noContent().build();
+	}
+	
+	private ResponseEntity<E> mapElement(Long id, E element) {
+		Optional<E> optElement = service.findById(id);
+		
+		if (optElement.isEmpty()) {
+			return ResponseEntity.notFound().build();
+		}
+		
+		mapper.map(element, optElement.get());
+		
+		return ResponseEntity.ok().body(service.save(optElement.get()));
 	}
 	
 }

@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
+import javax.validation.constraints.NotBlank;
 
 @Embeddable
 @Data
@@ -14,9 +15,11 @@ import javax.persistence.Embeddable;
 public class Image {
 	
 	@Column(name = "image_url", nullable = false)
+	@NotBlank
 	private String url;
 	
 	@Column(name = "image_description", nullable = false)
+	@NotBlank
 	private String description;
 	
 }

@@ -4,7 +4,6 @@ import com.eviive.personalapi.model.Project;
 import com.eviive.personalapi.model.Skill;
 import com.eviive.personalapi.repository.ProjectRepository;
 import com.eviive.personalapi.repository.SkillRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,8 +39,8 @@ public class UserController extends AbstractController<ApiUser> {
 			consumes = APPLICATION_JSON_VALUE,
 			produces = APPLICATION_JSON_VALUE
 	)
-	public ResponseEntity<Map<String, String>> refreshToken(@RequestBody RefreshTokenForm form, HttpServletRequest req) {
-		String refreshToken = form.getRefreshToken();
+	public ResponseEntity<Map<String, String>> refreshToken(@Valid @RequestBody RefreshTokenForm form, HttpServletRequest req) {
+		String refreshToken = form.refreshToken;
 		Map<String, String> body = new HashMap<>();
 		
 		if (refreshToken != null) {
@@ -73,9 +75,10 @@ public class UserController extends AbstractController<ApiUser> {
 	
 	@Data
 	private static class RefreshTokenForm {
-
+		
+		@NotBlank
 		private String refreshToken;
-
+		
 	}
 	
 }

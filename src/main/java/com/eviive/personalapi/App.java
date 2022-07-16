@@ -1,6 +1,5 @@
 package com.eviive.personalapi;
 
-import com.eviive.personalapi.mapper.ModelMapper;
 import com.eviive.personalapi.model.*;
 import com.eviive.personalapi.service.ProjectService;
 import com.eviive.personalapi.service.RoleService;

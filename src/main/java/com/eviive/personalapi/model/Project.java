@@ -2,10 +2,12 @@ package com.eviive.personalapi.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,15 +40,19 @@ public class Project implements IModel {
 	private Long id;
 	
 	@Column(nullable = false)
+	@NotBlank
 	private String name;
 	
 	@Column(nullable = false)
+	@NotBlank
 	private String description;
 	
 	@Column(name = "repo_url", nullable = false)
+	@NotBlank
 	private String repoURL;
 	
 	@Column(name = "demo_url", nullable = false)
+	@NotBlank
 	private String demoURL;
 	
 	@ManyToMany(fetch = EAGER)
@@ -63,12 +69,16 @@ public class Project implements IModel {
 					foreignKey = @ForeignKey(name = "FK_Map_Skill")
 			)
 	)
+	@NotNull
 	private List<Skill> skills;
 	
 	@Embedded
+	@Valid
+	@NotNull
 	private Image image;
 	
 	@Column(nullable = false)
+	@NotNull
 	private Boolean featured;
 	
 	public boolean addSkill(Skill skill) {

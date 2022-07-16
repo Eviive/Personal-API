@@ -5,6 +5,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,12 +37,15 @@ public class ApiUser implements IModel {
 	private Long id;
 	
 	@Column(nullable = false)
+	@NotBlank
 	private String name;
 	
 	@Column(nullable = false)
+	@NotBlank
 	private String username;
 	
 	@Column(nullable = false)
+	@NotBlank
 	private String password;
 	
 	@ManyToMany(fetch = EAGER)
@@ -57,6 +62,7 @@ public class ApiUser implements IModel {
 					foreignKey = @ForeignKey(name = "FK_Map_Role")
 			)
 	)
+	@NotNull
 	private List<Role> roles;
 	
 	public boolean addRole(Role role) {
