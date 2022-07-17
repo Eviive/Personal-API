@@ -11,6 +11,7 @@ public class ModelMapper<E extends IModel> {
 																		.build();
 	
 	public ModelMapper(Class<E> eClass) {
+		mapperFactory.registerFilter(new BlankFilter<>());
 		mapperFactory.classMap(eClass, eClass)
 					 .exclude("id")
 					 .byDefault()

@@ -13,6 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -32,26 +33,26 @@ public class UserService extends AbstractService<ApiUser> implements UserDetails
 	
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		Optional<ApiUser> optApiUser = ((UserRepository)getRepository()).findByUsername(username);
+		Optional<ApiUser> optUser = ((UserRepository)getRepository()).findByUsername(username);
 		
-		if (optApiUser.isEmpty()) {
+		if (optUser.isEmpty()) {
 			throw new UsernameNotFoundException("User " + username + " not found in the DB");
 		}
 		
-		ApiUser apiUser = optApiUser.get();
+		ApiUser user = optUser.get();
 		
 		List<SimpleGrantedAuthority> authorities = new ArrayList<>();
-		for (Role role: apiUser.getRoles()) {
+		for (Role role: user.getRoles()) {
 			authorities.add(new SimpleGrantedAuthority(role.getName()));
 		}
 		
-		return new User(apiUser.getUsername(), apiUser.getPassword(), authorities);
+		return new User(user.getUsername(), user.getPassword(), authorities);
 	}
 	
 	@Override
-	public ApiUser save(ApiUser apiUser) {
-		apiUser.setPassword(passwordEncoder.encode(apiUser.getPassword()));
-		return getRepository().save(apiUser);
+	public ApiUser save(@Valid ApiUser user) {
+		user.setPassword(passwordEncoder.encode(user.getPassword()));
+		return getRepository().save(user);
 	}
 	
 	public Optional<ApiUser> findByUsername(String username) {
