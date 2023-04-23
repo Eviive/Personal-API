@@ -1,3 +1,9 @@
+### Custom ###
+
+secrets*.properties
+
+### Miscellaneous ###
+
 HELP.md
 .gradle
 build/
