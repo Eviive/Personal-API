@@ -18,7 +18,6 @@ import static jakarta.persistence.GenerationType.SEQUENCE;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class User implements IEntity {
 
     @Id

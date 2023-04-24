@@ -12,7 +12,6 @@ import static jakarta.persistence.GenerationType.SEQUENCE;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class Image implements IEntity {
 
     @Id

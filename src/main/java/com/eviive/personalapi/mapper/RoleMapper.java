@@ -1,6 +1,6 @@
 package com.eviive.personalapi.mapper;
 
-import com.eviive.personalapi.dto.RoleDto;
+import com.eviive.personalapi.dto.RoleDTO;
 import com.eviive.personalapi.entity.Role;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -17,18 +17,18 @@ public interface RoleMapper {
     // to Entity
 
     @Mapping(target = "users", ignore = true)
-    Role toEntity(RoleDto roleDto);
+    Role toEntity(RoleDTO roleDTO);
 
-    List<Role> toEntity(List<RoleDto> roleDtos);
+    List<Role> toEntity(List<RoleDTO> roleDTOs);
 
-    Set<Role> toEntity(Set<RoleDto> roleDtos);
+    Set<Role> toEntity(Set<RoleDTO> roleDTOs);
 
     // to DTO
 
-    RoleDto toDto(Role role);
+    RoleDTO toDTO(Role role);
 
-    List<RoleDto> toDto(List<Role> roles);
+    List<RoleDTO> toDTO(List<Role> roles);
 
-    Set<RoleDto> toDto(Set<Role> roles);
+    Set<RoleDTO> toDTO(Set<Role> roles);
 
 }

@@ -17,7 +17,6 @@ import static jakarta.persistence.GenerationType.SEQUENCE;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class Skill implements IEntity {
 
     @Id

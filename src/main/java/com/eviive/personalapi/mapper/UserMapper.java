@@ -1,6 +1,6 @@
 package com.eviive.personalapi.mapper;
 
-import com.eviive.personalapi.dto.UserDto;
+import com.eviive.personalapi.dto.UserDTO;
 import com.eviive.personalapi.entity.User;
 import org.mapstruct.Mapper;
 
@@ -15,18 +15,18 @@ public interface UserMapper {
 
     // to Entity
 
-    User toEntity(UserDto userDto);
+    User toEntity(UserDTO userDTO);
 
-    List<User> toEntity(List<UserDto> userDtos);
+    List<User> toEntity(List<UserDTO> userDTOs);
 
-    Set<User> toEntity(Set<UserDto> userDtos);
+    Set<User> toEntity(Set<UserDTO> userDTOs);
 
     // to DTO
 
-    UserDto toDto(User user);
+    UserDTO toDTO(User user);
 
-    List<UserDto> toDto(List<User> users);
+    List<UserDTO> toDTO(List<User> users);
 
-    Set<UserDto> toDto(Set<User> users);
+    Set<UserDTO> toDTO(Set<User> users);
 
 }

@@ -1,6 +1,6 @@
 package com.eviive.personalapi.mapper;
 
-import com.eviive.personalapi.dto.SkillDto;
+import com.eviive.personalapi.dto.SkillDTO;
 import com.eviive.personalapi.entity.Skill;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -17,18 +17,18 @@ public interface SkillMapper {
     // to Entity
 
     @Mapping(target = "projects", ignore = true)
-    Skill toEntity(SkillDto skill);
+    Skill toEntity(SkillDTO skill);
 
-    List<Skill> toEntity(List<SkillDto> skills);
+    List<Skill> toEntity(List<SkillDTO> skillDTOs);
 
-    Set<Skill> toEntity(Set<SkillDto> skills);
+    Set<Skill> toEntity(Set<SkillDTO> skillDTOs);
 
     // to DTO
 
-    SkillDto toDto(Skill skill);
+    SkillDTO toDTO(Skill skill);
 
-    List<SkillDto> toDto(List<Skill> skills);
+    List<SkillDTO> toDTO(List<Skill> skills);
 
-    Set<SkillDto> toDto(Set<Skill> skills);
+    Set<SkillDTO> toDTO(Set<Skill> skills);
 
 }

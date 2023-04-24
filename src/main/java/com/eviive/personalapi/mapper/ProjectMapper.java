@@ -1,6 +1,6 @@
 package com.eviive.personalapi.mapper;
 
-import com.eviive.personalapi.dto.ProjectDto;
+import com.eviive.personalapi.dto.ProjectDTO;
 import com.eviive.personalapi.entity.Project;
 import org.mapstruct.Mapper;
 
@@ -15,18 +15,18 @@ public interface ProjectMapper {
 
     // to Entity
 
-    Project toEntity(ProjectDto projectDto);
+    Project toEntity(ProjectDTO projectDTO);
 
-    List<Project> toEntity(List<ProjectDto> projectDtos);
+    List<Project> toEntity(List<ProjectDTO> projectDTOs);
 
-    Set<Project> toEntity(Set<ProjectDto> projectDtos);
+    Set<Project> toEntity(Set<ProjectDTO> projectDTOs);
 
     // to DTO
 
-    ProjectDto toDto(Project project);
+    ProjectDTO toDTO(Project project);
 
-    List<ProjectDto> toDto(List<Project> projects);
+    List<ProjectDTO> toDTO(List<Project> projects);
 
-    Set<ProjectDto> toDto(Set<Project> projects);
+    Set<ProjectDTO> toDTO(Set<Project> projects);
 
 }

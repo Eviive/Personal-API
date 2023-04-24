@@ -1,6 +1,6 @@
 package com.eviive.personalapi.dto;
 
-public interface IDto {
+public interface IDTO {
 
     Long getId();
 

@@ -6,7 +6,7 @@ import java.time.LocalDate;
 import java.util.Set;
 
 @Data
-public class ProjectDto implements IDto {
+public class ProjectDTO implements IDTO {
 
     private Long id;
 
@@ -22,8 +22,8 @@ public class ProjectDto implements IDto {
 
     private Boolean featured;
 
-    private ImageDto image;
+    private ImageDTO image;
 
-    private Set<SkillDto> skills;
+    private Set<SkillDTO> skills;
 
 }

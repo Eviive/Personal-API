@@ -19,7 +19,6 @@ import static jakarta.persistence.GenerationType.SEQUENCE;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class Project implements IEntity {
 
     @Id
