@@ -1,13 +1,13 @@
 package com.eviive.personalapi.exception;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatusCode;
 
 import static org.springframework.http.HttpStatus.*;
 
 @Getter
-@AllArgsConstructor
+@RequiredArgsConstructor
 public enum PersonalApiErrorsEnum {
 
     // 400 Bad Request

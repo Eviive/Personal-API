@@ -4,7 +4,7 @@ import com.eviive.personalapi.dto.ProjectDTO;
 import com.eviive.personalapi.exception.PersonalApiException;
 import com.eviive.personalapi.service.ProjectService;
 import jakarta.validation.Valid;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,7 +16,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController
 @RequestMapping("project")
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class ProjectController {
 
 	private final ProjectService projectService;

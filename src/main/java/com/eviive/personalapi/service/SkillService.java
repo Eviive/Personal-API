@@ -5,8 +5,7 @@ import com.eviive.personalapi.entity.Skill;
 import com.eviive.personalapi.exception.PersonalApiException;
 import com.eviive.personalapi.mapper.SkillMapper;
 import com.eviive.personalapi.repository.SkillRepository;
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,8 +13,7 @@ import java.util.List;
 import static com.eviive.personalapi.exception.PersonalApiErrorsEnum.API404_SKILL_ID_NOT_FOUND;
 
 @Service
-@Data
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class SkillService {
 
     private final SkillRepository skillRepository;

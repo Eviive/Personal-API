@@ -9,8 +9,7 @@ import com.eviive.personalapi.mapper.UserMapper;
 import com.eviive.personalapi.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.core.Authentication;
@@ -31,8 +30,7 @@ import static com.eviive.personalapi.exception.PersonalApiErrorsEnum.*;
 import static com.eviive.personalapi.util.TokenUtilities.*;
 
 @Service
-@Data
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;

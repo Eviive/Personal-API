@@ -5,8 +5,7 @@ import com.eviive.personalapi.entity.Project;
 import com.eviive.personalapi.exception.PersonalApiException;
 import com.eviive.personalapi.mapper.ProjectMapper;
 import com.eviive.personalapi.repository.ProjectRepository;
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -17,8 +16,7 @@ import java.util.List;
 import static com.eviive.personalapi.exception.PersonalApiErrorsEnum.API404_PROJECT_ID_NOT_FOUND;
 
 @Service
-@Data
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class ProjectService {
 
     private final ProjectRepository projectRepository;

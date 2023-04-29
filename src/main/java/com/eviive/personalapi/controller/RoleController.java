@@ -2,7 +2,7 @@ package com.eviive.personalapi.controller;
 
 import com.eviive.personalapi.dto.RoleDTO;
 import com.eviive.personalapi.service.RoleService;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,7 +15,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController
 @RequestMapping("role")
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class RoleController {
 
 	private final RoleService roleService;

@@ -5,8 +5,7 @@ import com.eviive.personalapi.entity.Role;
 import com.eviive.personalapi.exception.PersonalApiException;
 import com.eviive.personalapi.mapper.RoleMapper;
 import com.eviive.personalapi.repository.RoleRepository;
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,8 +13,7 @@ import java.util.List;
 import static com.eviive.personalapi.exception.PersonalApiErrorsEnum.API404_ROLE_ID_NOT_FOUND;
 
 @Service
-@Data
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class RoleService {
 
     private final RoleRepository roleRepository;

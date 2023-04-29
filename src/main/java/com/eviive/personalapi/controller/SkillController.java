@@ -3,7 +3,7 @@ package com.eviive.personalapi.controller;
 import com.eviive.personalapi.dto.SkillDTO;
 import com.eviive.personalapi.service.SkillService;
 import jakarta.validation.Valid;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,7 +14,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController
 @RequestMapping("skill")
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class SkillController {
 
 	private final SkillService skillService;
