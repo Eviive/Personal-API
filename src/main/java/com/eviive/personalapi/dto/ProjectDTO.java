@@ -10,7 +10,7 @@ public class ProjectDTO implements IDTO {
 
     private Long id;
 
-    private String name;
+    private String title;
 
     private String description;
 

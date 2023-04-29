@@ -27,7 +27,7 @@ public class Project implements IEntity {
     private Long id;
 
     @Column(nullable = false)
-    private String name;
+    private String title;
 
     @Column(nullable = false)
     private String description;
