@@ -55,7 +55,6 @@ public class Project implements IEntity {
             joinColumns = @JoinColumn(name = "PROJECT_ID", referencedColumnName = "ID", foreignKey = @ForeignKey(name = "FK_MAP_PROJECT")),
             inverseJoinColumns = @JoinColumn(name = "SKILL_ID", referencedColumnName = "ID", foreignKey = @ForeignKey(name = "FK_MAP_SKILL"))
     )
-    @Builder.Default
     @ToString.Exclude
     private Set<Skill> skills = new HashSet<>();
 

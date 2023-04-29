@@ -43,7 +43,6 @@ public class User implements IEntity {
             joinColumns = @JoinColumn(name = "USER_ID", referencedColumnName = "ID", foreignKey = @ForeignKey(name = "FK_MAP_USER")),
             inverseJoinColumns = @JoinColumn(name = "ROLE_ID", referencedColumnName = "ID", foreignKey = @ForeignKey(name = "FK_MAP_ROLE"))
     )
-    @Builder.Default
     @ToString.Exclude
     private Set<Role> roles = new HashSet<>();
 
