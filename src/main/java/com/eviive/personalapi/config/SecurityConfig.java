@@ -5,8 +5,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -31,9 +29,6 @@ public class SecurityConfig {
 
     private final AuthorizationFilter authorizationFilter;
 
-    @Value("${allowed-origins}")
-    private List<String> allowedOrigins;
-
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http.cors()
@@ -43,19 +38,18 @@ public class SecurityConfig {
                    .and()
                    .addFilterBefore(authorizationFilter, UsernamePasswordAuthenticationFilter.class)
                    .authorizeHttpRequests()
-                       .requestMatchers(POST, "/users/login", "/users/logout", "/users/refresh").permitAll()
-                       .requestMatchers("/users/**").hasAuthority("ROLE_ADMIN")
+                       .requestMatchers(POST, "/user/login", "/user/logout", "/user/refresh").permitAll()
+                       .requestMatchers("/user/**").hasAuthority("ROLE_ADMIN")
 
-                       .requestMatchers("/roles/**").hasAuthority("ROLE_ADMIN")
+                       .requestMatchers("/role/**").hasAuthority("ROLE_ADMIN")
 
-                       .requestMatchers(GET, "/projects/**").permitAll()
-                       .requestMatchers("/projects/**").hasAuthority("ROLE_USER")
+                       .requestMatchers(GET, "/project/**").permitAll()
+                       .requestMatchers("/project/**").hasAuthority("ROLE_USER")
 
-                       .requestMatchers(GET, "/skills/**").permitAll()
-                       .requestMatchers("/skills/**").hasAuthority("ROLE_USER")
+                       .requestMatchers(GET, "/skill/**").permitAll()
+                       .requestMatchers("/skill/**").hasAuthority("ROLE_USER")
 
-                       .requestMatchers(GET, "/actuator/**").hasAuthority("ROLE_ADMIN")
-                       .requestMatchers(POST, "/actuator/shutdown").hasAuthority("ROLE_ADMIN")
+                       .requestMatchers("/actuator/**").hasAuthority("ROLE_ADMIN")
 
                        .requestMatchers(GET, "/documentation").permitAll()
 
@@ -65,7 +59,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
+    public CorsConfigurationSource corsConfigurationSource(@Value("${allowed-origins}") List<String> allowedOrigins) {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(allowedOrigins);
         configuration.addAllowedMethod("*");
@@ -79,11 +73,6 @@ public class SecurityConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
-    }
-
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
-        return authenticationConfiguration.getAuthenticationManager();
     }
 
 }
