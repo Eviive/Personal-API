@@ -30,48 +30,48 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @Component
 public class AuthorizationFilter extends OncePerRequestFilter {
 
-	@Override
-	protected void doFilterInternal(@NonNull HttpServletRequest req, @NonNull HttpServletResponse res, @NonNull FilterChain filterChain) throws ServletException, IOException {
-		String authorizationHeader = req.getHeader(AUTHORIZATION);
+    @Override
+    protected void doFilterInternal(@NonNull HttpServletRequest req, @NonNull HttpServletResponse res, @NonNull FilterChain filterChain) throws ServletException, IOException {
+        String authorizationHeader = req.getHeader(AUTHORIZATION);
 
-		if (authorizationHeader == null) {
-			filterChain.doFilter(req, res);
-			return;
-		}
+        if (authorizationHeader == null) {
+            filterChain.doFilter(req, res);
+            return;
+        }
 
-		try {
-			if (!authorizationHeader.startsWith("Bearer ")) {
-				throw new IllegalStateException("The access token must be a bearer token.");
-			}
+        try {
+            if (!authorizationHeader.startsWith("Bearer ")) {
+                throw new IllegalStateException("The access token must be a bearer token.");
+            }
 
-			String token = authorizationHeader.substring("Bearer ".length());
+            String token = authorizationHeader.substring("Bearer ".length());
 
-			DecodedJWT decodedToken = verifyToken(token);
+            DecodedJWT decodedToken = verifyToken(token);
 
-			String username = decodedToken.getSubject();
+            String username = decodedToken.getSubject();
 
-			Claim claim = decodedToken.getClaim("roles");
-			if (claim.isNull()) {
-				throw new IllegalStateException("Roles are missing from the token.");
-			}
+            Claim claim = decodedToken.getClaim("roles");
+            if (claim.isNull()) {
+                throw new IllegalStateException("Roles are missing from the token.");
+            }
 
-			List<SimpleGrantedAuthority> authorities = new ArrayList<>();
-			for (String role: claim.asArray(String.class)) {
-				authorities.add(new SimpleGrantedAuthority(role));
-			}
+            List<SimpleGrantedAuthority> authorities = new ArrayList<>();
+            for (String role: claim.asArray(String.class)) {
+                authorities.add(new SimpleGrantedAuthority(role));
+            }
 
-			Authentication authenticationToken = new UsernamePasswordAuthenticationToken(username, null, authorities);
-			SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+            Authentication authenticationToken = new UsernamePasswordAuthenticationToken(username, null, authorities);
+            SecurityContextHolder.getContext().setAuthentication(authenticationToken);
 
-			filterChain.doFilter(req, res);
-		} catch (Exception e) {
-			res.setStatus(UNAUTHORIZED.value());
-			res.setContentType(APPLICATION_JSON_VALUE);
-			res.setHeader(WWW_AUTHENTICATE, "Bearer realm=\"Personal-API\"");
+            filterChain.doFilter(req, res);
+        } catch (Exception e) {
+            res.setStatus(UNAUTHORIZED.value());
+            res.setContentType(APPLICATION_JSON_VALUE);
+            res.setHeader(WWW_AUTHENTICATE, "Bearer realm=\"Personal-API\"");
 
-			Map<String, Object> body = generateErrorBody(UNAUTHORIZED, e.getMessage());
-			res.getWriter().write(new ObjectMapper().writeValueAsString(body));
-		}
-	}
+            Map<String, Object> body = generateErrorBody(UNAUTHORIZED, e.getMessage());
+            res.getWriter().write(new ObjectMapper().writeValueAsString(body));
+        }
+    }
 
 }
