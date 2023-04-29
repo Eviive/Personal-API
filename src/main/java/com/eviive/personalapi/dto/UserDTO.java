@@ -5,7 +5,7 @@ import lombok.Data;
 import java.util.Set;
 
 @Data
-public class UserDTO implements IDTO {
+public class UserDTO {
 
     private Long id;
 
@@ -14,8 +14,6 @@ public class UserDTO implements IDTO {
     private String firstName;
 
     private String lastName;
-
-    private String password;
 
     private Set<RoleDTO> roles;
 

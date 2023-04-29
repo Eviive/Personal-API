@@ -11,12 +11,12 @@ import java.util.List;
 @Repository
 public interface ProjectRepository extends JpaRepository<Project, Long> {
 
-	List<Project> findAllByOrderByFeaturedDescCreationDateDesc();
+    List<Project> findAllByOrderByFeaturedDescCreationDateDesc();
 
-	List<Project> findAllByFeaturedIsTrueOrderByCreationDateDesc();
+    List<Project> findAllByFeaturedIsTrueOrderByCreationDateDesc();
 
-	List<Project> findAllByFeaturedIsFalseOrderByCreationDateDesc();
+    List<Project> findAllByFeaturedIsFalseOrderByCreationDateDesc();
 
-	Page<Project> findAllByFeaturedIsFalseOrderByCreationDateDesc(Pageable pageable);
+    Page<Project> findAllByFeaturedIsFalseOrderByCreationDateDesc(Pageable pageable);
 
 }

@@ -6,7 +6,7 @@ import java.time.LocalDate;
 import java.util.Set;
 
 @Data
-public class ProjectDTO implements IDTO {
+public class ProjectDTO {
 
     private Long id;
 
