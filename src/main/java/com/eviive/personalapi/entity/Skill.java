@@ -8,7 +8,7 @@ import java.util.Set;
 
 import static jakarta.persistence.CascadeType.ALL;
 import static jakarta.persistence.FetchType.LAZY;
-import static jakarta.persistence.GenerationType.SEQUENCE;
+import static jakarta.persistence.GenerationType.IDENTITY;
 
 @Entity
 @Table(name = "API_SKILL")
@@ -17,11 +17,10 @@ import static jakarta.persistence.GenerationType.SEQUENCE;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class Skill implements IEntity {
+public class Skill {
 
     @Id
-    @SequenceGenerator(name = "API_SKILL_SEQUENCE", allocationSize = 1)
-    @GeneratedValue(strategy = SEQUENCE, generator = "API_SKILL_SEQUENCE")
+    @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
     @Column(nullable = false)

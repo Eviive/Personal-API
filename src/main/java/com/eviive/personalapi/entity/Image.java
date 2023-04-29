@@ -3,7 +3,7 @@ package com.eviive.personalapi.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import static jakarta.persistence.GenerationType.SEQUENCE;
+import static jakarta.persistence.GenerationType.IDENTITY;
 
 @Entity
 @Table(name = "API_IMAGE")
@@ -12,15 +12,14 @@ import static jakarta.persistence.GenerationType.SEQUENCE;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class Image implements IEntity {
+public class Image {
 
     @Id
-    @SequenceGenerator(name = "API_IMAGE_SEQUENCE", allocationSize = 1)
-    @GeneratedValue(strategy = SEQUENCE, generator = "API_IMAGE_SEQUENCE")
+    @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
     @Column(nullable = false)
-    private String url;
+    private String uri;
 
     @Column(nullable = false)
     private String alt;

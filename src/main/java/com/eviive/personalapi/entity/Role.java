@@ -6,7 +6,7 @@ import lombok.*;
 import java.util.Objects;
 import java.util.Set;
 
-import static jakarta.persistence.GenerationType.SEQUENCE;
+import static jakarta.persistence.GenerationType.IDENTITY;
 
 @Entity
 @Table(name = "API_ROLE")
@@ -15,11 +15,10 @@ import static jakarta.persistence.GenerationType.SEQUENCE;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class Role implements IEntity {
+public class Role {
 
     @Id
-    @SequenceGenerator(name = "API_ROLE_SEQUENCE", allocationSize = 1)
-    @GeneratedValue(strategy = SEQUENCE, generator = "API_ROLE_SEQUENCE")
+    @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
     @Column(nullable = false)

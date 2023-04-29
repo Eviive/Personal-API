@@ -3,11 +3,11 @@ package com.eviive.personalapi.dto;
 import lombok.Data;
 
 @Data
-public class ImageDTO implements IDTO {
+public class ImageDTO {
 
     private Long id;
 
-    private String url;
+    private String uri;
 
     private String alt;
 

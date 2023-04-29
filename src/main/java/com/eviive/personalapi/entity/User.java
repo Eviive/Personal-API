@@ -9,7 +9,7 @@ import java.util.Set;
 
 import static jakarta.persistence.CascadeType.ALL;
 import static jakarta.persistence.FetchType.LAZY;
-import static jakarta.persistence.GenerationType.SEQUENCE;
+import static jakarta.persistence.GenerationType.IDENTITY;
 
 @Entity
 @Table(name = "API_USER")
@@ -18,11 +18,10 @@ import static jakarta.persistence.GenerationType.SEQUENCE;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class User implements IEntity {
+public class User {
 
     @Id
-    @SequenceGenerator(name = "API_USER_SEQUENCE", allocationSize = 1)
-    @GeneratedValue(strategy = SEQUENCE, generator = "API_USER_SEQUENCE")
+    @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
     @Column(nullable = false)
