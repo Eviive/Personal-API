@@ -26,7 +26,7 @@ public class User implements IEntity {
     private Long id;
 
     @Column(nullable = false)
-    private String name;
+    private String username;
 
     @Column(nullable = false)
     private String firstName;
