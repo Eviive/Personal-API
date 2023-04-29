@@ -3,6 +3,7 @@
 secrets*.properties
 logs
 .jpb
+data.sql
 
 ### Miscellaneous ###
 
