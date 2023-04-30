@@ -19,7 +19,7 @@ public class ImageController {
 
     // GET
 
-    @GetMapping(path = "{id}/download")
+    @GetMapping(path = "{id}")
     public ResponseEntity<StreamingResponseBody> download(@PathVariable Long id) {
         Pair<StreamingResponseBody, MediaType> responseBodyAndMediaType = imageService.download(id);
 
