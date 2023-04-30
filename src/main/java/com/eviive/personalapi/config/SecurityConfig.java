@@ -49,6 +49,9 @@ public class SecurityConfig {
                        .requestMatchers(GET, "/skill/**").permitAll()
                        .requestMatchers("/skill/**").hasAuthority("ROLE_USER")
 
+                       .requestMatchers(GET, "/image/**").permitAll()
+                       .requestMatchers("/image/**").hasAuthority("ROLE_USER")
+
                        .requestMatchers("/actuator/**").hasAuthority("ROLE_ADMIN")
 
                        .requestMatchers(GET, "/documentation").permitAll()

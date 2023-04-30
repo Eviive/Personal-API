@@ -8,9 +8,14 @@ public class PersonalApiException extends RuntimeException {
 
     private final HttpStatusCode httpStatusCode;
 
-    public PersonalApiException(String message, HttpStatusCode httpStatusCode) {
+    private PersonalApiException(String message, HttpStatusCode httpStatusCode) {
         super(message);
         this.httpStatusCode = httpStatusCode;
+    }
+
+    public PersonalApiException(PersonalApiErrorsEnum personalApiErrorsEnum) {
+        super(personalApiErrorsEnum.getMessage());
+        this.httpStatusCode = personalApiErrorsEnum.getHttpStatusCode();
     }
 
     public static PersonalApiException format(PersonalApiErrorsEnum personalApiErrorsEnum, Object... args) {
