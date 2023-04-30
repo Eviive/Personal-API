@@ -48,7 +48,7 @@ public class UserController {
     }
 
     @PostMapping(path = "login", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<Map<String, Object>> login(@Valid @RequestBody LoginForm form, HttpServletRequest req, HttpServletResponse res) {
+    public ResponseEntity<Map<String, Object>> login(@RequestBody @Valid LoginForm form, HttpServletRequest req, HttpServletResponse res) {
         Map<String, Object> body = userService.login(form.getUsername(), form.getPassword(), req, res);
 
         return ResponseEntity.ok().body(body);
