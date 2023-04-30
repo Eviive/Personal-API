@@ -61,23 +61,22 @@ public class ImageService {
 
         URI uri = URI.create(String.format("%s/%s", containerName, fileName));
 
+        if (image.getUri() != null) {
+            delete(image);
+        }
+
         image.setUri(uri.toString());
 
         return image;
     }
 
-    public void delete(Long id) {
-        Image image = imageRepository.findById(id)
-                                     .orElseThrow(() -> PersonalApiException.format(API404_IMAGE_NOT_FOUND, id));
-
-        getBlobClient(image).delete();
-
-        image.setUri(null);
-    }
-
     public Pair<StreamingResponseBody, MediaType> download(Long id) {
         Image image = imageRepository.findById(id)
                                      .orElseThrow(() -> PersonalApiException.format(API404_IMAGE_NOT_FOUND, id));
+
+        if (image.getUri() == null) {
+            throw PersonalApiException.format(API404_IMAGE_NOT_UPLOADED, id);
+        }
 
         BlobClient blobClient = getBlobClient(image);
 
@@ -89,6 +88,25 @@ public class ImageService {
         MediaType mediaType = MediaType.parseMediaType(blobClient.getProperties().getContentType());
 
         return Pair.of(responseBody, mediaType);
+    }
+
+    public void delete(Long id) {
+        Image image = imageRepository.findById(id)
+                                     .orElseThrow(() -> PersonalApiException.format(API404_IMAGE_NOT_FOUND, id));
+
+        if (image.getUri() == null) {
+            throw PersonalApiException.format(API404_IMAGE_NOT_UPLOADED, id);
+        }
+
+        delete(image);
+
+        imageRepository.save(image);
+    }
+
+    private void delete(Image image) {
+        getBlobClient(image).delete();
+
+        image.setUri(null);
     }
 
     private BlobClient getBlobClient(Image image) {

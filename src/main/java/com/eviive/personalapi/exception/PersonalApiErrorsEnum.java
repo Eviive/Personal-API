@@ -29,6 +29,7 @@ public enum PersonalApiErrorsEnum {
     API404_PROJECT_ID_NOT_FOUND("Project with id %d not found", NOT_FOUND),
     API404_SKILL_ID_NOT_FOUND("Skill with id %d not found", NOT_FOUND),
     API404_IMAGE_NOT_FOUND("Image with id %d not found", NOT_FOUND),
+    API404_IMAGE_NOT_UPLOADED("Image with id %d has not been uploaded yet", NOT_FOUND),
 
     // 415 Unsupported Media Type
 

@@ -5,10 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.util.Pair;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
@@ -29,6 +26,14 @@ public class ImageController {
         return ResponseEntity.ok()
                              .header(CONTENT_TYPE, responseBodyAndMediaType.getSecond().toString())
                              .body(responseBodyAndMediaType.getFirst());
+    }
+
+    // DELETE
+
+    @DeleteMapping(path = "{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        imageService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 
 }
