@@ -2,11 +2,14 @@ package com.eviive.personalapi.filter;
 
 import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.eviive.personalapi.util.JsonUtilities;
+import com.eviive.personalapi.util.TokenUtilities;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -20,15 +23,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static com.eviive.personalapi.util.JsonUtilities.generateErrorBody;
-import static com.eviive.personalapi.util.TokenUtilities.verifyToken;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.HttpHeaders.WWW_AUTHENTICATE;
 import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @Component
+@RequiredArgsConstructor
 public class AuthorizationFilter extends OncePerRequestFilter {
+
+    private final TokenUtilities tokenUtilities;
+    private final JsonUtilities jsonUtilities;
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest req, @NonNull HttpServletResponse res, @NonNull FilterChain filterChain) throws ServletException, IOException {
@@ -46,7 +51,7 @@ public class AuthorizationFilter extends OncePerRequestFilter {
 
             String token = authorizationHeader.substring("Bearer ".length());
 
-            DecodedJWT decodedToken = verifyToken(token);
+            DecodedJWT decodedToken = tokenUtilities.verifyToken(token);
 
             String username = decodedToken.getSubject();
 
@@ -69,7 +74,7 @@ public class AuthorizationFilter extends OncePerRequestFilter {
             res.setContentType(APPLICATION_JSON_VALUE);
             res.setHeader(WWW_AUTHENTICATE, "Bearer realm=\"Personal-API\"");
 
-            Map<String, Object> body = generateErrorBody(UNAUTHORIZED, e.getMessage());
+            Map<String, Object> body = jsonUtilities.generateErrorBody(UNAUTHORIZED, e.getMessage());
             res.getWriter().write(new ObjectMapper().writeValueAsString(body));
         }
     }

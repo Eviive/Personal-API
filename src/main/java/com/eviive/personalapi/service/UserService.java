@@ -7,6 +7,7 @@ import com.eviive.personalapi.entity.User;
 import com.eviive.personalapi.exception.PersonalApiException;
 import com.eviive.personalapi.mapper.UserMapper;
 import com.eviive.personalapi.repository.UserRepository;
+import com.eviive.personalapi.util.TokenUtilities;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +28,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.eviive.personalapi.exception.PersonalApiErrorsEnum.*;
-import static com.eviive.personalapi.util.TokenUtilities.*;
 
 @Service
 @RequiredArgsConstructor
@@ -36,6 +36,7 @@ public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
 
+    private final TokenUtilities tokenUtilities;
     private final AuthenticationConfiguration authenticationConfiguration;
     private final PasswordEncoder passwordEncoder;
 
@@ -92,9 +93,9 @@ public class UserService implements UserDetailsService {
             Map<String, Object> body = new HashMap<>();
             body.put("username", subject);
             body.put("roles", claims);
-            body.put("accessToken", generateAccessToken(subject, issuer, claims));
+            body.put("accessToken", tokenUtilities.generateAccessToken(subject, issuer, claims));
 
-            res.addCookie(generateRefreshTokenCookie(subject, issuer));
+            res.addCookie(tokenUtilities.generateRefreshTokenCookie(subject, issuer));
 
             return body;
         } catch (Exception e) {
@@ -103,12 +104,12 @@ public class UserService implements UserDetailsService {
     }
 
     public void logout(HttpServletResponse res) {
-        res.addCookie(createCookie(null, 0));
+        res.addCookie(tokenUtilities.createCookie(null, 0));
     }
 
     public Map<String, Object> refreshToken(String refreshToken, HttpServletRequest req) {
         try {
-            DecodedJWT decodedToken = verifyToken(refreshToken);
+            DecodedJWT decodedToken = tokenUtilities.verifyToken(refreshToken);
 
             User user = userRepository.findByUsername(decodedToken.getSubject())
                                       .orElseThrow(() -> PersonalApiException.format(API404_USERNAME_NOT_FOUND, decodedToken.getSubject()));
@@ -118,7 +119,7 @@ public class UserService implements UserDetailsService {
                                       .map(Role::getName)
                                       .toList();
 
-            String accessToken = generateAccessToken(user.getUsername(), req.getRequestURL().toString(), claims);
+            String accessToken = tokenUtilities.generateAccessToken(user.getUsername(), req.getRequestURL().toString(), claims);
 
             Map<String, Object> body = new HashMap<>();
             body.put("username", user.getUsername());

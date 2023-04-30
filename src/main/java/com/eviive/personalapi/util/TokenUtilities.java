@@ -4,33 +4,30 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.Cookie;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import java.time.Instant;
 import java.util.Date;
 import java.util.List;
 
+@Component
 public final class TokenUtilities {
 
-    private static Algorithm algorithm;
-    private static boolean isProduction;
-
-    private TokenUtilities() {
-        throw new UnsupportedOperationException("Utility class cannot be instantiated");
-    }
-
+    private Algorithm algorithm;
     @Value("${jwt-secret-key}")
-    public static void setAlgorithm(String secret) {
-        TokenUtilities.algorithm = Algorithm.HMAC256(secret);
-    }
-
+    private String secret;
     @Value("${is-production}")
-    public static void setIsProduction(boolean isProduction) {
-        TokenUtilities.isProduction = isProduction;
+    private boolean isProduction;
+
+    @PostConstruct
+    public void init() {
+        algorithm = Algorithm.HMAC256(secret);
     }
 
-    public static String generateAccessToken(String subject, String issuer, List<String> claims) {
+    public String generateAccessToken(String subject, String issuer, List<String> claims) {
         int maxAge = 15 * 60; // expires in 15 minutes
         return JWT.create()
                   .withSubject(subject)
@@ -40,7 +37,7 @@ public final class TokenUtilities {
                   .sign(algorithm);
     }
 
-    public static Cookie generateRefreshTokenCookie(String subject, String issuer) {
+    public Cookie generateRefreshTokenCookie(String subject, String issuer) {
         int maxAge = 7 * 24 * 3600; // expires in 7 days
         String refreshToken = JWT.create()
                                  .withSubject(subject)
@@ -50,12 +47,12 @@ public final class TokenUtilities {
         return createCookie(refreshToken, maxAge);
     }
 
-    public static DecodedJWT verifyToken(String token) {
+    public DecodedJWT verifyToken(String token) {
         JWTVerifier verifier = JWT.require(algorithm).build();
         return verifier.verify(token);
     }
 
-    public static Cookie createCookie(String value, int maxAge) {
+    public Cookie createCookie(String value, int maxAge) {
         Cookie cookie = new Cookie("API_refresh-token", value);
         cookie.setMaxAge(maxAge);
         cookie.setSecure(isProduction);
