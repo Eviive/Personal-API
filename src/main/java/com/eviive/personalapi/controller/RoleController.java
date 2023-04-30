@@ -21,7 +21,7 @@ public class RoleController {
 	private final RoleService roleService;
 
     @GetMapping(path = "{id}", produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<RoleDTO> findById(@PathVariable("id") Long id) {
+    public ResponseEntity<RoleDTO> findById(@PathVariable Long id) {
         return ResponseEntity.ok().body(roleService.findById(id));
     }
 

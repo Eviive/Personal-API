@@ -20,7 +20,7 @@ public class SkillController {
 	private final SkillService skillService;
 
     @GetMapping(path = "{id}", produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<SkillDTO> findById(@PathVariable("id") Long id) {
+    public ResponseEntity<SkillDTO> findById(@PathVariable Long id) {
         return ResponseEntity.ok().body(skillService.findById(id));
     }
 
@@ -39,12 +39,12 @@ public class SkillController {
     }
 
     @PutMapping(path = "{id}", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<SkillDTO> update(@PathVariable("id") Long id, @RequestBody @Valid SkillDTO skillDTO) {
+    public ResponseEntity<SkillDTO> update(@PathVariable Long id, @RequestBody @Valid SkillDTO skillDTO) {
         return ResponseEntity.ok().body(skillService.update(id, skillDTO));
     }
 
     @DeleteMapping(path = "{id}")
-    public ResponseEntity<Void> delete(@PathVariable("id") Long id) {
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
         skillService.delete(id);
 
         return ResponseEntity.noContent().build();

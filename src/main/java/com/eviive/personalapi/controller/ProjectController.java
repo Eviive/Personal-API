@@ -22,7 +22,7 @@ public class ProjectController {
 	private final ProjectService projectService;
 
     @GetMapping(path = "{id}", produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<ProjectDTO> findById(@PathVariable("id") Long id) {
+    public ResponseEntity<ProjectDTO> findById(@PathVariable Long id) {
         return ResponseEntity.ok().body(projectService.findById(id));
     }
 
@@ -60,12 +60,12 @@ public class ProjectController {
     }
 
     @PutMapping(path = "{id}", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<ProjectDTO> update(@PathVariable("id") Long id, @RequestBody @Valid ProjectDTO projectDTO) {
+    public ResponseEntity<ProjectDTO> update(@PathVariable Long id, @RequestBody @Valid ProjectDTO projectDTO) {
         return ResponseEntity.ok().body(projectService.update(id, projectDTO));
     }
 
     @DeleteMapping(path = "{id}")
-    public ResponseEntity<Void> delete(@PathVariable("id") Long id) {
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
         projectService.delete(id);
 
         return ResponseEntity.noContent().build();
