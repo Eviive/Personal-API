@@ -24,6 +24,8 @@ public class UserController {
 
 	private final UserService userService;
 
+    // GET
+
     @GetMapping(path = "{id}", produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<UserDTO> findById(@PathVariable Long id) {
         return ResponseEntity.ok().body(userService.findById(id));
@@ -34,6 +36,8 @@ public class UserController {
 		return ResponseEntity.ok().body(userService.findAll());
 	}
 
+    // POST
+
     @PostMapping(consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<UserDTO> save(@RequestBody @Valid UserDTO userDTO) {
         UserDTO createdUserDTO = userService.save(userDTO);
@@ -41,18 +45,6 @@ public class UserController {
         URI uri = URI.create(String.format("/user/%s", createdUserDTO.getId()));
 
         return ResponseEntity.created(uri).body(createdUserDTO);
-    }
-
-    @PutMapping(path = "{id}", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<UserDTO> update(@PathVariable Long id, @RequestBody @Valid UserDTO userDTO) {
-        return ResponseEntity.ok().body(userService.update(id, userDTO));
-    }
-
-    @DeleteMapping(path = "{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        userService.delete(id);
-
-        return ResponseEntity.noContent().build();
     }
 
     @PostMapping(path = "login", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
@@ -74,6 +66,22 @@ public class UserController {
         Map<String, Object> body = userService.refreshToken(refreshToken, req);
 
         return ResponseEntity.ok().body(body);
+    }
+
+    // PUT
+
+    @PutMapping(path = "{id}", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity<UserDTO> update(@PathVariable Long id, @RequestBody @Valid UserDTO userDTO) {
+        return ResponseEntity.ok().body(userService.update(id, userDTO));
+    }
+
+    // DELETE
+
+    @DeleteMapping(path = "{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        userService.delete(id);
+
+        return ResponseEntity.noContent().build();
     }
 
     @Data

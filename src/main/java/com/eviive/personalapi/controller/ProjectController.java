@@ -7,12 +7,14 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.net.URI;
 import java.util.List;
 
 import static com.eviive.personalapi.exception.PersonalApiErrorsEnum.API400_PAGE_NUMBER_NEGATIVE;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
 
 @RestController
 @RequestMapping("project")
@@ -20,6 +22,8 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 public class ProjectController {
 
 	private final ProjectService projectService;
+
+    // GET
 
     @GetMapping(path = "{id}", produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<ProjectDTO> findById(@PathVariable Long id) {
@@ -50,6 +54,8 @@ public class ProjectController {
         return ResponseEntity.ok().body(projectService.findAllNotFeaturedPaginated(page));
 	}
 
+    // POST
+
     @PostMapping(consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<ProjectDTO> save(@RequestBody @Valid ProjectDTO projectDTO) {
         ProjectDTO createdProjectDTO = projectService.save(projectDTO);
@@ -59,10 +65,19 @@ public class ProjectController {
         return ResponseEntity.created(uri).body(createdProjectDTO);
     }
 
+    @PostMapping(path = "{id}/upload-image", consumes = MULTIPART_FORM_DATA_VALUE, produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity<ProjectDTO> uploadImage(@PathVariable Long id, @RequestParam("file") MultipartFile file) {
+        return ResponseEntity.ok().body(projectService.uploadImage(id, file));
+    }
+
+    // PUT
+
     @PutMapping(path = "{id}", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<ProjectDTO> update(@PathVariable Long id, @RequestBody @Valid ProjectDTO projectDTO) {
         return ResponseEntity.ok().body(projectService.update(id, projectDTO));
     }
+
+    // DELETE
 
     @DeleteMapping(path = "{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {

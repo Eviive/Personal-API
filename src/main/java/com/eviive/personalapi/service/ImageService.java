@@ -4,10 +4,8 @@ import com.azure.storage.blob.BlobClient;
 import com.azure.storage.blob.BlobContainerClient;
 import com.azure.storage.blob.BlobServiceClient;
 import com.azure.storage.blob.models.BlobHttpHeaders;
-import com.eviive.personalapi.dto.ImageDTO;
 import com.eviive.personalapi.entity.Image;
 import com.eviive.personalapi.exception.PersonalApiException;
-import com.eviive.personalapi.mapper.ImageMapper;
 import com.eviive.personalapi.repository.ImageRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.util.Pair;
@@ -26,11 +24,10 @@ import static com.eviive.personalapi.exception.PersonalApiErrorsEnum.*;
 public class ImageService {
 
     private final ImageRepository imageRepository;
-    private final ImageMapper imageMapper;
 
     private final BlobServiceClient blobServiceClient;
 
-    public ImageDTO upload(String containerName, MultipartFile file, String alt) {
+    public Image upload(Image image, String containerName, MultipartFile file) {
         if (file.isEmpty()) {
             throw new PersonalApiException(API400_FILE_EMPTY);
         }
@@ -64,11 +61,9 @@ public class ImageService {
 
         URI uri = URI.create(String.format("%s/%s", containerName, fileName));
 
-        Image image = new Image();
         image.setUri(uri.toString());
-        image.setAlt(alt);
 
-        return imageMapper.toDTO(imageRepository.save(image));
+        return image;
     }
 
     public void delete(Long id) {

@@ -20,6 +20,8 @@ public class RoleController {
 
 	private final RoleService roleService;
 
+	// GET
+
     @GetMapping(path = "{id}", produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<RoleDTO> findById(@PathVariable Long id) {
         return ResponseEntity.ok().body(roleService.findById(id));

@@ -18,7 +18,6 @@ public class Image {
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
     private String uri;
 
     @Column(nullable = false)
