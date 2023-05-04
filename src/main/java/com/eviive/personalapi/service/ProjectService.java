@@ -81,7 +81,7 @@ public class ProjectService {
 
     public ProjectDTO uploadImage(Long id, MultipartFile file) {
         Project project = projectRepository.findById(id)
-                .orElseThrow(() -> PersonalApiException.format(API404_PROJECT_ID_NOT_FOUND, id));
+                                           .orElseThrow(() -> PersonalApiException.format(API404_PROJECT_ID_NOT_FOUND, id));
 
         Image image = imageService.upload(project.getImage(), AZURE_CONTAINER_NAME, file);
 

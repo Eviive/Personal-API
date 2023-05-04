@@ -6,7 +6,6 @@ import lombok.*;
 import java.util.Objects;
 import java.util.Set;
 
-import static jakarta.persistence.CascadeType.ALL;
 import static jakarta.persistence.FetchType.LAZY;
 import static jakarta.persistence.GenerationType.IDENTITY;
 
@@ -26,7 +25,7 @@ public class Skill {
     @Column(nullable = false)
     private String name;
 
-    @OneToOne(cascade = ALL, fetch = LAZY, orphanRemoval = true)
+    @OneToOne(fetch = LAZY, orphanRemoval = true)
     @JoinColumn(name = "IMAGE_ID", referencedColumnName = "ID", foreignKey = @ForeignKey(name = "FK_SKILL_IMAGE"))
     @ToString.Exclude
     private Image image;
