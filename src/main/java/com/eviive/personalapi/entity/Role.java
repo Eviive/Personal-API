@@ -6,6 +6,7 @@ import lombok.*;
 import java.util.Objects;
 import java.util.Set;
 
+import static jakarta.persistence.FetchType.LAZY;
 import static jakarta.persistence.GenerationType.IDENTITY;
 
 @Entity
@@ -24,7 +25,7 @@ public class Role {
     @Column(nullable = false)
     private String name;
 
-    @ManyToMany(mappedBy = "roles")
+    @ManyToMany(mappedBy = "roles", fetch = LAZY)
     @ToString.Exclude
     private Set<User> users;
 

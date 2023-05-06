@@ -28,8 +28,7 @@ public enum PersonalApiErrorsEnum {
     API404_ROLE_ID_NOT_FOUND("Role with id %d not found", NOT_FOUND),
     API404_PROJECT_ID_NOT_FOUND("Project with id %d not found", NOT_FOUND),
     API404_SKILL_ID_NOT_FOUND("Skill with id %d not found", NOT_FOUND),
-    API404_IMAGE_NOT_FOUND("Image with id %d not found", NOT_FOUND),
-    API404_IMAGE_NOT_UPLOADED("Image with id %d has not been uploaded yet", NOT_FOUND),
+    API404_IMAGE_NOT_FOUND("Image with uuid %s not found", NOT_FOUND),
 
     // 415 Unsupported Media Type
 
@@ -37,7 +36,8 @@ public enum PersonalApiErrorsEnum {
 
     // 500 Internal Server Error
 
-    API500_UPLOAD_ERROR("An error occurred while uploading the image : %s", INTERNAL_SERVER_ERROR);
+    API500_UPLOAD_ERROR("An error occurred while uploading the image : %s", INTERNAL_SERVER_ERROR),
+    API500_IMAGE_NO_PARENT("The image %d is linked to nothing", INTERNAL_SERVER_ERROR);
 
     private final String message;
     private final HttpStatusCode httpStatusCode;

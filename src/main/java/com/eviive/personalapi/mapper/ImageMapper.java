@@ -17,7 +17,8 @@ public interface ImageMapper {
 
     // to Entity
 
-    @Mapping(target = "uri", ignore = true)
+    @Mapping(target = "project", ignore = true)
+    @Mapping(target = "skill", ignore = true)
     Image toEntity(ImageDTO projectDTO);
 
     List<Image> toListEntity(Collection<ImageDTO> projectDTOs);
