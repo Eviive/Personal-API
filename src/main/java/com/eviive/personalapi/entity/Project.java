@@ -26,10 +26,10 @@ public class Project {
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 50)
     private String title;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 510)
     private String description;
 
     @Column(nullable = false)

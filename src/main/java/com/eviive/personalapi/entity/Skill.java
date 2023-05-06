@@ -23,7 +23,7 @@ public class Skill {
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 50)
     private String name;
 
     @OneToOne(cascade = ALL, fetch = LAZY, orphanRemoval = true)
