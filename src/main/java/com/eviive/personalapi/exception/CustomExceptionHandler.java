@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 @RestControllerAdvice
 @RequiredArgsConstructor
@@ -28,7 +29,7 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
 	protected ResponseEntity<Object> handleExceptionInternal(@NonNull Exception e, Object body, @NonNull HttpHeaders headers, @NonNull HttpStatusCode statusCode, @NonNull WebRequest request) {
 		Map<String, Object> responseBody = jsonUtilities.generateErrorBody(statusCode, e.getMessage().split(":")[0]);
 
-		return ResponseEntity.status(statusCode).body(responseBody);
+		return ResponseEntity.status(statusCode).contentType(APPLICATION_JSON).body(responseBody);
 	}
 
 	@Override
@@ -41,14 +42,14 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
 
 		Map<String, Object> body = jsonUtilities.generateErrorBody(BAD_REQUEST, validationErrors);
 
-		return ResponseEntity.badRequest().body(body);
+		return ResponseEntity.badRequest().contentType(APPLICATION_JSON).body(body);
 	}
 
 	@ExceptionHandler(PersonalApiException.class)
 	protected ResponseEntity<Object> handlePersonalApiException(PersonalApiException e) {
 		Map<String, Object> responseBody = jsonUtilities.generateErrorBody(e.getHttpStatusCode(), e.getMessage());
 
-		return ResponseEntity.status(e.getHttpStatusCode()).body(responseBody);
+		return ResponseEntity.status(e.getHttpStatusCode()).contentType(APPLICATION_JSON).body(responseBody);
 	}
 
 }
