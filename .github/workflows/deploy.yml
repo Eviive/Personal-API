@@ -48,6 +48,6 @@ jobs:
           port: ${{ secrets.VPS_PORT }}
           script: |
             cd /opt/api.${{ secrets.VPS_HOST }}
-            docker-compose pull personal-api
-            docker-compose up -d personal-api
+            docker compose pull personal-api
+            docker compose up -d personal-api
             docker image prune -f
