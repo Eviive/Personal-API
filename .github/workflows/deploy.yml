@@ -33,7 +33,8 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/personal-api:latest
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
 
   deploy:
     needs: build
@@ -49,5 +50,5 @@ jobs:
           script: |
             cd /opt/api.${{ secrets.VPS_HOST }}
             docker compose pull personal-api
-            docker compose up -d personal-api
+            docker compose up -d --no-deps personal-api
             docker image prune -f
