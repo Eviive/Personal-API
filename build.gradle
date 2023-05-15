@@ -11,12 +11,12 @@ sourceCompatibility = '17'
 description = 'I use this API to store data about all my projects and skills. Its dashboard allows me to manage all this data as well as its health.'
 
 flyway {
-    user = project.findProperty('flyway.user')
-    password = project.findProperty('flyway.password')
-    url = project.findProperty('flyway.url')
+    user = flyway.user
+    password = flyway.password
+    url = flyway.url
     schemas = ['public']
     locations = ['classpath:db/migration']
-    cleanDisabled = project.findProperty('flyway.cleanDisabled') ?: true
+    cleanDisabled = flyway.cleanDisabled
 }
 
 configurations {
