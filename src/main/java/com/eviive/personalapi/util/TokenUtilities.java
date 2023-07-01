@@ -4,7 +4,6 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
-import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.Cookie;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -16,15 +15,12 @@ import java.util.List;
 @Component
 public final class TokenUtilities {
 
-    private Algorithm algorithm;
-    @Value("${jwt-secret-key}")
-    private String secret;
-    @Value("${is-production}")
-    private boolean isProduction;
+    private final Algorithm algorithm;
+    private final boolean isProduction;
 
-    @PostConstruct
-    public void init() {
-        algorithm = Algorithm.HMAC256(secret);
+    public TokenUtilities(@Value("${jwt-secret-key}") String secret, @Value("${is-production}") boolean isProduction) {
+        this.algorithm = Algorithm.HMAC256(secret);
+        this.isProduction = isProduction;
     }
 
     public String generateAccessToken(String subject, String issuer, List<String> claims) {
