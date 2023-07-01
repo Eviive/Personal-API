@@ -6,17 +6,17 @@ plugins {
 }
 
 group = 'com.eviive'
-version = '0.0.1'
+version = '1.0.0'
 sourceCompatibility = '17'
 description = 'I use this API to store data about all my projects and skills. Its dashboard allows me to manage all this data as well as its health.'
 
 flyway {
-    user = project.property('flyway.user')
-    password = project.property('flyway.password')
-    url = project.property('flyway.url')
+    user = flyway.user
+    password = flyway.password
+    url = flyway.url
     schemas = ['public']
     locations = ['classpath:db/migration']
-    cleanDisabled = project.findProperty('flyway.cleanDisabled') ?: true
+    cleanDisabled = flyway.cleanDisabled
 }
 
 configurations {
