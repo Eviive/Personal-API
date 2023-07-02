@@ -29,7 +29,7 @@ public class Project {
     @Column(nullable = false, length = 50)
     private String title;
 
-    @Column(nullable = false, length = 510)
+    @Column(nullable = false, length = 512)
     private String description;
 
     @Column(nullable = false)
