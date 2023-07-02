@@ -94,8 +94,8 @@ public class ImageService {
         image.setUuid(null);
     }
 
-    private void delete(Image image, String containerName) {
-        getBlobClient(image, containerName).delete();
+    public void delete(Image image, String containerName) {
+        getBlobClient(image, containerName).deleteIfExists();
 
         image.setUuid(null);
     }

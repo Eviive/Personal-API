@@ -62,9 +62,14 @@ public class SkillService {
     }
 
     public void delete(Long id) {
-        if (!skillRepository.existsById(id)) {
-            throw PersonalApiException.format(API404_SKILL_ID_NOT_FOUND, id);
+        Skill skill = skillRepository.findById(id)
+                                     .orElseThrow(() -> PersonalApiException.format(API404_SKILL_ID_NOT_FOUND, id));
+
+        if (skill.getImage().getUuid() != null) {
+            imageService.delete(skill.getImage(), AZURE_CONTAINER_NAME);
         }
+
+        skill.getProjects().forEach(project -> project.getSkills().remove(skill));
 
         skillRepository.deleteById(id);
     }

@@ -80,8 +80,11 @@ public class ProjectService {
     }
 
     public void delete(Long id) {
-        if (!projectRepository.existsById(id)) {
-            throw PersonalApiException.format(API404_PROJECT_ID_NOT_FOUND, id);
+        Project project = projectRepository.findById(id)
+                                           .orElseThrow(() -> PersonalApiException.format(API404_PROJECT_ID_NOT_FOUND, id));
+
+        if (project.getImage().getUuid() != null) {
+            imageService.delete(project.getImage(), AZURE_CONTAINER_NAME);
         }
 
         projectRepository.deleteById(id);
