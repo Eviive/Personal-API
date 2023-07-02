@@ -26,7 +26,7 @@ public class ImageService {
 
     private final BlobServiceClient blobServiceClient;
 
-    public Image upload(Image image, String containerName, MultipartFile file) {
+    public void upload(Image image, String containerName, MultipartFile file) {
         if (file.isEmpty()) {
             throw new PersonalApiException(API400_FILE_EMPTY);
         }
@@ -57,12 +57,10 @@ public class ImageService {
         }
 
         if (image.getUuid() != null) {
-            delete(image);
+            delete(image, containerName);
         }
 
         image.setUuid(uuid);
-
-        return image;
     }
 
     public Pair<StreamingResponseBody, MediaType> download(UUID uuid) {
@@ -96,18 +94,29 @@ public class ImageService {
         image.setUuid(null);
     }
 
+    public void delete(Image image, String containerName) {
+        getBlobClient(image, containerName).deleteIfExists();
+
+        image.setUuid(null);
+    }
+
     private BlobClient getBlobClient(Image image) {
         String containerName;
         if (image.getProject() != null) {
-            containerName = "project";
+            containerName = "project-images";
         } else if (image.getSkill() != null) {
-            containerName = "skill";
+            containerName = "skill-images";
         } else {
             throw PersonalApiException.format(API500_IMAGE_NO_PARENT, image.getUuid().toString());
         }
+
+        return getBlobClient(image, containerName);
+    }
+
+    private BlobClient getBlobClient(Image image, String containerName) {
         String fileName = image.getUuid().toString();
 
-        return blobServiceClient.getBlobContainerClient(containerName + "-images").getBlobClient(fileName);
+        return blobServiceClient.getBlobContainerClient(containerName).getBlobClient(fileName);
     }
 
 }

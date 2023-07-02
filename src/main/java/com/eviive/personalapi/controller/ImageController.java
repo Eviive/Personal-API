@@ -3,6 +3,7 @@ package com.eviive.personalapi.controller;
 import com.eviive.personalapi.service.ImageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.util.Pair;
+import org.springframework.http.CacheControl;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -10,6 +11,7 @@ import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBo
 
 import java.util.UUID;
 
+import static java.util.concurrent.TimeUnit.DAYS;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 
 @RestController
@@ -27,6 +29,7 @@ public class ImageController {
 
         return ResponseEntity.ok()
                              .header(CONTENT_TYPE, responseBodyAndMediaType.getSecond().toString())
+                             .cacheControl(CacheControl.maxAge(30, DAYS))
                              .body(responseBodyAndMediaType.getFirst());
     }
 

@@ -1,11 +1,11 @@
 package com.eviive.personalapi.service;
 
 import com.eviive.personalapi.dto.ProjectDTO;
-import com.eviive.personalapi.entity.Image;
 import com.eviive.personalapi.entity.Project;
 import com.eviive.personalapi.exception.PersonalApiException;
 import com.eviive.personalapi.mapper.ProjectMapper;
 import com.eviive.personalapi.repository.ProjectRepository;
+import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -53,13 +53,17 @@ public class ProjectService {
                                 .map(projectMapper::toDTO);
     }
 
-    public ProjectDTO save(ProjectDTO projectDTO) {
+    public ProjectDTO save(ProjectDTO projectDTO, @Nullable MultipartFile file) {
         Project project = projectMapper.toEntity(projectDTO);
+
+        if (file != null) {
+            imageService.upload(project.getImage(), AZURE_CONTAINER_NAME, file);
+        }
 
         return projectMapper.toDTO(projectRepository.save(project));
     }
 
-    public ProjectDTO update(Long id, ProjectDTO projectDTO) {
+    public ProjectDTO update(Long id, ProjectDTO projectDTO, @Nullable MultipartFile file) {
         if (!projectRepository.existsById(id)) {
             throw PersonalApiException.format(API404_PROJECT_ID_NOT_FOUND, id);
         }
@@ -68,26 +72,22 @@ public class ProjectService {
 
         project.setId(id);
 
+        if (file != null) {
+            imageService.upload(project.getImage(), AZURE_CONTAINER_NAME, file);
+        }
+
         return projectMapper.toDTO(projectRepository.save(project));
     }
 
     public void delete(Long id) {
-        if (!projectRepository.existsById(id)) {
-            throw PersonalApiException.format(API404_PROJECT_ID_NOT_FOUND, id);
-        }
-
-        projectRepository.deleteById(id);
-    }
-
-    public ProjectDTO uploadImage(Long id, MultipartFile file) {
         Project project = projectRepository.findById(id)
                                            .orElseThrow(() -> PersonalApiException.format(API404_PROJECT_ID_NOT_FOUND, id));
 
-        Image image = imageService.upload(project.getImage(), AZURE_CONTAINER_NAME, file);
+        if (project.getImage().getUuid() != null) {
+            imageService.delete(project.getImage(), AZURE_CONTAINER_NAME);
+        }
 
-        project.setImage(image);
-
-        return projectMapper.toDTO(projectRepository.save(project));
+        projectRepository.deleteById(id);
     }
 
 }

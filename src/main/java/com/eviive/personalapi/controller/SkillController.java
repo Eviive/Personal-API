@@ -37,23 +37,28 @@ public class SkillController {
 
     @PostMapping(consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<SkillDTO> save(@RequestBody @Valid SkillDTO skillDTO) {
-        SkillDTO createdSkillDTO = skillService.save(skillDTO);
+        SkillDTO createdSkillDTO = skillService.save(skillDTO, null);
 
         URI uri = URI.create(String.format("/skill/%s", createdSkillDTO.getId()));
 
         return ResponseEntity.created(uri).body(createdSkillDTO);
     }
 
-    @PostMapping(path = "{id}/upload-image", consumes = MULTIPART_FORM_DATA_VALUE, produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<SkillDTO> uploadImage(@PathVariable Long id, @RequestParam("file") MultipartFile file) {
-        return ResponseEntity.ok().body(skillService.uploadImage(id, file));
+    @PostMapping(path = "with-image", consumes = MULTIPART_FORM_DATA_VALUE, produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity<SkillDTO> saveWithImage(@RequestPart("skill") @Valid SkillDTO skillDTO, @RequestPart("file") MultipartFile file) {
+        return ResponseEntity.ok().body(skillService.save(skillDTO, file));
     }
 
     // PUT
 
     @PutMapping(path = "{id}", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<SkillDTO> update(@PathVariable Long id, @RequestBody @Valid SkillDTO skillDTO) {
-        return ResponseEntity.ok().body(skillService.update(id, skillDTO));
+        return ResponseEntity.ok().body(skillService.update(id, skillDTO, null));
+    }
+
+    @PutMapping(path = "{id}/with-image", consumes = MULTIPART_FORM_DATA_VALUE, produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity<SkillDTO> updateWithImage(@PathVariable Long id, @RequestPart("skill") @Valid SkillDTO skillDTO, @RequestPart("file") MultipartFile file) {
+        return ResponseEntity.ok().body(skillService.update(id, skillDTO, file));
     }
 
     // DELETE
