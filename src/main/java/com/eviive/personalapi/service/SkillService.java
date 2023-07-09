@@ -45,6 +45,11 @@ public class SkillService {
         return skillMapper.toDTO(skillRepository.save(skill));
     }
 
+    public List<SkillDTO> saveAll(List<SkillDTO> skillDTOs) {
+        List<Skill> skills = skillMapper.toListEntity(skillDTOs);
+        return skillMapper.toListDTO(skillRepository.saveAll(skills));
+    }
+
     public SkillDTO update(Long id, SkillDTO skillDTO, @Nullable MultipartFile file) {
         if (!skillRepository.existsById(id)) {
             throw PersonalApiException.format(API404_SKILL_ID_NOT_FOUND, id);

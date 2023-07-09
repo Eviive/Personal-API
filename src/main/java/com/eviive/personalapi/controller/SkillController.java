@@ -49,6 +49,11 @@ public class SkillController {
         return ResponseEntity.ok().body(skillService.save(skillDTO, file));
     }
 
+    @PostMapping(path = "save-all", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<SkillDTO>> saveWithImage(@RequestBody @Valid List<SkillDTO> skillDTOs) {
+        return ResponseEntity.ok().body(skillService.saveAll(skillDTOs));
+    }
+
     // PUT
 
     @PutMapping(path = "{id}", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
