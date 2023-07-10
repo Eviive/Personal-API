@@ -34,22 +34,22 @@ public class ProjectService {
         return projectMapper.toDTO(project);
     }
 
-    public List<ProjectDTO> findAllOrdered() {
-        return projectMapper.toListDTO(projectRepository.findAllByOrderByFeaturedDescCreationDateDesc());
+    public List<ProjectDTO> findAll() {
+        return projectMapper.toListDTO(projectRepository.findAll());
     }
 
     public List<ProjectDTO> findAllFeatured() {
-        return projectMapper.toListDTO(projectRepository.findAllByFeaturedIsTrueOrderByCreationDateDesc());
+        return projectMapper.toListDTO(projectRepository.findAllByFeaturedIsTrue());
     }
 
     public List<ProjectDTO> findAllNotFeatured() {
-        return projectMapper.toListDTO(projectRepository.findAllByFeaturedIsFalseOrderByCreationDateDesc());
+        return projectMapper.toListDTO(projectRepository.findAllByFeaturedIsFalse());
     }
 
     public Page<ProjectDTO> findAllNotFeaturedPaginated(int page) {
         Pageable pageable = PageRequest.of(page, 6);
 
-        return projectRepository.findAllByFeaturedIsFalseOrderByCreationDateDesc(pageable)
+        return projectRepository.findAllByFeaturedIsFalse(pageable)
                                 .map(projectMapper::toDTO);
     }
 
@@ -61,6 +61,11 @@ public class ProjectService {
         }
 
         return projectMapper.toDTO(projectRepository.save(project));
+    }
+
+    public List<ProjectDTO> saveAll(List<ProjectDTO> projectDTOs) {
+        List<Project> projects = projectMapper.toListEntity(projectDTOs);
+        return projectMapper.toListDTO(projectRepository.saveAll(projects));
     }
 
     public ProjectDTO update(Long id, ProjectDTO projectDTO, @Nullable MultipartFile file) {

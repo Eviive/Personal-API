@@ -43,6 +43,9 @@ public class Project {
     @Column(nullable = false)
     private Boolean featured;
 
+    @Column(nullable = false)
+    private Integer sort;
+
     @OneToOne(cascade = ALL, fetch = LAZY, orphanRemoval = true)
     @JoinColumn(name = "IMAGE_ID", referencedColumnName = "ID", foreignKey = @ForeignKey(name = "FK_PROJECT_IMAGE"))
     @ToString.Exclude

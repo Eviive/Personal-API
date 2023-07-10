@@ -31,8 +31,8 @@ public class ProjectController {
     }
 
 	@GetMapping(produces = APPLICATION_JSON_VALUE)
-	public ResponseEntity<List<ProjectDTO>> findAllOrdered() {
-		return ResponseEntity.ok().body(projectService.findAllOrdered());
+	public ResponseEntity<List<ProjectDTO>> findAll() {
+		return ResponseEntity.ok().body(projectService.findAll());
 	}
 
 	@GetMapping(path = "featured", produces = APPLICATION_JSON_VALUE)
@@ -68,6 +68,11 @@ public class ProjectController {
     @PostMapping(path = "with-image", consumes = MULTIPART_FORM_DATA_VALUE, produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<ProjectDTO> saveWithImage(@RequestPart("project") @Valid ProjectDTO projectDTO, @RequestPart("file") MultipartFile file) {
         return ResponseEntity.ok().body(projectService.save(projectDTO, file));
+    }
+
+    @PostMapping(path = "save-all", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<ProjectDTO>> saveAll(@RequestBody @Valid List<ProjectDTO> projectDTOs) {
+        return ResponseEntity.ok().body(projectService.saveAll(projectDTOs));
     }
 
     // PUT
