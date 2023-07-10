@@ -3,7 +3,6 @@ FROM eclipse-temurin:17-jdk-alpine as build
 WORKDIR /workspace/app
 
 COPY gradlew *.gradle ./
-COPY gradle gradle
 COPY src src
 
 RUN ./gradlew bootJar
