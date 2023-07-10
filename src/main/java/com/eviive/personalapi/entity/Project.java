@@ -8,8 +8,7 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
-import static jakarta.persistence.CascadeType.ALL;
-import static jakarta.persistence.CascadeType.MERGE;
+import static jakarta.persistence.CascadeType.*;
 import static jakarta.persistence.FetchType.LAZY;
 import static jakarta.persistence.GenerationType.IDENTITY;
 
@@ -29,7 +28,7 @@ public class Project {
     @Column(nullable = false, length = 50)
     private String title;
 
-    @Column(nullable = false, length = 510)
+    @Column(nullable = false, length = 512)
     private String description;
 
     @Column(nullable = false)
@@ -44,12 +43,15 @@ public class Project {
     @Column(nullable = false)
     private Boolean featured;
 
+    @Column(nullable = false)
+    private Integer sort;
+
     @OneToOne(cascade = ALL, fetch = LAZY, orphanRemoval = true)
     @JoinColumn(name = "IMAGE_ID", referencedColumnName = "ID", foreignKey = @ForeignKey(name = "FK_PROJECT_IMAGE"))
     @ToString.Exclude
     private Image image;
 
-    @ManyToMany(cascade = MERGE, fetch = LAZY)
+    @ManyToMany(cascade = {DETACH, MERGE, PERSIST, REFRESH}, fetch = LAZY)
     @JoinTable(
             name = "API_PROJECT_SKILL_MAP",
             joinColumns = @JoinColumn(name = "PROJECT_ID", referencedColumnName = "ID", foreignKey = @ForeignKey(name = "FK_MAP_PROJECT")),

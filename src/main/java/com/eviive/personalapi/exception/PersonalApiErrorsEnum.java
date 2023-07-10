@@ -37,7 +37,7 @@ public enum PersonalApiErrorsEnum {
     // 500 Internal Server Error
 
     API500_UPLOAD_ERROR("An error occurred while uploading the image : %s", INTERNAL_SERVER_ERROR),
-    API500_IMAGE_NO_PARENT("The image %d is linked to nothing", INTERNAL_SERVER_ERROR);
+    API500_IMAGE_NO_PARENT("The image %s is linked to nothing", INTERNAL_SERVER_ERROR);
 
     private final String message;
     private final HttpStatusCode httpStatusCode;

@@ -26,6 +26,9 @@ public class Skill {
     @Column(nullable = false, length = 50)
     private String name;
 
+    @Column(nullable = false)
+    private Integer sort;
+
     @OneToOne(cascade = ALL, fetch = LAZY, orphanRemoval = true)
     @JoinColumn(name = "IMAGE_ID", referencedColumnName = "ID", foreignKey = @ForeignKey(name = "FK_SKILL_IMAGE"))
     @ToString.Exclude

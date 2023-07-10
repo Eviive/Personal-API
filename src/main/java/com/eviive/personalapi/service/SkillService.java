@@ -1,11 +1,11 @@
 package com.eviive.personalapi.service;
 
 import com.eviive.personalapi.dto.SkillDTO;
-import com.eviive.personalapi.entity.Image;
 import com.eviive.personalapi.entity.Skill;
 import com.eviive.personalapi.exception.PersonalApiException;
 import com.eviive.personalapi.mapper.SkillMapper;
 import com.eviive.personalapi.repository.SkillRepository;
+import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -35,13 +35,22 @@ public class SkillService {
         return skillMapper.toListDTO(skillRepository.findAll());
     }
 
-    public SkillDTO save(SkillDTO skillDTO) {
+    public SkillDTO save(SkillDTO skillDTO, @Nullable MultipartFile file) {
         Skill skill = skillMapper.toEntity(skillDTO);
+
+        if (file != null) {
+            imageService.upload(skill.getImage(), AZURE_CONTAINER_NAME, file);
+        }
 
         return skillMapper.toDTO(skillRepository.save(skill));
     }
 
-    public SkillDTO update(Long id, SkillDTO skillDTO) {
+    public List<SkillDTO> saveAll(List<SkillDTO> skillDTOs) {
+        List<Skill> skills = skillMapper.toListEntity(skillDTOs);
+        return skillMapper.toListDTO(skillRepository.saveAll(skills));
+    }
+
+    public SkillDTO update(Long id, SkillDTO skillDTO, @Nullable MultipartFile file) {
         if (!skillRepository.existsById(id)) {
             throw PersonalApiException.format(API404_SKILL_ID_NOT_FOUND, id);
         }
@@ -50,26 +59,24 @@ public class SkillService {
 
         skill.setId(id);
 
+        if (file != null) {
+            imageService.upload(skill.getImage(), AZURE_CONTAINER_NAME, file);
+        }
+
         return skillMapper.toDTO(skillRepository.save(skill));
     }
 
     public void delete(Long id) {
-        if (!skillRepository.existsById(id)) {
-            throw PersonalApiException.format(API404_SKILL_ID_NOT_FOUND, id);
-        }
-
-        skillRepository.deleteById(id);
-    }
-
-    public SkillDTO uploadImage(Long id, MultipartFile file) {
         Skill skill = skillRepository.findById(id)
                                      .orElseThrow(() -> PersonalApiException.format(API404_SKILL_ID_NOT_FOUND, id));
 
-        Image image = imageService.upload(skill.getImage(), AZURE_CONTAINER_NAME, file);
+        if (skill.getImage().getUuid() != null) {
+            imageService.delete(skill.getImage(), AZURE_CONTAINER_NAME);
+        }
 
-        skill.setImage(image);
+        skill.getProjects().forEach(project -> project.getSkills().remove(skill));
 
-        return skillMapper.toDTO(skillRepository.save(skill));
+        skillRepository.deleteById(id);
     }
 
 }

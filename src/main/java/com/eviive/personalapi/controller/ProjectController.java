@@ -31,8 +31,8 @@ public class ProjectController {
     }
 
 	@GetMapping(produces = APPLICATION_JSON_VALUE)
-	public ResponseEntity<List<ProjectDTO>> findAllOrdered() {
-		return ResponseEntity.ok().body(projectService.findAllOrdered());
+	public ResponseEntity<List<ProjectDTO>> findAll() {
+		return ResponseEntity.ok().body(projectService.findAll());
 	}
 
 	@GetMapping(path = "featured", produces = APPLICATION_JSON_VALUE)
@@ -58,23 +58,33 @@ public class ProjectController {
 
     @PostMapping(consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<ProjectDTO> save(@RequestBody @Valid ProjectDTO projectDTO) {
-        ProjectDTO createdProjectDTO = projectService.save(projectDTO);
+        ProjectDTO createdProjectDTO = projectService.save(projectDTO, null);
 
         URI uri = URI.create(String.format("/project/%s", createdProjectDTO.getId()));
 
         return ResponseEntity.created(uri).body(createdProjectDTO);
     }
 
-    @PostMapping(path = "{id}/upload-image", consumes = MULTIPART_FORM_DATA_VALUE, produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<ProjectDTO> uploadImage(@PathVariable Long id, @RequestParam("file") MultipartFile file) {
-        return ResponseEntity.ok().body(projectService.uploadImage(id, file));
+    @PostMapping(path = "with-image", consumes = MULTIPART_FORM_DATA_VALUE, produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity<ProjectDTO> saveWithImage(@RequestPart("project") @Valid ProjectDTO projectDTO, @RequestPart("file") MultipartFile file) {
+        return ResponseEntity.ok().body(projectService.save(projectDTO, file));
+    }
+
+    @PostMapping(path = "save-all", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<ProjectDTO>> saveAll(@RequestBody @Valid List<ProjectDTO> projectDTOs) {
+        return ResponseEntity.ok().body(projectService.saveAll(projectDTOs));
     }
 
     // PUT
 
     @PutMapping(path = "{id}", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<ProjectDTO> update(@PathVariable Long id, @RequestBody @Valid ProjectDTO projectDTO) {
-        return ResponseEntity.ok().body(projectService.update(id, projectDTO));
+        return ResponseEntity.ok().body(projectService.update(id, projectDTO, null));
+    }
+
+    @PutMapping(path = "{id}/with-image", consumes = MULTIPART_FORM_DATA_VALUE, produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity<ProjectDTO> updateWithImage(@PathVariable Long id, @RequestPart("project") @Valid ProjectDTO projectDTO, @RequestPart("file") MultipartFile file) {
+        return ResponseEntity.ok().body(projectService.update(id, projectDTO, file));
     }
 
     // DELETE

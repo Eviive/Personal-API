@@ -18,18 +18,18 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RequiredArgsConstructor
 public class RoleController {
 
-	private final RoleService roleService;
+    private final RoleService roleService;
 
-	// GET
+    // GET
 
     @GetMapping(path = "{id}", produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<RoleDTO> findById(@PathVariable Long id) {
         return ResponseEntity.ok().body(roleService.findById(id));
     }
 
-	@GetMapping(produces = APPLICATION_JSON_VALUE)
-	public ResponseEntity<List<RoleDTO>> findAll() {
-		return ResponseEntity.ok().body(roleService.findAll());
-	}
+    @GetMapping(produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<RoleDTO>> findAll() {
+        return ResponseEntity.ok().body(roleService.findAll());
+    }
 
 }
