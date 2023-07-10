@@ -54,8 +54,6 @@ public class SecurityConfig {
 
                        .requestMatchers("/actuator/**").hasAuthority("ROLE_ADMIN")
 
-                       .requestMatchers(GET, "/documentation").permitAll()
-
                        .anyRequest().denyAll() // deny-by-default policy
                    .and()
                    .build();
