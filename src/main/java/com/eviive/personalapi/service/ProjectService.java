@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -47,7 +48,7 @@ public class ProjectService {
     }
 
     public Page<ProjectDTO> findAllNotFeaturedPaginated(int page) {
-        Pageable pageable = PageRequest.of(page, 6);
+        Pageable pageable = PageRequest.of(page, 6, Sort.by("sort"));
 
         return projectRepository.findAllByFeaturedIsFalse(pageable)
                                 .map(projectMapper::toDTO);
