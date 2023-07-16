@@ -12,7 +12,12 @@ import java.util.Set;
 import static org.mapstruct.InjectionStrategy.CONSTRUCTOR;
 import static org.mapstruct.ReportingPolicy.ERROR;
 
-@Mapper(unmappedTargetPolicy = ERROR, componentModel = "spring", injectionStrategy = CONSTRUCTOR, uses = {RoleMapper.class})
+@Mapper(
+        unmappedTargetPolicy = ERROR,
+        componentModel = "spring",
+        injectionStrategy = CONSTRUCTOR,
+        uses = {RoleMapper.class}
+)
 public interface UserMapper {
 
     // to Entity

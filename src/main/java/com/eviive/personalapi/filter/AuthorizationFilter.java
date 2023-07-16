@@ -67,8 +67,6 @@ public class AuthorizationFilter extends OncePerRequestFilter {
 
             Authentication authenticationToken = new UsernamePasswordAuthenticationToken(username, null, authorities);
             SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-
-            filterChain.doFilter(req, res);
         } catch (Exception e) {
             res.setStatus(UNAUTHORIZED.value());
             res.setContentType(APPLICATION_JSON_VALUE);
@@ -77,6 +75,8 @@ public class AuthorizationFilter extends OncePerRequestFilter {
             Map<String, Object> body = jsonUtilities.generateErrorBody(UNAUTHORIZED, e.getMessage());
             res.getWriter().write(new ObjectMapper().writeValueAsString(body));
         }
+
+        filterChain.doFilter(req, res);
     }
 
 }
