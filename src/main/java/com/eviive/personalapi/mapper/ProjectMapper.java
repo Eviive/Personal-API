@@ -11,7 +11,12 @@ import java.util.Set;
 import static org.mapstruct.InjectionStrategy.CONSTRUCTOR;
 import static org.mapstruct.ReportingPolicy.ERROR;
 
-@Mapper(unmappedTargetPolicy = ERROR, componentModel = "spring", injectionStrategy = CONSTRUCTOR, uses = {SkillMapper.class, ImageMapper.class})
+@Mapper(
+        unmappedTargetPolicy = ERROR,
+        componentModel = "spring",
+        injectionStrategy = CONSTRUCTOR,
+        uses = {SkillMapper.class, ImageMapper.class}
+)
 public interface ProjectMapper {
 
     // to Entity

@@ -67,7 +67,11 @@ public class ProjectController {
 
     @PostMapping(path = "with-image", consumes = MULTIPART_FORM_DATA_VALUE, produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<ProjectDTO> saveWithImage(@RequestPart("project") @Valid ProjectDTO projectDTO, @RequestPart("file") MultipartFile file) {
-        return ResponseEntity.ok().body(projectService.save(projectDTO, file));
+        ProjectDTO createdProjectDTO = projectService.save(projectDTO, file);
+
+        URI uri = URI.create(String.format("/project/%s", createdProjectDTO.getId()));
+
+        return ResponseEntity.created(uri).body(createdProjectDTO);
     }
 
     @PostMapping(path = "save-all", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
