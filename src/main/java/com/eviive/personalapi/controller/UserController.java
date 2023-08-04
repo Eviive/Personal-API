@@ -1,12 +1,11 @@
 package com.eviive.personalapi.controller;
 
+import com.eviive.personalapi.dto.LoginDTO;
 import com.eviive.personalapi.dto.UserDTO;
 import com.eviive.personalapi.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -48,7 +47,7 @@ public class UserController {
     }
 
     @PostMapping(path = "login", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<Map<String, Object>> login(@RequestBody @Valid LoginForm form, HttpServletRequest req, HttpServletResponse res) {
+    public ResponseEntity<Map<String, Object>> login(@RequestBody @Valid LoginDTO form, HttpServletRequest req, HttpServletResponse res) {
         Map<String, Object> body = userService.login(form.getUsername(), form.getPassword(), req, res);
 
         return ResponseEntity.ok().body(body);
@@ -82,17 +81,6 @@ public class UserController {
         userService.delete(id);
 
         return ResponseEntity.noContent().build();
-    }
-
-    @Data
-    private static class LoginForm {
-
-        @NotBlank(message = "The username is required.")
-        private String username;
-
-        @NotBlank(message = "The password is required.")
-        private String password;
-
     }
 
 }

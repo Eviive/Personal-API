@@ -3,6 +3,7 @@ package com.eviive.personalapi.service;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.eviive.personalapi.dto.UserDTO;
 import com.eviive.personalapi.entity.Role;
+import com.eviive.personalapi.entity.RoleEnum;
 import com.eviive.personalapi.entity.User;
 import com.eviive.personalapi.exception.PersonalApiException;
 import com.eviive.personalapi.mapper.UserMapper;
@@ -25,7 +26,6 @@ import org.springframework.stereotype.Service;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static com.eviive.personalapi.exception.PersonalApiErrorsEnum.*;
 
@@ -88,7 +88,7 @@ public class UserService implements UserDetailsService {
             List<String> claims = user.getAuthorities()
                                       .stream()
                                       .map(GrantedAuthority::getAuthority)
-                                      .collect(Collectors.toList());
+                                      .toList();
 
             Map<String, Object> body = new HashMap<>();
             body.put("username", subject);
@@ -117,6 +117,7 @@ public class UserService implements UserDetailsService {
             List<String> claims = user.getRoles()
                                       .stream()
                                       .map(Role::getName)
+                                      .map(RoleEnum::toString)
                                       .toList();
 
             String accessToken = tokenUtilities.generateAccessToken(user.getUsername(), req.getRequestURL().toString(), claims);
@@ -142,7 +143,7 @@ public class UserService implements UserDetailsService {
 
         List<SimpleGrantedAuthority> authorities = user.getRoles()
                                                        .stream()
-                                                       .map(r -> new SimpleGrantedAuthority(r.getName()))
+                                                       .map(r -> new SimpleGrantedAuthority(r.getName().toString()))
                                                        .toList();
 
         return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), authorities);

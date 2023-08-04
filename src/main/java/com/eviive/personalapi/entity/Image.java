@@ -38,8 +38,8 @@ public class Image {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Image skill = (Image) o;
-        return Objects.equals(id, skill.id);
+        Image image = (Image) o;
+        return Objects.equals(id, image.id);
     }
 
     @Override
