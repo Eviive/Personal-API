@@ -10,12 +10,12 @@ import java.util.Map;
 @Component
 public final class JsonUtilities {
 
-    public Map<String, Object> generateErrorBody(HttpStatusCode status, Object message) {
+    public Map<String, Object> generateErrorBody(HttpStatusCode httpStatusCode, Object message) {
         Map<String, Object> body = new HashMap<>();
 
-        body.put("status", status.value());
-        if (status instanceof HttpStatus) {
-            body.put("error", ((HttpStatus) status).getReasonPhrase());
+        body.put("status", httpStatusCode.value());
+        if (httpStatusCode instanceof HttpStatus httpStatus) {
+            body.put("error", httpStatus.getReasonPhrase());
         }
         body.put("message", message);
 

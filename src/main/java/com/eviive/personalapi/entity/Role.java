@@ -24,7 +24,8 @@ public class Role {
     private Long id;
 
     @Column(nullable = false, length = 50)
-    private String name;
+    @Enumerated(EnumType.STRING)
+    private RoleEnum name;
 
     @ManyToMany(mappedBy = "roles", fetch = LAZY)
     @ToString.Exclude

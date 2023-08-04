@@ -17,6 +17,8 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.List;
 
+import static com.eviive.personalapi.entity.RoleEnum.ROLE_ADMIN;
+import static com.eviive.personalapi.entity.RoleEnum.ROLE_USER;
 import static org.springframework.http.HttpHeaders.*;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.POST;
@@ -39,20 +41,20 @@ public class SecurityConfig {
                    .addFilterBefore(authorizationFilter, UsernamePasswordAuthenticationFilter.class)
                    .authorizeHttpRequests()
                        .requestMatchers(POST, "/user/login", "/user/logout", "/user/refresh").permitAll()
-                       .requestMatchers("/user/**").hasAuthority("ROLE_ADMIN")
+                       .requestMatchers("/user/**").hasAuthority(ROLE_ADMIN.toString())
 
-                       .requestMatchers("/role/**").hasAuthority("ROLE_ADMIN")
+                       .requestMatchers("/role/**").hasAuthority(ROLE_ADMIN.toString())
 
                        .requestMatchers(GET, "/project/**").permitAll()
-                       .requestMatchers("/project/**").hasAuthority("ROLE_USER")
+                       .requestMatchers("/project/**").hasAuthority(ROLE_USER.toString())
 
                        .requestMatchers(GET, "/skill/**").permitAll()
-                       .requestMatchers("/skill/**").hasAuthority("ROLE_USER")
+                       .requestMatchers("/skill/**").hasAuthority(ROLE_USER.toString())
 
                        .requestMatchers(GET, "/image/**").permitAll()
-                       .requestMatchers("/image/**").hasAuthority("ROLE_USER")
+                       .requestMatchers("/image/**").hasAuthority(ROLE_USER.toString())
 
-                       .requestMatchers("/actuator/**").hasAuthority("ROLE_ADMIN")
+                       .requestMatchers("/actuator/**").hasAuthority(ROLE_ADMIN.toString())
 
                        .anyRequest().denyAll() // deny-by-default policy
                    .and()
