@@ -16,7 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
-import static com.eviive.personalapi.exception.PersonalApiErrorsEnum.API404_PROJECT_ID_NOT_FOUND;
+import static com.eviive.personalapi.exception.PersonalApiErrorsEnum.*;
 
 @Service
 @RequiredArgsConstructor
@@ -47,8 +47,16 @@ public class ProjectService {
         return projectMapper.toListDTO(projectRepository.findAllByFeaturedIsFalse());
     }
 
-    public Page<ProjectDTO> findAllNotFeaturedPaginated(int page) {
-        Pageable pageable = PageRequest.of(page, 6, Sort.by("sort"));
+    public Page<ProjectDTO> findAllNotFeaturedPaginated(int page, int size) {
+        if (page < 0) {
+            throw PersonalApiException.format(API400_PAGE_NUMBER_INVALID, page);
+        }
+
+        if (size < 1) {
+            throw PersonalApiException.format(API400_PAGE_SIZE_INVALID, size);
+        }
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by("sort"));
 
         return projectRepository.findAllByFeaturedIsFalse(pageable)
                                 .map(projectMapper::toDTO);

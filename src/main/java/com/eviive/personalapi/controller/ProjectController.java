@@ -1,7 +1,6 @@
 package com.eviive.personalapi.controller;
 
 import com.eviive.personalapi.dto.ProjectDTO;
-import com.eviive.personalapi.exception.PersonalApiException;
 import com.eviive.personalapi.service.ProjectService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -12,7 +11,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.net.URI;
 import java.util.List;
 
-import static com.eviive.personalapi.exception.PersonalApiErrorsEnum.API400_PAGE_NUMBER_NEGATIVE;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
 
@@ -46,12 +44,8 @@ public class ProjectController {
     }
 
 	@GetMapping(path = "not-featured/paginated", produces = APPLICATION_JSON_VALUE)
-	public ResponseEntity<Iterable<ProjectDTO>> findAllNotFeaturedPaginated(@RequestParam(value = "page", defaultValue = "0") Integer page) {
-        if (page < 0) {
-            throw PersonalApiException.format(API400_PAGE_NUMBER_NEGATIVE, page);
-        }
-
-        return ResponseEntity.ok().body(projectService.findAllNotFeaturedPaginated(page));
+	public ResponseEntity<Iterable<ProjectDTO>> findAllNotFeaturedPaginated(@RequestParam(value = "page", defaultValue = "0") Integer page, @RequestParam(value = "size", defaultValue = "8") Integer size) {
+        return ResponseEntity.ok().body(projectService.findAllNotFeaturedPaginated(page, size));
 	}
 
     // POST
