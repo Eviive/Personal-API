@@ -64,9 +64,10 @@ public class ProjectService {
         return projectMapper.toDTO(projectRepository.save(project));
     }
 
-    public List<ProjectDTO> saveAll(List<ProjectDTO> projectDTOs) {
-        List<Project> projects = projectMapper.toListEntity(projectDTOs);
-        return projectMapper.toListDTO(projectRepository.saveAll(projects));
+    public void sort(List<Long> sortedIds) {
+        for (Long id: sortedIds) {
+            projectRepository.updateSortById(sortedIds.indexOf(id), id);
+        }
     }
 
     public ProjectDTO update(Long id, ProjectDTO projectDTO, @Nullable MultipartFile file) {

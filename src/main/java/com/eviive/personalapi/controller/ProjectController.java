@@ -74,9 +74,10 @@ public class ProjectController {
         return ResponseEntity.created(uri).body(createdProjectDTO);
     }
 
-    @PostMapping(path = "save-all", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<ProjectDTO>> saveAll(@RequestBody @Valid List<ProjectDTO> projectDTOs) {
-        return ResponseEntity.ok().body(projectService.saveAll(projectDTOs));
+    @PostMapping(path = "sort", consumes = APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> sort(@RequestBody List<Long> sortedIds) {
+        projectService.sort(sortedIds);
+        return ResponseEntity.noContent().build();
     }
 
     // PUT
