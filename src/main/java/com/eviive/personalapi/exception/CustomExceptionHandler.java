@@ -1,5 +1,6 @@
 package com.eviive.personalapi.exception;
 
+import com.eviive.personalapi.dto.ErrorResponseDTO;
 import com.eviive.personalapi.util.JsonUtilities;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
@@ -14,7 +15,6 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import java.util.List;
-import java.util.Map;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
@@ -27,7 +27,7 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
 
     @Override
     protected ResponseEntity<Object> handleExceptionInternal(@NonNull Exception e, Object body, @NonNull HttpHeaders headers, @NonNull HttpStatusCode statusCode, @NonNull WebRequest request) {
-        Map<String, Object> responseBody = jsonUtilities.generateErrorBody(statusCode, e.getMessage().split(":")[0]);
+        ErrorResponseDTO responseBody = jsonUtilities.generateErrorBody(statusCode, e.getMessage().split(":")[0]);
 
         return ResponseEntity.status(statusCode)
                              .contentType(APPLICATION_JSON)
@@ -42,16 +42,16 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
                 .map(DefaultMessageSourceResolvable::getDefaultMessage)
                 .toList();
 
-        Map<String, Object> body = jsonUtilities.generateErrorBody(BAD_REQUEST, validationErrors);
+        ErrorResponseDTO responseBody = jsonUtilities.generateErrorBody(BAD_REQUEST, validationErrors);
 
         return ResponseEntity.badRequest()
                              .contentType(APPLICATION_JSON)
-                             .body(body);
+                             .body(responseBody);
     }
 
     @ExceptionHandler(PersonalApiException.class)
-    protected ResponseEntity<Object> handlePersonalApiException(PersonalApiException e) {
-        Map<String, Object> responseBody = jsonUtilities.generateErrorBody(e.getHttpStatusCode(), e.getMessage());
+    protected ResponseEntity<ErrorResponseDTO> handlePersonalApiException(PersonalApiException e) {
+        ErrorResponseDTO responseBody = jsonUtilities.generateErrorBody(e.getHttpStatusCode(), e.getMessage());
 
         return ResponseEntity.status(e.getHttpStatusCode())
                              .contentType(APPLICATION_JSON)

@@ -1,25 +1,24 @@
 package com.eviive.personalapi.util;
 
+import com.eviive.personalapi.dto.ErrorResponseDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
-import java.util.Map;
-
 @Component
 public final class JsonUtilities {
 
-    public Map<String, Object> generateErrorBody(HttpStatusCode httpStatusCode, Object message) {
-        Map<String, Object> body = new HashMap<>();
+    public ErrorResponseDTO generateErrorBody(HttpStatusCode httpStatusCode, Object message) {
+        ErrorResponseDTO responseBody = new ErrorResponseDTO();
 
-        body.put("status", httpStatusCode.value());
+        responseBody.setStatus(httpStatusCode.value());
+
         if (httpStatusCode instanceof HttpStatus httpStatus) {
-            body.put("error", httpStatus.getReasonPhrase());
+            responseBody.setError(httpStatus.getReasonPhrase());
         }
-        body.put("message", message);
 
-        return body;
+        responseBody.setMessage(message);
+        return responseBody;
     }
 
 }

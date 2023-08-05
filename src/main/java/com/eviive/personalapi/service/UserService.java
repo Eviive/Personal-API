@@ -1,6 +1,7 @@
 package com.eviive.personalapi.service;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.eviive.personalapi.dto.AuthResponseDTO;
 import com.eviive.personalapi.dto.UserDTO;
 import com.eviive.personalapi.entity.Role;
 import com.eviive.personalapi.entity.RoleEnum;
@@ -23,9 +24,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static com.eviive.personalapi.exception.PersonalApiErrorsEnum.*;
 
@@ -78,7 +77,7 @@ public class UserService implements UserDetailsService {
         userRepository.deleteById(id);
     }
 
-    public Map<String, Object> login(String username, String password, HttpServletRequest req, HttpServletResponse res) {
+    public AuthResponseDTO login(String username, String password, HttpServletRequest req, HttpServletResponse res) {
         try {
             Authentication authentication = authenticationConfiguration.getAuthenticationManager().authenticate(new UsernamePasswordAuthenticationToken(username, password));
 
@@ -90,14 +89,14 @@ public class UserService implements UserDetailsService {
                                       .map(GrantedAuthority::getAuthority)
                                       .toList();
 
-            Map<String, Object> body = new HashMap<>();
-            body.put("username", subject);
-            body.put("roles", claims);
-            body.put("accessToken", tokenUtilities.generateAccessToken(subject, issuer, claims));
+            AuthResponseDTO responseBody = new AuthResponseDTO();
+            responseBody.setUsername(subject);
+            responseBody.setRoles(claims);
+            responseBody.setAccessToken(tokenUtilities.generateAccessToken(subject, issuer, claims));
 
             res.addCookie(tokenUtilities.generateRefreshTokenCookie(subject, issuer));
 
-            return body;
+            return responseBody;
         } catch (Exception e) {
             throw PersonalApiException.format(API401_LOGIN_ERROR, e.getMessage());
         }
@@ -107,7 +106,7 @@ public class UserService implements UserDetailsService {
         res.addCookie(tokenUtilities.createCookie(null, 0));
     }
 
-    public Map<String, Object> refreshToken(String refreshToken, HttpServletRequest req) {
+    public AuthResponseDTO refreshToken(String refreshToken, HttpServletRequest req) {
         try {
             DecodedJWT decodedToken = tokenUtilities.verifyToken(refreshToken);
 
@@ -122,11 +121,11 @@ public class UserService implements UserDetailsService {
 
             String accessToken = tokenUtilities.generateAccessToken(user.getUsername(), req.getRequestURL().toString(), claims);
 
-            Map<String, Object> body = new HashMap<>();
-            body.put("username", user.getUsername());
-            body.put("roles", claims);
-            body.put("accessToken", accessToken);
-            return body;
+            AuthResponseDTO responseBody = new AuthResponseDTO();
+            responseBody.setUsername(user.getUsername());
+            responseBody.setRoles(claims);
+            responseBody.setAccessToken(accessToken);
+            return responseBody;
         } catch (Exception e) {
             throw PersonalApiException.format(API401_TOKEN_ERROR, e.getMessage());
         }

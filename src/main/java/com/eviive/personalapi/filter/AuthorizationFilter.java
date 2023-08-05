@@ -2,6 +2,7 @@ package com.eviive.personalapi.filter;
 
 import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.eviive.personalapi.dto.ErrorResponseDTO;
 import com.eviive.personalapi.util.JsonUtilities;
 import com.eviive.personalapi.util.TokenUtilities;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -21,7 +22,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.HttpHeaders.WWW_AUTHENTICATE;
@@ -72,8 +72,8 @@ public class AuthorizationFilter extends OncePerRequestFilter {
             res.setContentType(APPLICATION_JSON_VALUE);
             res.setHeader(WWW_AUTHENTICATE, "Bearer realm=\"Personal-API\"");
 
-            Map<String, Object> body = jsonUtilities.generateErrorBody(UNAUTHORIZED, e.getMessage());
-            res.getWriter().write(new ObjectMapper().writeValueAsString(body));
+            ErrorResponseDTO responseBody = jsonUtilities.generateErrorBody(UNAUTHORIZED, e.getMessage());
+            res.getWriter().write(new ObjectMapper().writeValueAsString(responseBody));
         }
 
         filterChain.doFilter(req, res);
