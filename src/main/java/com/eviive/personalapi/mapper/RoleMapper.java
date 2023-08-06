@@ -2,8 +2,10 @@ package com.eviive.personalapi.mapper;
 
 import com.eviive.personalapi.dto.RoleDTO;
 import com.eviive.personalapi.entity.Role;
+import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 
 import java.util.Collection;
 import java.util.List;
@@ -27,6 +29,13 @@ public interface RoleMapper {
     List<Role> toListEntity(Collection<RoleDTO> roleDTOs);
 
     Set<Role> toSetEntity(Collection<RoleDTO> roleDTOs);
+
+    @AfterMapping
+    default void afterMapping(@MappingTarget Role role) {
+        if (role.getUsers() != null) {
+            role.getUsers().forEach(user -> user.getRoles().add(role));
+        }
+    }
 
     // to DTO
 

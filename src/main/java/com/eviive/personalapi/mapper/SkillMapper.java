@@ -2,8 +2,10 @@ package com.eviive.personalapi.mapper;
 
 import com.eviive.personalapi.dto.SkillDTO;
 import com.eviive.personalapi.entity.Skill;
+import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 
 import java.util.Collection;
 import java.util.List;
@@ -28,6 +30,16 @@ public interface SkillMapper {
     List<Skill> toListEntity(Collection<SkillDTO> skillDTOs);
 
     Set<Skill> toSetEntity(Collection<SkillDTO> skillDTOs);
+
+    @AfterMapping
+    default void afterMapping(@MappingTarget Skill skill) {
+        if (skill.getProjects() != null) {
+            skill.getProjects().forEach(project -> project.getSkills().add(skill));
+        }
+        if (skill.getImage() != null) {
+            skill.getImage().setSkill(skill);
+        }
+    }
 
     // to DTO
 

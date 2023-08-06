@@ -1,19 +1,18 @@
 package com.eviive.personalapi.controller;
 
+import com.eviive.personalapi.dto.AuthRequestDTO;
+import com.eviive.personalapi.dto.AuthResponseDTO;
 import com.eviive.personalapi.dto.UserDTO;
 import com.eviive.personalapi.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.util.List;
-import java.util.Map;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -48,24 +47,24 @@ public class UserController {
     }
 
     @PostMapping(path = "login", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<Map<String, Object>> login(@RequestBody @Valid LoginForm form, HttpServletRequest req, HttpServletResponse res) {
-        Map<String, Object> body = userService.login(form.getUsername(), form.getPassword(), req, res);
+    public ResponseEntity<AuthResponseDTO> login(@RequestBody @Valid AuthRequestDTO loginForm, HttpServletRequest req, HttpServletResponse res) {
+        AuthResponseDTO responseBody = userService.login(loginForm.getUsername(), loginForm.getPassword(), req, res);
 
-        return ResponseEntity.ok().body(body);
+        return ResponseEntity.ok().body(responseBody);
     }
 
     @PostMapping(path = "logout", produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<Map<String, Object>> logout(HttpServletResponse res) {
+    public ResponseEntity<Void> logout(HttpServletResponse res) {
         userService.logout(res);
 
         return ResponseEntity.noContent().build();
     }
 
     @PostMapping(path = "refresh", produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<Map<String, Object>> refreshToken(@CookieValue("API_refresh-token") String refreshToken, HttpServletRequest req) {
-        Map<String, Object> body = userService.refreshToken(refreshToken, req);
+    public ResponseEntity<AuthResponseDTO> refreshToken(@CookieValue("API_refresh-token") String refreshToken, HttpServletRequest req) {
+        AuthResponseDTO responseBody = userService.refreshToken(refreshToken, req);
 
-        return ResponseEntity.ok().body(body);
+        return ResponseEntity.ok().body(responseBody);
     }
 
     // PUT
@@ -82,17 +81,6 @@ public class UserController {
         userService.delete(id);
 
         return ResponseEntity.noContent().build();
-    }
-
-    @Data
-    private static class LoginForm {
-
-        @NotBlank(message = "The username is required.")
-        private String username;
-
-        @NotBlank(message = "The password is required.")
-        private String password;
-
     }
 
 }

@@ -31,7 +31,8 @@ public class ImageService {
             throw new PersonalApiException(API400_FILE_EMPTY);
         }
 
-        if (file.getContentType() == null || !file.getContentType().startsWith("image/")) {
+        String contentType = file.getContentType();
+        if (contentType == null || contentType.startsWith("image/")) {
             throw PersonalApiException.format(API415_FILE_NOT_IMAGE, file.getContentType());
         }
 

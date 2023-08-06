@@ -3,6 +3,7 @@ package com.eviive.personalapi.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -36,7 +37,7 @@ public class Skill {
 
     @ManyToMany(mappedBy = "skills", fetch = LAZY)
     @ToString.Exclude
-    private Set<Project> projects;
+    private Set<Project> projects = new HashSet<>();
 
     @Override
     public boolean equals(Object o) {

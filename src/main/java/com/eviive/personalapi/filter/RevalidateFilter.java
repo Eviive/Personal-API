@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -32,6 +33,10 @@ public class RevalidateFilter extends OncePerRequestFilter {
         filterChain.doFilter(req, res);
 
         if (!List.of("POST", "PUT", "PATCH", "DELETE").contains(req.getMethod())) {
+            return;
+        }
+
+        if (!HttpStatus.valueOf(res.getStatus()).is2xxSuccessful()) {
             return;
         }
 

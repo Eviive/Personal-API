@@ -1,8 +1,9 @@
 package com.eviive.personalapi.service;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.eviive.personalapi.dto.AuthResponseDTO;
+import com.eviive.personalapi.dto.RoleDTO;
 import com.eviive.personalapi.dto.UserDTO;
-import com.eviive.personalapi.entity.Role;
 import com.eviive.personalapi.entity.User;
 import com.eviive.personalapi.exception.PersonalApiException;
 import com.eviive.personalapi.mapper.UserMapper;
@@ -22,10 +23,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 import static com.eviive.personalapi.exception.PersonalApiErrorsEnum.*;
 
@@ -43,6 +41,12 @@ public class UserService implements UserDetailsService {
     public UserDTO findById(Long id) {
         User user = userRepository.findById(id)
                                   .orElseThrow(() -> PersonalApiException.format(API404_USER_ID_NOT_FOUND, id));
+        return userMapper.toDTO(user);
+    }
+
+    public UserDTO findByUsername(String username) {
+        User user = userRepository.findByUsername(username)
+                                  .orElseThrow(() -> PersonalApiException.format(API404_USERNAME_NOT_FOUND, username));
         return userMapper.toDTO(user);
     }
 
@@ -78,9 +82,10 @@ public class UserService implements UserDetailsService {
         userRepository.deleteById(id);
     }
 
-    public Map<String, Object> login(String username, String password, HttpServletRequest req, HttpServletResponse res) {
+    public AuthResponseDTO login(String username, String password, HttpServletRequest req, HttpServletResponse res) {
         try {
-            Authentication authentication = authenticationConfiguration.getAuthenticationManager().authenticate(new UsernamePasswordAuthenticationToken(username, password));
+            Authentication authentication = authenticationConfiguration.getAuthenticationManager()
+                                                                       .authenticate(new UsernamePasswordAuthenticationToken(username, password));
 
             org.springframework.security.core.userdetails.User user = (org.springframework.security.core.userdetails.User) authentication.getPrincipal();
             String subject = user.getUsername();
@@ -88,16 +93,16 @@ public class UserService implements UserDetailsService {
             List<String> claims = user.getAuthorities()
                                       .stream()
                                       .map(GrantedAuthority::getAuthority)
-                                      .collect(Collectors.toList());
+                                      .toList();
 
-            Map<String, Object> body = new HashMap<>();
-            body.put("username", subject);
-            body.put("roles", claims);
-            body.put("accessToken", tokenUtilities.generateAccessToken(subject, issuer, claims));
+            AuthResponseDTO responseBody = new AuthResponseDTO();
+            responseBody.setUsername(subject);
+            responseBody.setRoles(claims);
+            responseBody.setAccessToken(tokenUtilities.generateAccessToken(subject, issuer, claims));
 
             res.addCookie(tokenUtilities.generateRefreshTokenCookie(subject, issuer));
 
-            return body;
+            return responseBody;
         } catch (Exception e) {
             throw PersonalApiException.format(API401_LOGIN_ERROR, e.getMessage());
         }
@@ -107,25 +112,24 @@ public class UserService implements UserDetailsService {
         res.addCookie(tokenUtilities.createCookie(null, 0));
     }
 
-    public Map<String, Object> refreshToken(String refreshToken, HttpServletRequest req) {
+    public AuthResponseDTO refreshToken(String refreshToken, HttpServletRequest req) {
         try {
             DecodedJWT decodedToken = tokenUtilities.verifyToken(refreshToken);
 
-            User user = userRepository.findByUsername(decodedToken.getSubject())
-                                      .orElseThrow(() -> PersonalApiException.format(API404_USERNAME_NOT_FOUND, decodedToken.getSubject()));
+            UserDTO user = findByUsername(decodedToken.getSubject());
 
             List<String> claims = user.getRoles()
                                       .stream()
-                                      .map(Role::getName)
+                                      .map(RoleDTO::getName)
                                       .toList();
 
             String accessToken = tokenUtilities.generateAccessToken(user.getUsername(), req.getRequestURL().toString(), claims);
 
-            Map<String, Object> body = new HashMap<>();
-            body.put("username", user.getUsername());
-            body.put("roles", claims);
-            body.put("accessToken", accessToken);
-            return body;
+            AuthResponseDTO responseBody = new AuthResponseDTO();
+            responseBody.setUsername(user.getUsername());
+            responseBody.setRoles(claims);
+            responseBody.setAccessToken(accessToken);
+            return responseBody;
         } catch (Exception e) {
             throw PersonalApiException.format(API401_TOKEN_ERROR, e.getMessage());
         }
@@ -134,15 +138,11 @@ public class UserService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) {
         User user = userRepository.findByUsername(username)
-                                  .orElse(null);
-
-        if (user == null) {
-            throw new UsernameNotFoundException(String.format("User %s not found", username));
-        }
+                                  .orElseThrow(() -> new UsernameNotFoundException(String.format("User %s not found", username)));
 
         List<SimpleGrantedAuthority> authorities = user.getRoles()
                                                        .stream()
-                                                       .map(r -> new SimpleGrantedAuthority(r.getName()))
+                                                       .map(r -> new SimpleGrantedAuthority(r.getName().toString()))
                                                        .toList();
 
         return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), authorities);

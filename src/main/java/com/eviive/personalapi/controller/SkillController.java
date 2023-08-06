@@ -53,9 +53,10 @@ public class SkillController {
         return ResponseEntity.created(uri).body(createdSkillDTO);
     }
 
-    @PostMapping(path = "save-all", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<SkillDTO>> saveAll(@RequestBody @Valid List<SkillDTO> skillDTOs) {
-        return ResponseEntity.ok().body(skillService.saveAll(skillDTOs));
+    @PostMapping(path = "sort", consumes = APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> sort(@RequestBody List<Long> sortedIds) {
+        skillService.sort(sortedIds);
+        return ResponseEntity.noContent().build();
     }
 
     // PUT

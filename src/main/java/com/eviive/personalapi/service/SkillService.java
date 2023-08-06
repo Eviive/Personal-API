@@ -45,9 +45,10 @@ public class SkillService {
         return skillMapper.toDTO(skillRepository.save(skill));
     }
 
-    public List<SkillDTO> saveAll(List<SkillDTO> skillDTOs) {
-        List<Skill> skills = skillMapper.toListEntity(skillDTOs);
-        return skillMapper.toListDTO(skillRepository.saveAll(skills));
+    public void sort(List<Long> sortedIds) {
+        for (Long id: sortedIds) {
+            skillRepository.updateSortById(sortedIds.indexOf(id), id);
+        }
     }
 
     public SkillDTO update(Long id, SkillDTO skillDTO, @Nullable MultipartFile file) {
