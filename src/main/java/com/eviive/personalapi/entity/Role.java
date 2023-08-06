@@ -3,6 +3,7 @@ package com.eviive.personalapi.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -22,12 +23,13 @@ public class Role {
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 50)
-    private String name;
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private RoleEnum name;
 
     @ManyToMany(mappedBy = "roles", fetch = LAZY)
     @ToString.Exclude
-    private Set<User> users;
+    private Set<User> users = new HashSet<>();
 
     @Override
     public boolean equals(Object o) {

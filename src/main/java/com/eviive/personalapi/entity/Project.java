@@ -8,8 +8,7 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
-import static jakarta.persistence.CascadeType.ALL;
-import static jakarta.persistence.CascadeType.MERGE;
+import static jakarta.persistence.CascadeType.*;
 import static jakarta.persistence.FetchType.LAZY;
 import static jakarta.persistence.GenerationType.IDENTITY;
 
@@ -52,7 +51,7 @@ public class Project {
     @ToString.Exclude
     private Image image;
 
-    @ManyToMany(cascade = MERGE, fetch = LAZY)
+    @ManyToMany(cascade = {DETACH, MERGE, PERSIST, REFRESH})
     @JoinTable(
             name = "API_PROJECT_SKILL_MAP",
             joinColumns = @JoinColumn(name = "PROJECT_ID", referencedColumnName = "ID", foreignKey = @ForeignKey(name = "FK_MAP_PROJECT")),
