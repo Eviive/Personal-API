@@ -1,5 +1,6 @@
 package com.eviive.personalapi.service;
 
+import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.eviive.personalapi.dto.AuthResponseDTO;
 import com.eviive.personalapi.dto.RoleDTO;
@@ -15,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -105,8 +107,10 @@ public class UserService implements UserDetailsService {
             res.addCookie(tokenUtilities.generateRefreshTokenCookie(subject, issuer));
 
             return responseBody;
-        } catch (Exception e) {
+        } catch (AuthenticationException e) {
             throw PersonalApiException.format(API401_LOGIN_ERROR, e.getMessage());
+        } catch (Exception e) {
+            throw PersonalApiException.format(API500_INTERNAL_SERVER_ERROR, e.getMessage());
         }
     }
 
@@ -132,7 +136,7 @@ public class UserService implements UserDetailsService {
             responseBody.setRoles(claims);
             responseBody.setAccessToken(accessToken);
             return responseBody;
-        } catch (Exception e) {
+        } catch (JWTVerificationException e) {
             throw PersonalApiException.format(API401_TOKEN_ERROR, e.getMessage());
         }
     }
