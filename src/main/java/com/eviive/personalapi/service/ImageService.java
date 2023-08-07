@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.util.Pair;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
@@ -19,6 +20,7 @@ import java.util.UUID;
 import static com.eviive.personalapi.exception.PersonalApiErrorsEnum.*;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class ImageService {
 
@@ -32,7 +34,7 @@ public class ImageService {
         }
 
         String contentType = file.getContentType();
-        if (contentType == null || contentType.startsWith("image/")) {
+        if (contentType == null || !contentType.startsWith("image/")) {
             throw PersonalApiException.format(API415_FILE_NOT_IMAGE, file.getContentType());
         }
 

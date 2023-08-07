@@ -8,6 +8,7 @@ import com.eviive.personalapi.repository.SkillRepository;
 import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -15,6 +16,7 @@ import java.util.List;
 import static com.eviive.personalapi.exception.PersonalApiErrorsEnum.API404_SKILL_ID_NOT_FOUND;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class SkillService {
 
