@@ -72,14 +72,14 @@ public class ImageService {
 
         BlobClient blobClient = getBlobClient(image);
 
-        StreamingResponseBody responseBody = outputStream -> {
+        StreamingResponseBody streamingResponseBody = outputStream -> {
             blobClient.downloadStream(outputStream);
             outputStream.flush();
         };
 
         MediaType mediaType = MediaType.parseMediaType(blobClient.getProperties().getContentType());
 
-        return Pair.of(responseBody, mediaType);
+        return Pair.of(streamingResponseBody, mediaType);
     }
 
     public void delete(UUID uuid) {
