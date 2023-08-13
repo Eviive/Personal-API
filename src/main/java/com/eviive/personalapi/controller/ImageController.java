@@ -25,12 +25,12 @@ public class ImageController {
 
     @GetMapping(path = "{uuid}")
     public ResponseEntity<StreamingResponseBody> download(@PathVariable UUID uuid) {
-        Pair<StreamingResponseBody, MediaType> responseBodyAndMediaType = imageService.download(uuid);
+        Pair<StreamingResponseBody, MediaType> bodyAndMediaType = imageService.download(uuid);
 
         return ResponseEntity.ok()
-                             .header(CONTENT_TYPE, responseBodyAndMediaType.getSecond().toString())
+                             .header(CONTENT_TYPE, bodyAndMediaType.getSecond().toString())
                              .cacheControl(CacheControl.maxAge(30, DAYS))
-                             .body(responseBodyAndMediaType.getFirst());
+                             .body(bodyAndMediaType.getFirst());
     }
 
     // DELETE

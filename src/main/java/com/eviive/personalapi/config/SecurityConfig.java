@@ -31,6 +31,9 @@ public class SecurityConfig {
 
     private final AuthorizationFilter authorizationFilter;
 
+    @Value("${allowed-origins}")
+    private List<String> allowedOrigins;
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http.cors()
@@ -62,7 +65,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public CorsConfigurationSource corsConfigurationSource(@Value("${allowed-origins}") List<String> allowedOrigins) {
+    public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(allowedOrigins);
         configuration.addAllowedMethod("*");

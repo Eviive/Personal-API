@@ -5,20 +5,26 @@ import com.azure.storage.blob.BlobContainerClient;
 import com.azure.storage.blob.BlobServiceClient;
 import com.azure.storage.blob.models.BlobHttpHeaders;
 import com.eviive.personalapi.entity.Image;
+import com.eviive.personalapi.entity.Project;
+import com.eviive.personalapi.entity.Skill;
 import com.eviive.personalapi.exception.PersonalApiException;
 import com.eviive.personalapi.repository.ImageRepository;
+import com.eviive.personalapi.util.StreamUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.util.Pair;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
+import java.io.IOException;
 import java.util.UUID;
 
 import static com.eviive.personalapi.exception.PersonalApiErrorsEnum.*;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class ImageService {
 
@@ -26,13 +32,15 @@ public class ImageService {
 
     private final BlobServiceClient blobServiceClient;
 
+    private final StreamUtils streamUtils;
+
     public void upload(Image image, String containerName, MultipartFile file) {
         if (file.isEmpty()) {
             throw new PersonalApiException(API400_FILE_EMPTY);
         }
 
         String contentType = file.getContentType();
-        if (contentType == null || contentType.startsWith("image/")) {
+        if (contentType == null || !contentType.startsWith("image/")) {
             throw PersonalApiException.format(API415_FILE_NOT_IMAGE, file.getContentType());
         }
 
@@ -54,7 +62,7 @@ public class ImageService {
 
             blobClient.setHttpHeaders(headers);
         } catch (Exception e) {
-            throw PersonalApiException.format(API500_UPLOAD_ERROR, e.getMessage());
+            throw PersonalApiException.format(API500_UPLOAD_ERROR, e, e.getMessage());
         }
 
         if (image.getUuid() != null) {
@@ -70,14 +78,17 @@ public class ImageService {
 
         BlobClient blobClient = getBlobClient(image);
 
-        StreamingResponseBody responseBody = outputStream -> {
-            blobClient.downloadStream(outputStream);
-            outputStream.flush();
+        StreamingResponseBody streamingResponseBody = outputStream -> {
+            try {
+                streamUtils.transferTo(blobClient.openInputStream(), outputStream);
+            } catch (IOException e) {
+                throw PersonalApiException.format(API500_DOWNLOAD_ERROR, e, e.getMessage());
+            }
         };
 
         MediaType mediaType = MediaType.parseMediaType(blobClient.getProperties().getContentType());
 
-        return Pair.of(responseBody, mediaType);
+        return Pair.of(streamingResponseBody, mediaType);
     }
 
     public void delete(UUID uuid) {
@@ -90,7 +101,7 @@ public class ImageService {
     }
 
     private void delete(Image image) {
-        getBlobClient(image).delete();
+        getBlobClient(image).deleteIfExists();
 
         image.setUuid(null);
     }
@@ -104,9 +115,9 @@ public class ImageService {
     private BlobClient getBlobClient(Image image) {
         String containerName;
         if (image.getProject() != null) {
-            containerName = "project-images";
+            containerName = Project.AZURE_CONTAINER_NAME;
         } else if (image.getSkill() != null) {
-            containerName = "skill-images";
+            containerName = Skill.AZURE_CONTAINER_NAME;
         } else {
             throw PersonalApiException.format(API500_IMAGE_NO_PARENT, image.getUuid().toString());
         }

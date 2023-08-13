@@ -21,6 +21,8 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 @AllArgsConstructor
 public class Project {
 
+    public static final String AZURE_CONTAINER_NAME = "project-images";
+
     @Id
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
