@@ -24,8 +24,6 @@ import static com.eviive.personalapi.exception.PersonalApiErrorsEnum.*;
 @RequiredArgsConstructor
 public class ProjectService {
 
-    private static final String AZURE_CONTAINER_NAME = "project-images";
-
     private final ProjectRepository projectRepository;
     private final ProjectMapper projectMapper;
 
@@ -68,7 +66,7 @@ public class ProjectService {
         Project project = projectMapper.toEntity(projectDTO);
 
         if (file != null) {
-            imageService.upload(project.getImage(), AZURE_CONTAINER_NAME, file);
+            imageService.upload(project.getImage(), Project.AZURE_CONTAINER_NAME, file);
         }
 
         return projectMapper.toDTO(projectRepository.save(project));
@@ -90,7 +88,7 @@ public class ProjectService {
         project.setId(id);
 
         if (file != null) {
-            imageService.upload(project.getImage(), AZURE_CONTAINER_NAME, file);
+            imageService.upload(project.getImage(), Project.AZURE_CONTAINER_NAME, file);
         }
 
         return projectMapper.toDTO(projectRepository.save(project));
@@ -101,7 +99,7 @@ public class ProjectService {
                                            .orElseThrow(() -> PersonalApiException.format(API404_PROJECT_ID_NOT_FOUND, id));
 
         if (project.getImage().getUuid() != null) {
-            imageService.delete(project.getImage(), AZURE_CONTAINER_NAME);
+            imageService.delete(project.getImage(), Project.AZURE_CONTAINER_NAME);
         }
 
         projectRepository.deleteById(id);
