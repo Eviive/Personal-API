@@ -16,11 +16,12 @@ import java.util.List;
 public final class TokenUtilities {
 
     private final Algorithm algorithm;
-    private final boolean isProduction;
 
-    public TokenUtilities(@Value("${jwt-secret-key}") String secret, @Value("${is-production}") boolean isProduction) {
+    @Value("${is-production}")
+    private boolean isProduction;
+
+    public TokenUtilities(@Value("${jwt-secret-key}") String secret) {
         this.algorithm = Algorithm.HMAC256(secret);
-        this.isProduction = isProduction;
     }
 
     public String generateAccessToken(String subject, String issuer, List<String> claims) {
