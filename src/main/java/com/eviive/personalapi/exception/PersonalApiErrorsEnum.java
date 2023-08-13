@@ -38,6 +38,7 @@ public enum PersonalApiErrorsEnum {
     // 500 Internal Server Error
 
     API500_INTERNAL_SERVER_ERROR("An internal server error occurred : %s", INTERNAL_SERVER_ERROR),
+    API500_DOWNLOAD_ERROR("An error occurred while downloading the image : %s", INTERNAL_SERVER_ERROR),
     API500_UPLOAD_ERROR("An error occurred while uploading the image : %s", INTERNAL_SERVER_ERROR),
     API500_IMAGE_NO_PARENT("The image %s is linked to nothing", INTERNAL_SERVER_ERROR);
 

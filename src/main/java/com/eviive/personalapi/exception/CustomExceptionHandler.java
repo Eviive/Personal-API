@@ -27,7 +27,11 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
 
     @Override
     protected ResponseEntity<Object> handleExceptionInternal(@NonNull Exception e, Object body, @NonNull HttpHeaders headers, @NonNull HttpStatusCode statusCode, @NonNull WebRequest request) {
-        ErrorResponseDTO responseBody = jsonUtilities.generateErrorBody(statusCode, e.getMessage().split(":")[0]);
+        String message = e.getMessage() != null
+                ? e.getMessage().split(":")[0]
+                : e.getClass().getSimpleName();
+
+        ErrorResponseDTO responseBody = jsonUtilities.generateErrorBody(statusCode, message);
 
         return ResponseEntity.status(statusCode)
                              .contentType(APPLICATION_JSON)
