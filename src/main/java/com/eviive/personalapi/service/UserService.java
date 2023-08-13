@@ -108,9 +108,9 @@ public class UserService implements UserDetailsService {
 
             return responseBody;
         } catch (AuthenticationException e) {
-            throw PersonalApiException.format(API401_LOGIN_ERROR, e.getMessage());
+            throw PersonalApiException.format(API401_LOGIN_ERROR, e, e.getMessage());
         } catch (Exception e) {
-            throw PersonalApiException.format(API500_INTERNAL_SERVER_ERROR, e.getMessage());
+            throw PersonalApiException.format(API500_INTERNAL_SERVER_ERROR, e, e.getMessage());
         }
     }
 
@@ -137,7 +137,7 @@ public class UserService implements UserDetailsService {
             responseBody.setAccessToken(accessToken);
             return responseBody;
         } catch (JWTVerificationException e) {
-            throw PersonalApiException.format(API401_TOKEN_ERROR, e.getMessage());
+            throw PersonalApiException.format(API401_TOKEN_ERROR, e, e.getMessage());
         }
     }
 
