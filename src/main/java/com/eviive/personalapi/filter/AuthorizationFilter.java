@@ -35,6 +35,8 @@ public class AuthorizationFilter extends OncePerRequestFilter {
     private final TokenUtilities tokenUtilities;
     private final JsonUtilities jsonUtilities;
 
+    private final ObjectMapper objectMapper;
+
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest req, @NonNull HttpServletResponse res, @NonNull FilterChain filterChain) throws ServletException, IOException {
         String authorizationHeader = req.getHeader(AUTHORIZATION);
@@ -67,16 +69,16 @@ public class AuthorizationFilter extends OncePerRequestFilter {
 
             Authentication authenticationToken = new UsernamePasswordAuthenticationToken(username, null, authorities);
             SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+            filterChain.doFilter(req, res);
         } catch (Exception e) {
-            res.setStatus(UNAUTHORIZED.value());
+            ErrorResponseDTO errorResponse = jsonUtilities.buildError(UNAUTHORIZED, e.getMessage());
+
+            res.setStatus(errorResponse.getStatus());
             res.setContentType(APPLICATION_JSON_VALUE);
             res.setHeader(WWW_AUTHENTICATE, "Bearer realm=\"Personal-API\"");
-
-            ErrorResponseDTO responseBody = jsonUtilities.generateErrorBody(UNAUTHORIZED, e.getMessage());
-            res.getWriter().write(new ObjectMapper().writeValueAsString(responseBody));
+            res.getOutputStream().print(objectMapper.writeValueAsString(errorResponse));
+            res.flushBuffer();
         }
-
-        filterChain.doFilter(req, res);
     }
 
 }

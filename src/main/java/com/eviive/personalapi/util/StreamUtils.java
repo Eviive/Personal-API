@@ -8,7 +8,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 @Component
-public class StreamUtils {
+public final class StreamUtils {
 
     private static final DataSize DEFAULT_BUFFER_SIZE = DataSize.ofMegabytes(4);
 

@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 @Component
 public final class JsonUtilities {
 
-    public ErrorResponseDTO generateErrorBody(HttpStatusCode httpStatusCode, Object message) {
+    public ErrorResponseDTO buildError(HttpStatusCode httpStatusCode, Object message) {
         ErrorResponseDTO responseBody = new ErrorResponseDTO();
 
         responseBody.setStatus(httpStatusCode.value());

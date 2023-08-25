@@ -31,11 +31,11 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
                 ? e.getMessage().split(":")[0]
                 : e.getClass().getSimpleName();
 
-        ErrorResponseDTO responseBody = jsonUtilities.generateErrorBody(statusCode, message);
+        ErrorResponseDTO errorResponse = jsonUtilities.buildError(statusCode, message);
 
         return ResponseEntity.status(statusCode)
                              .contentType(APPLICATION_JSON)
-                             .body(responseBody);
+                             .body(errorResponse);
     }
 
     @Override
@@ -46,20 +46,20 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
                 .map(DefaultMessageSourceResolvable::getDefaultMessage)
                 .toList();
 
-        ErrorResponseDTO responseBody = jsonUtilities.generateErrorBody(BAD_REQUEST, validationErrors);
+        ErrorResponseDTO errorResponse = jsonUtilities.buildError(BAD_REQUEST, validationErrors);
 
         return ResponseEntity.badRequest()
                              .contentType(APPLICATION_JSON)
-                             .body(responseBody);
+                             .body(errorResponse);
     }
 
     @ExceptionHandler(PersonalApiException.class)
     protected ResponseEntity<ErrorResponseDTO> handlePersonalApiException(PersonalApiException e) {
-        ErrorResponseDTO responseBody = jsonUtilities.generateErrorBody(e.getHttpStatusCode(), e.getMessage());
+        ErrorResponseDTO errorResponse = jsonUtilities.buildError(e.getHttpStatusCode(), e.getMessage());
 
         return ResponseEntity.status(e.getHttpStatusCode())
                              .contentType(APPLICATION_JSON)
-                             .body(responseBody);
+                             .body(errorResponse);
     }
 
 }
