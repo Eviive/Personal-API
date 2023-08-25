@@ -1,9 +1,7 @@
 ### Custom ###
 
 secrets*.properties
-logs
-.jpb
-data.sql
+logs/
 
 ### Miscellaneous ###
 

@@ -19,9 +19,13 @@ public class ProjectDTO {
     @Length(max = 50, message = "The project's title cannot be longer than 50 characters.")
     private String title;
 
-    @NotBlank(message = "The project's description cannot be blank.")
-    @Length(max = 510, message = "The project's description cannot be longer than 510 characters.")
-    private String description;
+    @NotBlank(message = "The project's english description cannot be blank.")
+    @Length(max = 510, message = "The project's english description cannot be longer than 510 characters.")
+    private String descriptionEn;
+
+    @NotBlank(message = "The project's french description cannot be blank.")
+    @Length(max = 510, message = "The project's french description cannot be longer than 510 characters.")
+    private String descriptionFr;
 
     @NotNull(message = "The project's creation date cannot be null.")
     private LocalDate creationDate;

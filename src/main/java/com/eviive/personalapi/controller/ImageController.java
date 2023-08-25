@@ -29,7 +29,7 @@ public class ImageController {
 
         return ResponseEntity.ok()
                              .header(CONTENT_TYPE, bodyAndMediaType.getSecond().toString())
-                             .cacheControl(CacheControl.maxAge(30, DAYS))
+                             .cacheControl(CacheControl.maxAge(30, DAYS).cachePublic().immutable())
                              .body(bodyAndMediaType.getFirst());
     }
 

@@ -24,7 +24,10 @@ public class Image {
     private UUID uuid;
 
     @Column(nullable = false)
-    private String alt;
+    private String altEn;
+
+    @Column(nullable = false)
+    private String altFr;
 
     @OneToOne(mappedBy = "image")
     @ToString.Exclude
