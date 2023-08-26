@@ -62,7 +62,7 @@ public class ImageService {
 
             blobClient.setHttpHeaders(headers);
         } catch (Exception e) {
-            throw PersonalApiException.format(API500_UPLOAD_ERROR, e, e.getMessage());
+            throw PersonalApiException.format(e, API500_UPLOAD_ERROR, e.getMessage());
         }
 
         if (image.getUuid() != null) {
@@ -82,7 +82,7 @@ public class ImageService {
             try {
                 streamUtils.transferTo(blobClient.openInputStream(), outputStream);
             } catch (IOException e) {
-                throw PersonalApiException.format(API500_DOWNLOAD_ERROR, e, e.getMessage());
+                throw PersonalApiException.format(e, API500_DOWNLOAD_ERROR, e.getMessage());
             }
         };
 
