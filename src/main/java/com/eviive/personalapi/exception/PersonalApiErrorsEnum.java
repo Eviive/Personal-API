@@ -12,15 +12,23 @@ public enum PersonalApiErrorsEnum {
 
     // 400 Bad Request
 
+    API400_BAD_REQUEST("Bad request", BAD_REQUEST),
     API400_PAGE_NUMBER_INVALID("The page number must be positive (currently %d).", BAD_REQUEST),
     API400_PAGE_SIZE_INVALID("The page's size must be greater than one (currently %d).", BAD_REQUEST),
     API400_FILE_EMPTY("The received file is empty", BAD_REQUEST),
     API400_IMAGE_NO_NAME("The received image has no name", BAD_REQUEST),
+    API400_MISSING_SERVLET_REQUEST_PARAMETER("The request parameter %s of type %s is missing", BAD_REQUEST),
+    API400_TYPE_MISMATCH("The received type for the property %s is not valid", BAD_REQUEST),
 
     // 401 Unauthorized
 
+    API401_UNAUTHORIZED("You are not authorized to access this resource", UNAUTHORIZED),
     API401_LOGIN_ERROR("An error occurred while logging you in : %s", UNAUTHORIZED),
     API401_TOKEN_ERROR("An error occurred while processing the token : %s", UNAUTHORIZED),
+
+    // 403 Forbidden
+
+    API403_FORBIDDEN("You are not allowed to access this resource", FORBIDDEN),
 
     // 404 Not Found
 
@@ -30,6 +38,10 @@ public enum PersonalApiErrorsEnum {
     API404_PROJECT_ID_NOT_FOUND("Project with id %d not found", NOT_FOUND),
     API404_SKILL_ID_NOT_FOUND("Skill with id %d not found", NOT_FOUND),
     API404_IMAGE_NOT_FOUND("Image with uuid %s not found", NOT_FOUND),
+
+    // 408 Request Timeout
+
+    API408_REQUEST_TIMEOUT("The request timed out : %s", REQUEST_TIMEOUT),
 
     // 415 Unsupported Media Type
 
