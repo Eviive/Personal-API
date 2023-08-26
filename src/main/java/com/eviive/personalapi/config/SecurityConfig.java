@@ -1,5 +1,6 @@
 package com.eviive.personalapi.config;
 
+import com.eviive.personalapi.exception.CustomExceptionHandler;
 import com.eviive.personalapi.filter.AuthorizationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -32,6 +33,8 @@ public class SecurityConfig {
 
     private final AuthorizationFilter authorizationFilter;
 
+    private final CustomExceptionHandler customExceptionHandler;
+
     @Value("${allowed-origins}")
     private List<String> allowedOrigins;
 
@@ -63,6 +66,11 @@ public class SecurityConfig {
                                .requestMatchers("/actuator/**").hasAuthority(ROLE_ADMIN.toString())
 
                                .anyRequest().denyAll() // deny-by-default policy
+                   )
+
+                   .exceptionHandling(exceptionHandling ->
+                           exceptionHandling.authenticationEntryPoint(customExceptionHandler)
+                                            .accessDeniedHandler(customExceptionHandler)
                    )
 
                    .build();

@@ -9,7 +9,7 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
 
 @Component
-public final class JsonUtilities {
+public final class ErrorUtilities {
 
     public ErrorResponseDTO buildError(HttpStatusCode httpStatusCode, Object message) {
         ErrorResponseDTO responseBody = new ErrorResponseDTO();

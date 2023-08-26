@@ -1,7 +1,7 @@
 package com.eviive.personalapi.exception;
 
 import com.eviive.personalapi.dto.ErrorResponseDTO;
-import com.eviive.personalapi.util.JsonUtilities;
+import com.eviive.personalapi.util.ErrorUtilities;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -39,9 +39,9 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestControllerAdvice
 @RequiredArgsConstructor
-public class CustomExceptionHandler extends ResponseEntityExceptionHandler implements AccessDeniedHandler, AuthenticationEntryPoint {
+public class CustomExceptionHandler extends ResponseEntityExceptionHandler implements AuthenticationEntryPoint, AccessDeniedHandler {
 
-    private final JsonUtilities jsonUtilities;
+    private final ErrorUtilities errorUtilities;
 
     private final ObjectMapper objectMapper;
 
@@ -56,7 +56,7 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler imple
     }
 
     private void sendError(HttpServletResponse res, PersonalApiErrorsEnum personalApiErrorsEnum) {
-        ErrorResponseDTO errorResponse = jsonUtilities.buildError(personalApiErrorsEnum);
+        ErrorResponseDTO errorResponse = errorUtilities.buildError(personalApiErrorsEnum);
 
         res.setStatus(errorResponse.getStatus());
         res.setContentType(APPLICATION_JSON_VALUE);
@@ -75,32 +75,32 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler imple
         boolean logException = true;
 
         if (e instanceof AccessDeniedException) {
-            errorResponse = jsonUtilities.buildError(API403_FORBIDDEN);
+            errorResponse = errorUtilities.buildError(API403_FORBIDDEN);
             logException = false;
 
         } else if (e instanceof PersonalApiException personalApiException) {
-            errorResponse = jsonUtilities.buildError(personalApiException);
+            errorResponse = errorUtilities.buildError(personalApiException);
 
         } else if (e instanceof JpaSystemException jpaSystemException) {
-            errorResponse = jsonUtilities.buildError(API500_INTERNAL_SERVER_ERROR, jpaSystemException);
+            errorResponse = errorUtilities.buildError(API500_INTERNAL_SERVER_ERROR, jpaSystemException);
 
         } else if (e instanceof TransactionSystemException transactionSystemException) {
-            errorResponse = jsonUtilities.buildError(API500_INTERNAL_SERVER_ERROR, transactionSystemException);
+            errorResponse = errorUtilities.buildError(API500_INTERNAL_SERVER_ERROR, transactionSystemException);
 
         } else if (e instanceof NestedRuntimeException nestedRuntimeException) {
-            errorResponse = jsonUtilities.buildError(API500_INTERNAL_SERVER_ERROR, nestedRuntimeException);
+            errorResponse = errorUtilities.buildError(API500_INTERNAL_SERVER_ERROR, nestedRuntimeException);
 
         } else if (e instanceof ClientAbortException clientAbortException) {
-            errorResponse = jsonUtilities.buildError(PersonalApiException.format(clientAbortException, API408_REQUEST_TIMEOUT, clientAbortException.getLocalizedMessage()));
+            errorResponse = errorUtilities.buildError(PersonalApiException.format(clientAbortException, API408_REQUEST_TIMEOUT, clientAbortException.getLocalizedMessage()));
             logException = false;
 
         } else {
-            errorResponse = jsonUtilities.buildError(PersonalApiException.format(e, API500_INTERNAL_SERVER_ERROR, e.getMessage()));
+            errorResponse = errorUtilities.buildError(PersonalApiException.format(e, API500_INTERNAL_SERVER_ERROR, e.getMessage()));
             defaultExceptionHandler = true;
         }
 
         if (logException) {
-            String loggerMessage = getExceptionHandlerName(e, defaultExceptionHandler) + " : " + req.getDescription(false);
+            String loggerMessage = getExceptionHandlerName(e, defaultExceptionHandler) + ": " + req.getDescription(false);
 
             if (HttpStatusCode.valueOf(errorResponse.getStatus()).is5xxServerError()) {
                 logger.error(loggerMessage, e);
@@ -150,7 +150,7 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler imple
     }
 
     private ResponseEntity<Object> handleBadRequestException(String message) {
-        ErrorResponseDTO errorResponse = jsonUtilities.buildError(BAD_REQUEST, message);
+        ErrorResponseDTO errorResponse = errorUtilities.buildError(BAD_REQUEST, message);
 
         return ResponseEntity.badRequest()
                              .contentType(APPLICATION_JSON)

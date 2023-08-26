@@ -23,8 +23,8 @@ public enum PersonalApiErrorsEnum {
     // 401 Unauthorized
 
     API401_UNAUTHORIZED("You are not authorized to access this resource", UNAUTHORIZED),
-    API401_LOGIN_ERROR("An error occurred while logging you in : %s", UNAUTHORIZED),
-    API401_TOKEN_ERROR("An error occurred while processing the token : %s", UNAUTHORIZED),
+    API401_LOGIN_ERROR("An error occurred while logging you in: %s", UNAUTHORIZED),
+    API401_TOKEN_ERROR("An error occurred while processing the token: %s", UNAUTHORIZED),
 
     // 403 Forbidden
 
@@ -41,7 +41,7 @@ public enum PersonalApiErrorsEnum {
 
     // 408 Request Timeout
 
-    API408_REQUEST_TIMEOUT("The request timed out : %s", REQUEST_TIMEOUT),
+    API408_REQUEST_TIMEOUT("The request timed out: %s", REQUEST_TIMEOUT),
 
     // 415 Unsupported Media Type
 
@@ -49,9 +49,9 @@ public enum PersonalApiErrorsEnum {
 
     // 500 Internal Server Error
 
-    API500_INTERNAL_SERVER_ERROR("An internal server error occurred : %s", INTERNAL_SERVER_ERROR),
-    API500_DOWNLOAD_ERROR("An error occurred while downloading the image : %s", INTERNAL_SERVER_ERROR),
-    API500_UPLOAD_ERROR("An error occurred while uploading the image : %s", INTERNAL_SERVER_ERROR),
+    API500_INTERNAL_SERVER_ERROR("An internal server error occurred: %s", INTERNAL_SERVER_ERROR),
+    API500_DOWNLOAD_ERROR("An error occurred while downloading the image: %s", INTERNAL_SERVER_ERROR),
+    API500_UPLOAD_ERROR("An error occurred while uploading the image: %s", INTERNAL_SERVER_ERROR),
     API500_IMAGE_NO_PARENT("The image %s is linked to nothing", INTERNAL_SERVER_ERROR);
 
     private final String message;
