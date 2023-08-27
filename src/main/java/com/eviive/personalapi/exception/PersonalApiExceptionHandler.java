@@ -30,7 +30,7 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import java.io.IOException;
-import java.util.stream.Collectors;
+import java.util.List;
 
 import static com.eviive.personalapi.exception.PersonalApiErrorsEnum.*;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
@@ -39,7 +39,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestControllerAdvice
 @RequiredArgsConstructor
-public class CustomExceptionHandler extends ResponseEntityExceptionHandler implements AuthenticationEntryPoint, AccessDeniedHandler {
+public class PersonalApiExceptionHandler extends ResponseEntityExceptionHandler implements AuthenticationEntryPoint, AccessDeniedHandler {
 
     private final ErrorUtilities errorUtilities;
 
@@ -74,11 +74,7 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler imple
         boolean defaultExceptionHandler = false;
         boolean logException = true;
 
-        if (e instanceof AccessDeniedException) {
-            errorResponse = errorUtilities.buildError(API403_FORBIDDEN);
-            logException = false;
-
-        } else if (e instanceof PersonalApiException personalApiException) {
+        if (e instanceof PersonalApiException personalApiException) {
             errorResponse = errorUtilities.buildError(personalApiException);
 
         } else if (e instanceof JpaSystemException jpaSystemException) {
@@ -120,11 +116,11 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler imple
 
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException e, @NotNull HttpHeaders headers, @NotNull HttpStatusCode status, @NotNull WebRequest req) {
-        String validationErrors = e.getBindingResult()
-                                    .getAllErrors()
-                                    .stream()
-                                    .map(DefaultMessageSourceResolvable::getDefaultMessage)
-                                    .collect(Collectors.joining("\\n"));
+        List<String> validationErrors = e.getBindingResult()
+                                         .getAllErrors()
+                                         .stream()
+                                         .map(DefaultMessageSourceResolvable::getDefaultMessage)
+                                         .toList();
 
         return handleBadRequestException(validationErrors);
     }
@@ -149,7 +145,7 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler imple
         return handleBadRequestException(e.getLocalizedMessage());
     }
 
-    private ResponseEntity<Object> handleBadRequestException(String message) {
+    private ResponseEntity<Object> handleBadRequestException(Object message) {
         ErrorResponseDTO errorResponse = errorUtilities.buildError(BAD_REQUEST, message);
 
         return ResponseEntity.badRequest()
