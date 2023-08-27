@@ -44,7 +44,7 @@ public class ProjectController {
     }
 
 	@GetMapping(path = "not-featured/paginated", produces = APPLICATION_JSON_VALUE)
-	public ResponseEntity<Iterable<ProjectDTO>> findAllNotFeaturedPaginated(@RequestParam(value = "page", defaultValue = "0") Integer page, @RequestParam(value = "size", defaultValue = "8") Integer size) {
+	public ResponseEntity<Iterable<ProjectDTO>> findAllNotFeaturedPaginated(@RequestParam(value = "page", defaultValue = "1") Integer page, @RequestParam(value = "size", defaultValue = "8") Integer size) {
         return ResponseEntity.ok().body(projectService.findAllNotFeaturedPaginated(page, size));
 	}
 

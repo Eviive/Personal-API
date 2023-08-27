@@ -14,7 +14,7 @@ public enum PersonalApiErrorsEnum {
 
     API400_BAD_REQUEST("Bad request", BAD_REQUEST),
     API400_PAGE_NUMBER_INVALID("The page number must be positive (currently %d).", BAD_REQUEST),
-    API400_PAGE_SIZE_INVALID("The page's size must be greater than one (currently %d).", BAD_REQUEST),
+    API400_PAGE_SIZE_INVALID("The page's size must be positive (currently %d).", BAD_REQUEST),
     API400_FILE_EMPTY("The received file is empty", BAD_REQUEST),
     API400_IMAGE_NO_NAME("The received image has no name", BAD_REQUEST),
     API400_MISSING_SERVLET_REQUEST_PARAMETER("The request parameter %s of type %s is missing", BAD_REQUEST),

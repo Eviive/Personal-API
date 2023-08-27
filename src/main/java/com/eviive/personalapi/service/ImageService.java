@@ -57,8 +57,7 @@ public class ImageService {
         try {
             blobClient.upload(file.getInputStream(), file.getSize());
 
-            BlobHttpHeaders headers = new BlobHttpHeaders();
-            headers.setContentType(file.getContentType());
+            BlobHttpHeaders headers = new BlobHttpHeaders().setContentType(file.getContentType());
 
             blobClient.setHttpHeaders(headers);
         } catch (Exception e) {
@@ -128,7 +127,8 @@ public class ImageService {
     private BlobClient getBlobClient(Image image, String containerName) {
         String fileName = image.getUuid().toString();
 
-        return blobServiceClient.getBlobContainerClient(containerName).getBlobClient(fileName);
+        return blobServiceClient.getBlobContainerClient(containerName)
+                                .getBlobClient(fileName);
     }
 
 }
