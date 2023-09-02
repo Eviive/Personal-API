@@ -119,6 +119,10 @@ public class UserService implements UserDetailsService {
     }
 
     public AuthResponseDTO refreshToken(String refreshToken, HttpServletRequest req) {
+        if (refreshToken == null) {
+            throw PersonalApiException.format(API401_TOKEN_ERROR, "Refresh token not found");
+        }
+
         try {
             DecodedJWT decodedToken = tokenUtilities.verifyToken(refreshToken);
 
