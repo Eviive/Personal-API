@@ -29,7 +29,7 @@ repositories {
 }
 
 ext {
-    set('springCloudAzureVersion', "5.4.0")
+    set('springCloudAzureVersion', "5.5.0")
     set('mapstructVersion', "1.5.5.Final")
 }
 
