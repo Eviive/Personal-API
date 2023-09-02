@@ -78,20 +78,20 @@ public class PersonalApiExceptionHandler extends ResponseEntityExceptionHandler 
             errorResponse = errorUtilities.buildError(personalApiException);
 
         } else if (e instanceof JpaSystemException jpaSystemException) {
-            errorResponse = errorUtilities.buildError(API500_INTERNAL_SERVER_ERROR, jpaSystemException);
+            errorResponse = errorUtilities.buildError(API500_INTERNAL_SERVER_ERROR, jpaSystemException.getMostSpecificCause().getMessage());
 
         } else if (e instanceof TransactionSystemException transactionSystemException) {
-            errorResponse = errorUtilities.buildError(API500_INTERNAL_SERVER_ERROR, transactionSystemException);
+            errorResponse = errorUtilities.buildError(API500_INTERNAL_SERVER_ERROR, transactionSystemException.getMostSpecificCause().getMessage());
 
         } else if (e instanceof NestedRuntimeException nestedRuntimeException) {
-            errorResponse = errorUtilities.buildError(API500_INTERNAL_SERVER_ERROR, nestedRuntimeException);
+            errorResponse = errorUtilities.buildError(API500_INTERNAL_SERVER_ERROR, nestedRuntimeException.getMostSpecificCause().getMessage());
 
         } else if (e instanceof ClientAbortException clientAbortException) {
-            errorResponse = errorUtilities.buildError(PersonalApiException.format(clientAbortException, API408_REQUEST_TIMEOUT, clientAbortException.getLocalizedMessage()));
+            errorResponse = errorUtilities.buildError(API408_REQUEST_TIMEOUT, clientAbortException.getLocalizedMessage());
             logException = false;
 
         } else {
-            errorResponse = errorUtilities.buildError(PersonalApiException.format(e, API500_INTERNAL_SERVER_ERROR, e.getMessage()));
+            errorResponse = errorUtilities.buildError(API500_INTERNAL_SERVER_ERROR, e.getMessage());
             defaultExceptionHandler = true;
         }
 
@@ -127,17 +127,17 @@ public class PersonalApiExceptionHandler extends ResponseEntityExceptionHandler 
 
     @Override
     protected ResponseEntity<Object> handleMissingServletRequestParameter(MissingServletRequestParameterException e, @NotNull HttpHeaders headers, @NotNull HttpStatusCode status, @NotNull WebRequest req) {
-        return handleBadRequestException(PersonalApiException.format(API400_MISSING_SERVLET_REQUEST_PARAMETER, e.getParameterName(), e.getParameterType()));
+        return handleBadRequestException(API400_MISSING_SERVLET_REQUEST_PARAMETER, e.getParameterName(), e.getParameterType());
     }
 
     @Override
     protected ResponseEntity<Object> handleServletRequestBindingException(@NotNull ServletRequestBindingException e, @NotNull HttpHeaders headers, @NotNull HttpStatusCode status, @NotNull WebRequest req) {
-        return handleBadRequestException(e);
+        return handleBadRequestException(e.getMessage());
     }
 
     @Override
     protected ResponseEntity<Object> handleTypeMismatch(TypeMismatchException e, @NotNull HttpHeaders headers, @NotNull HttpStatusCode status, @NotNull WebRequest req) {
-        return handleBadRequestException(PersonalApiException.format(API400_TYPE_MISMATCH, e.getPropertyName()));
+        return handleBadRequestException(API400_TYPE_MISMATCH, e.getPropertyName());
     }
 
     @Override
@@ -153,8 +153,8 @@ public class PersonalApiExceptionHandler extends ResponseEntityExceptionHandler 
                              .body(errorResponse);
     }
 
-    private ResponseEntity<Object> handleBadRequestException(Exception e) {
-        return handleBadRequestException(e.getMessage());
+    private ResponseEntity<Object> handleBadRequestException(PersonalApiErrorsEnum personalApiErrorsEnum, Object... args) {
+        return handleBadRequestException(personalApiErrorsEnum.getMessage().formatted(args));
     }
 
 }
