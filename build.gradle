@@ -6,7 +6,7 @@ plugins {
 }
 
 group = 'com.eviive'
-version = '1.2.1'
+version = '1.2.2'
 sourceCompatibility = '17'
 description = 'I use this API to store data about all my projects and skills. Its dashboard allows me to manage all this data as well as its health.'
 
