@@ -7,7 +7,6 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
-import static jakarta.persistence.CascadeType.*;
 import static jakarta.persistence.GenerationType.IDENTITY;
 
 @Entity
@@ -35,7 +34,7 @@ public class User {
     @Column(nullable = false)
     private String password;
 
-    @ManyToMany(cascade = {DETACH, MERGE, PERSIST, REFRESH})
+    @ManyToMany
     @JoinTable(
             name = "API_USER_ROLE_MAP",
             joinColumns = @JoinColumn(name = "USER_ID", referencedColumnName = "ID", foreignKey = @ForeignKey(name = "FK_MAP_USER")),
