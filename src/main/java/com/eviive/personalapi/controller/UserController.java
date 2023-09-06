@@ -61,7 +61,7 @@ public class UserController {
     }
 
     @PostMapping(path = "refresh", produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<AuthResponseDTO> refreshToken(@CookieValue("API_refresh-token") String refreshToken, HttpServletRequest req) {
+    public ResponseEntity<AuthResponseDTO> refreshToken(@CookieValue(value = "API_refresh-token", required = false) String refreshToken, HttpServletRequest req) {
         AuthResponseDTO responseBody = userService.refreshToken(refreshToken, req);
 
         return ResponseEntity.ok().body(responseBody);

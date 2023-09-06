@@ -45,7 +45,9 @@ public class RevalidateFilter extends OncePerRequestFilter {
         }
 
         try {
-            RevalidateRequestDTO revalidateRequestDTO = RevalidateRequestDTO.of(portfolioApiSecret);
+            RevalidateRequestDTO revalidateRequestDTO = new RevalidateRequestDTO();
+            revalidateRequestDTO.setSecret(portfolioApiSecret);
+
             RevalidateResponseDTO revalidateResponseDTO = portfolioWebService.revalidate(revalidateRequestDTO);
             log.info("Revalidated portfolio API: {}", revalidateResponseDTO);
         } catch (Exception e) {

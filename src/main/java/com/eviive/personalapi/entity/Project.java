@@ -21,6 +21,8 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 @AllArgsConstructor
 public class Project {
 
+    public static final String AZURE_CONTAINER_NAME = "project-images";
+
     @Id
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
@@ -28,8 +30,11 @@ public class Project {
     @Column(nullable = false, length = 50)
     private String title;
 
-    @Column(nullable = false, length = 512)
-    private String description;
+    @Column(nullable = false, length = 510)
+    private String descriptionEn;
+
+    @Column(nullable = false, length = 510)
+    private String descriptionFr;
 
     @Column(nullable = false)
     private LocalDate creationDate;

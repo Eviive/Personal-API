@@ -8,6 +8,7 @@ import com.eviive.personalapi.repository.SkillRepository;
 import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -15,10 +16,9 @@ import java.util.List;
 import static com.eviive.personalapi.exception.PersonalApiErrorsEnum.API404_SKILL_ID_NOT_FOUND;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class SkillService {
-
-    private static final String AZURE_CONTAINER_NAME = "skill-images";
 
     private final SkillRepository skillRepository;
     private final SkillMapper skillMapper;
@@ -39,7 +39,7 @@ public class SkillService {
         Skill skill = skillMapper.toEntity(skillDTO);
 
         if (file != null) {
-            imageService.upload(skill.getImage(), AZURE_CONTAINER_NAME, file);
+            imageService.upload(skill.getImage(), Skill.AZURE_CONTAINER_NAME, file);
         }
 
         return skillMapper.toDTO(skillRepository.save(skill));
@@ -61,7 +61,7 @@ public class SkillService {
         skill.setId(id);
 
         if (file != null) {
-            imageService.upload(skill.getImage(), AZURE_CONTAINER_NAME, file);
+            imageService.upload(skill.getImage(), Skill.AZURE_CONTAINER_NAME, file);
         }
 
         return skillMapper.toDTO(skillRepository.save(skill));
@@ -72,7 +72,7 @@ public class SkillService {
                                      .orElseThrow(() -> PersonalApiException.format(API404_SKILL_ID_NOT_FOUND, id));
 
         if (skill.getImage().getUuid() != null) {
-            imageService.delete(skill.getImage(), AZURE_CONTAINER_NAME);
+            imageService.delete(skill.getImage(), Skill.AZURE_CONTAINER_NAME);
         }
 
         skill.getProjects().forEach(project -> project.getSkills().remove(skill));

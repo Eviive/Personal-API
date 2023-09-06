@@ -9,9 +9,13 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class AzureConfig {
 
+    @Value("${azure.storage.connection-string}")
+    private String connectionString;
+
     @Bean
-    public BlobServiceClient blobServiceClient(@Value("${azure.storage.connection-string}") String connectionString) {
-        return new BlobServiceClientBuilder().connectionString(connectionString).buildClient();
+    public BlobServiceClient blobServiceClient() {
+        return new BlobServiceClientBuilder().connectionString(connectionString)
+                                             .buildClient();
     }
 
 }

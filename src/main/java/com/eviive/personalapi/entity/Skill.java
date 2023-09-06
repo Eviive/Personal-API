@@ -20,6 +20,8 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 @AllArgsConstructor
 public class Skill {
 
+    public static final String AZURE_CONTAINER_NAME = "skill-images";
+
     @Id
     @GeneratedValue(strategy = IDENTITY)
     private Long id;

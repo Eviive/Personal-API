@@ -7,12 +7,14 @@ import com.eviive.personalapi.mapper.RoleMapper;
 import com.eviive.personalapi.repository.RoleRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 import static com.eviive.personalapi.exception.PersonalApiErrorsEnum.API404_ROLE_ID_NOT_FOUND;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class RoleService {
 

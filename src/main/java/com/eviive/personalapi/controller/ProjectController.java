@@ -4,6 +4,7 @@ import com.eviive.personalapi.dto.ProjectDTO;
 import com.eviive.personalapi.service.ProjectService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -44,7 +45,7 @@ public class ProjectController {
     }
 
 	@GetMapping(path = "not-featured/paginated", produces = APPLICATION_JSON_VALUE)
-	public ResponseEntity<Iterable<ProjectDTO>> findAllNotFeaturedPaginated(@RequestParam(value = "page", defaultValue = "0") Integer page, @RequestParam(value = "size", defaultValue = "8") Integer size) {
+	public ResponseEntity<Page<ProjectDTO>> findAllNotFeaturedPaginated(@RequestParam(value = "page", defaultValue = "1") Integer page, @RequestParam(value = "size", defaultValue = "6") Integer size) {
         return ResponseEntity.ok().body(projectService.findAllNotFeaturedPaginated(page, size));
 	}
 

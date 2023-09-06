@@ -12,6 +12,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -19,10 +20,9 @@ import java.util.List;
 import static com.eviive.personalapi.exception.PersonalApiErrorsEnum.*;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class ProjectService {
-
-    private static final String AZURE_CONTAINER_NAME = "project-images";
 
     private final ProjectRepository projectRepository;
     private final ProjectMapper projectMapper;
@@ -48,7 +48,7 @@ public class ProjectService {
     }
 
     public Page<ProjectDTO> findAllNotFeaturedPaginated(int page, int size) {
-        if (page < 0) {
+        if (page < 1) {
             throw PersonalApiException.format(API400_PAGE_NUMBER_INVALID, page);
         }
 
@@ -56,7 +56,7 @@ public class ProjectService {
             throw PersonalApiException.format(API400_PAGE_SIZE_INVALID, size);
         }
 
-        Pageable pageable = PageRequest.of(page, size, Sort.by("sort"));
+        Pageable pageable = PageRequest.of(page - 1, size, Sort.by("sort"));
 
         return projectRepository.findAllByFeaturedIsFalse(pageable)
                                 .map(projectMapper::toDTO);
@@ -66,7 +66,7 @@ public class ProjectService {
         Project project = projectMapper.toEntity(projectDTO);
 
         if (file != null) {
-            imageService.upload(project.getImage(), AZURE_CONTAINER_NAME, file);
+            imageService.upload(project.getImage(), Project.AZURE_CONTAINER_NAME, file);
         }
 
         return projectMapper.toDTO(projectRepository.save(project));
@@ -88,7 +88,7 @@ public class ProjectService {
         project.setId(id);
 
         if (file != null) {
-            imageService.upload(project.getImage(), AZURE_CONTAINER_NAME, file);
+            imageService.upload(project.getImage(), Project.AZURE_CONTAINER_NAME, file);
         }
 
         return projectMapper.toDTO(projectRepository.save(project));
@@ -99,7 +99,7 @@ public class ProjectService {
                                            .orElseThrow(() -> PersonalApiException.format(API404_PROJECT_ID_NOT_FOUND, id));
 
         if (project.getImage().getUuid() != null) {
-            imageService.delete(project.getImage(), AZURE_CONTAINER_NAME);
+            imageService.delete(project.getImage(), Project.AZURE_CONTAINER_NAME);
         }
 
         projectRepository.deleteById(id);
