@@ -48,7 +48,7 @@ public class ProjectService {
     }
 
     public Page<ProjectDTO> findAllNotFeaturedPaginated(int page, int size) {
-        if (page < 0) {
+        if (page < 1) {
             throw PersonalApiException.format(API400_PAGE_NUMBER_INVALID, page);
         }
 
@@ -56,7 +56,7 @@ public class ProjectService {
             throw PersonalApiException.format(API400_PAGE_SIZE_INVALID, size);
         }
 
-        Pageable pageable = PageRequest.of(page, size, Sort.by("sort"));
+        Pageable pageable = PageRequest.of(page - 1, size, Sort.by("sort"));
 
         return projectRepository.findAllByFeaturedIsFalse(pageable)
                                 .map(projectMapper::toDTO);

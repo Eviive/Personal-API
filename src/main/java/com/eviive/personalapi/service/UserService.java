@@ -108,9 +108,9 @@ public class UserService implements UserDetailsService {
 
             return responseBody;
         } catch (AuthenticationException e) {
-            throw PersonalApiException.format(API401_LOGIN_ERROR, e, e.getMessage());
+            throw PersonalApiException.format(e, API401_LOGIN_ERROR, e.getMessage());
         } catch (Exception e) {
-            throw PersonalApiException.format(API500_INTERNAL_SERVER_ERROR, e, e.getMessage());
+            throw PersonalApiException.format(e, API500_INTERNAL_SERVER_ERROR, e.getMessage());
         }
     }
 
@@ -119,6 +119,10 @@ public class UserService implements UserDetailsService {
     }
 
     public AuthResponseDTO refreshToken(String refreshToken, HttpServletRequest req) {
+        if (refreshToken == null) {
+            throw PersonalApiException.format(API401_TOKEN_ERROR, "Refresh token not found");
+        }
+
         try {
             DecodedJWT decodedToken = tokenUtilities.verifyToken(refreshToken);
 
@@ -137,7 +141,7 @@ public class UserService implements UserDetailsService {
             responseBody.setAccessToken(accessToken);
             return responseBody;
         } catch (JWTVerificationException e) {
-            throw PersonalApiException.format(API401_TOKEN_ERROR, e, e.getMessage());
+            throw PersonalApiException.format(e, API401_TOKEN_ERROR, e.getMessage());
         }
     }
 

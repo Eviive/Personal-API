@@ -16,12 +16,14 @@ import java.util.List;
 public final class TokenUtilities {
 
     private final Algorithm algorithm;
+    private final JWTVerifier verifier;
 
     @Value("${is-production}")
     private boolean isProduction;
 
     public TokenUtilities(@Value("${jwt-secret-key}") String secret) {
         this.algorithm = Algorithm.HMAC256(secret);
+        this.verifier = JWT.require(algorithm).build();
     }
 
     public String generateAccessToken(String subject, String issuer, List<String> claims) {
@@ -45,7 +47,6 @@ public final class TokenUtilities {
     }
 
     public DecodedJWT verifyToken(String token) {
-        JWTVerifier verifier = JWT.require(algorithm).build();
         return verifier.verify(token);
     }
 

@@ -57,12 +57,11 @@ public class ImageService {
         try {
             blobClient.upload(file.getInputStream(), file.getSize());
 
-            BlobHttpHeaders headers = new BlobHttpHeaders();
-            headers.setContentType(file.getContentType());
+            BlobHttpHeaders headers = new BlobHttpHeaders().setContentType(file.getContentType());
 
             blobClient.setHttpHeaders(headers);
         } catch (Exception e) {
-            throw PersonalApiException.format(API500_UPLOAD_ERROR, e, e.getMessage());
+            throw PersonalApiException.format(e, API500_UPLOAD_ERROR, e.getMessage());
         }
 
         if (image.getUuid() != null) {
@@ -82,7 +81,7 @@ public class ImageService {
             try {
                 streamUtils.transferTo(blobClient.openInputStream(), outputStream);
             } catch (IOException e) {
-                throw PersonalApiException.format(API500_DOWNLOAD_ERROR, e, e.getMessage());
+                throw PersonalApiException.format(e, API500_DOWNLOAD_ERROR, e.getMessage());
             }
         };
 
@@ -128,7 +127,8 @@ public class ImageService {
     private BlobClient getBlobClient(Image image, String containerName) {
         String fileName = image.getUuid().toString();
 
-        return blobServiceClient.getBlobContainerClient(containerName).getBlobClient(fileName);
+        return blobServiceClient.getBlobContainerClient(containerName)
+                                .getBlobClient(fileName);
     }
 
 }
