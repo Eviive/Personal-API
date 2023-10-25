@@ -26,27 +26,27 @@ public class ProjectController {
 
     @GetMapping(path = "{id}", produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<ProjectDTO> findById(@PathVariable Long id) {
-        return ResponseEntity.ok().body(projectService.findById(id));
+        return ResponseEntity.ok(projectService.findById(id));
     }
 
 	@GetMapping(produces = APPLICATION_JSON_VALUE)
 	public ResponseEntity<List<ProjectDTO>> findAll() {
-		return ResponseEntity.ok().body(projectService.findAll());
+		return ResponseEntity.ok(projectService.findAll());
 	}
 
 	@GetMapping(path = "featured", produces = APPLICATION_JSON_VALUE)
 	public ResponseEntity<List<ProjectDTO>> findAllFeatured() {
-		return ResponseEntity.ok().body(projectService.findAllFeatured());
+		return ResponseEntity.ok(projectService.findAllFeatured());
 	}
 
     @GetMapping(path = "not-featured", produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<List<ProjectDTO>> findAllNotFeatured() {
-        return ResponseEntity.ok().body(projectService.findAllNotFeatured());
+        return ResponseEntity.ok(projectService.findAllNotFeatured());
     }
 
 	@GetMapping(path = "not-featured/paginated", produces = APPLICATION_JSON_VALUE)
 	public ResponseEntity<Page<ProjectDTO>> findAllNotFeaturedPaginated(@RequestParam(value = "page", defaultValue = "1") Integer page, @RequestParam(value = "size", defaultValue = "6") Integer size) {
-        return ResponseEntity.ok().body(projectService.findAllNotFeaturedPaginated(page, size));
+        return ResponseEntity.ok(projectService.findAllNotFeaturedPaginated(page, size));
 	}
 
     // POST
@@ -79,12 +79,12 @@ public class ProjectController {
 
     @PutMapping(path = "{id}", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<ProjectDTO> update(@PathVariable Long id, @RequestBody @Valid ProjectDTO projectDTO) {
-        return ResponseEntity.ok().body(projectService.update(id, projectDTO, null));
+        return ResponseEntity.ok(projectService.update(id, projectDTO, null));
     }
 
     @PutMapping(path = "{id}/with-image", consumes = MULTIPART_FORM_DATA_VALUE, produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<ProjectDTO> updateWithImage(@PathVariable Long id, @RequestPart("project") @Valid ProjectDTO projectDTO, @RequestPart("file") MultipartFile file) {
-        return ResponseEntity.ok().body(projectService.update(id, projectDTO, file));
+        return ResponseEntity.ok(projectService.update(id, projectDTO, file));
     }
 
     // DELETE

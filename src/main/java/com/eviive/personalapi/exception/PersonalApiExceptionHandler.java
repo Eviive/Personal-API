@@ -1,7 +1,7 @@
 package com.eviive.personalapi.exception;
 
 import com.eviive.personalapi.dto.ErrorResponseDTO;
-import com.eviive.personalapi.util.ErrorUtilities;
+import com.eviive.personalapi.util.ErrorUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -41,7 +41,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RequiredArgsConstructor
 public class PersonalApiExceptionHandler extends ResponseEntityExceptionHandler implements AuthenticationEntryPoint, AccessDeniedHandler {
 
-    private final ErrorUtilities errorUtilities;
+    private final ErrorUtils errorUtils;
 
     private final ObjectMapper objectMapper;
 
@@ -56,7 +56,7 @@ public class PersonalApiExceptionHandler extends ResponseEntityExceptionHandler 
     }
 
     private void sendError(HttpServletResponse res, PersonalApiErrorsEnum personalApiErrorsEnum) {
-        ErrorResponseDTO errorResponse = errorUtilities.buildError(personalApiErrorsEnum);
+        ErrorResponseDTO errorResponse = errorUtils.buildError(personalApiErrorsEnum);
 
         res.setStatus(errorResponse.getStatus());
         res.setContentType(APPLICATION_JSON_VALUE);
@@ -75,23 +75,23 @@ public class PersonalApiExceptionHandler extends ResponseEntityExceptionHandler 
         boolean logException = true;
 
         if (e instanceof PersonalApiException personalApiException) {
-            errorResponse = errorUtilities.buildError(personalApiException);
+            errorResponse = errorUtils.buildError(personalApiException);
 
         } else if (e instanceof JpaSystemException jpaSystemException) {
-            errorResponse = errorUtilities.buildError(API500_INTERNAL_SERVER_ERROR, jpaSystemException.getMostSpecificCause().getMessage());
+            errorResponse = errorUtils.buildError(API500_INTERNAL_SERVER_ERROR, jpaSystemException.getMostSpecificCause().getMessage());
 
         } else if (e instanceof TransactionSystemException transactionSystemException) {
-            errorResponse = errorUtilities.buildError(API500_INTERNAL_SERVER_ERROR, transactionSystemException.getMostSpecificCause().getMessage());
+            errorResponse = errorUtils.buildError(API500_INTERNAL_SERVER_ERROR, transactionSystemException.getMostSpecificCause().getMessage());
 
         } else if (e instanceof NestedRuntimeException nestedRuntimeException) {
-            errorResponse = errorUtilities.buildError(API500_INTERNAL_SERVER_ERROR, nestedRuntimeException.getMostSpecificCause().getMessage());
+            errorResponse = errorUtils.buildError(API500_INTERNAL_SERVER_ERROR, nestedRuntimeException.getMostSpecificCause().getMessage());
 
         } else if (e instanceof ClientAbortException clientAbortException) {
-            errorResponse = errorUtilities.buildError(API408_REQUEST_TIMEOUT, clientAbortException.getLocalizedMessage());
+            errorResponse = errorUtils.buildError(API408_REQUEST_TIMEOUT, clientAbortException.getLocalizedMessage());
             logException = false;
 
         } else {
-            errorResponse = errorUtilities.buildError(API500_INTERNAL_SERVER_ERROR, e.getMessage());
+            errorResponse = errorUtils.buildError(API500_INTERNAL_SERVER_ERROR, e.getMessage());
             defaultExceptionHandler = true;
         }
 
@@ -146,7 +146,7 @@ public class PersonalApiExceptionHandler extends ResponseEntityExceptionHandler 
     }
 
     private ResponseEntity<Object> handleBadRequestException(Object message) {
-        ErrorResponseDTO errorResponse = errorUtilities.buildError(BAD_REQUEST, message);
+        ErrorResponseDTO errorResponse = errorUtils.buildError(BAD_REQUEST, message);
 
         return ResponseEntity.badRequest()
                              .contentType(APPLICATION_JSON)

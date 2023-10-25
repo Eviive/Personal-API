@@ -24,12 +24,12 @@ public class RoleController {
 
     @GetMapping(path = "{id}", produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<RoleDTO> findById(@PathVariable Long id) {
-        return ResponseEntity.ok().body(roleService.findById(id));
+        return ResponseEntity.ok(roleService.findById(id));
     }
 
     @GetMapping(produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<List<RoleDTO>> findAll() {
-        return ResponseEntity.ok().body(roleService.findAll());
+        return ResponseEntity.ok(roleService.findAll());
     }
 
 }

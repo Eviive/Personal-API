@@ -13,7 +13,7 @@ import java.util.Date;
 import java.util.List;
 
 @Component
-public final class TokenUtilities {
+public final class TokenUtils {
 
     private final Algorithm algorithm;
     private final JWTVerifier verifier;
@@ -21,7 +21,7 @@ public final class TokenUtilities {
     @Value("${is-production}")
     private boolean isProduction;
 
-    public TokenUtilities(@Value("${jwt-secret-key}") String secret) {
+    public TokenUtils(@Value("${jwt-secret-key}") String secret) {
         this.algorithm = Algorithm.HMAC256(secret);
         this.verifier = JWT.require(algorithm).build();
     }

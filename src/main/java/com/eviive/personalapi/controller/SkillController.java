@@ -25,12 +25,12 @@ public class SkillController {
 
     @GetMapping(path = "{id}", produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<SkillDTO> findById(@PathVariable Long id) {
-        return ResponseEntity.ok().body(skillService.findById(id));
+        return ResponseEntity.ok(skillService.findById(id));
     }
 
 	@GetMapping(produces = APPLICATION_JSON_VALUE)
 	public ResponseEntity<List<SkillDTO>> findAll() {
-		return ResponseEntity.ok().body(skillService.findAll());
+		return ResponseEntity.ok(skillService.findAll());
 	}
 
     // POST
@@ -63,12 +63,12 @@ public class SkillController {
 
     @PutMapping(path = "{id}", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<SkillDTO> update(@PathVariable Long id, @RequestBody @Valid SkillDTO skillDTO) {
-        return ResponseEntity.ok().body(skillService.update(id, skillDTO, null));
+        return ResponseEntity.ok(skillService.update(id, skillDTO, null));
     }
 
     @PutMapping(path = "{id}/with-image", consumes = MULTIPART_FORM_DATA_VALUE, produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<SkillDTO> updateWithImage(@PathVariable Long id, @RequestPart("skill") @Valid SkillDTO skillDTO, @RequestPart("file") MultipartFile file) {
-        return ResponseEntity.ok().body(skillService.update(id, skillDTO, file));
+        return ResponseEntity.ok(skillService.update(id, skillDTO, file));
     }
 
     // DELETE

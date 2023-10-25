@@ -9,7 +9,7 @@ import com.eviive.personalapi.entity.User;
 import com.eviive.personalapi.exception.PersonalApiException;
 import com.eviive.personalapi.mapper.UserMapper;
 import com.eviive.personalapi.repository.UserRepository;
-import com.eviive.personalapi.util.TokenUtilities;
+import com.eviive.personalapi.util.TokenUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -38,7 +38,7 @@ public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
 
-    private final TokenUtilities tokenUtilities;
+    private final TokenUtils tokenUtils;
     private final AuthenticationConfiguration authenticationConfiguration;
     private final PasswordEncoder passwordEncoder;
 
@@ -102,9 +102,9 @@ public class UserService implements UserDetailsService {
             AuthResponseDTO responseBody = new AuthResponseDTO();
             responseBody.setUsername(subject);
             responseBody.setRoles(claims);
-            responseBody.setAccessToken(tokenUtilities.generateAccessToken(subject, issuer, claims));
+            responseBody.setAccessToken(tokenUtils.generateAccessToken(subject, issuer, claims));
 
-            res.addCookie(tokenUtilities.generateRefreshTokenCookie(subject, issuer));
+            res.addCookie(tokenUtils.generateRefreshTokenCookie(subject, issuer));
 
             return responseBody;
         } catch (AuthenticationException e) {
@@ -115,7 +115,7 @@ public class UserService implements UserDetailsService {
     }
 
     public void logout(HttpServletResponse res) {
-        res.addCookie(tokenUtilities.createCookie(null, 0));
+        res.addCookie(tokenUtils.createCookie(null, 0));
     }
 
     public AuthResponseDTO refreshToken(String refreshToken, HttpServletRequest req) {
@@ -124,7 +124,7 @@ public class UserService implements UserDetailsService {
         }
 
         try {
-            DecodedJWT decodedToken = tokenUtilities.verifyToken(refreshToken);
+            DecodedJWT decodedToken = tokenUtils.verifyToken(refreshToken);
 
             UserDTO user = findByUsername(decodedToken.getSubject());
 
@@ -133,7 +133,7 @@ public class UserService implements UserDetailsService {
                                       .map(RoleDTO::getName)
                                       .toList();
 
-            String accessToken = tokenUtilities.generateAccessToken(user.getUsername(), req.getRequestURL().toString(), claims);
+            String accessToken = tokenUtils.generateAccessToken(user.getUsername(), req.getRequestURL().toString(), claims);
 
             AuthResponseDTO responseBody = new AuthResponseDTO();
             responseBody.setUsername(user.getUsername());

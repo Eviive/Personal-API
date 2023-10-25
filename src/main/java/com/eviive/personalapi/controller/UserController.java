@@ -27,12 +27,12 @@ public class UserController {
 
     @GetMapping(path = "{id}", produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<UserDTO> findById(@PathVariable Long id) {
-        return ResponseEntity.ok().body(userService.findById(id));
+        return ResponseEntity.ok(userService.findById(id));
     }
 
 	@GetMapping(produces = APPLICATION_JSON_VALUE)
 	public ResponseEntity<List<UserDTO>> findAll() {
-		return ResponseEntity.ok().body(userService.findAll());
+		return ResponseEntity.ok(userService.findAll());
 	}
 
     // POST
@@ -48,9 +48,7 @@ public class UserController {
 
     @PostMapping(path = "login", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<AuthResponseDTO> login(@RequestBody @Valid AuthRequestDTO loginForm, HttpServletRequest req, HttpServletResponse res) {
-        AuthResponseDTO responseBody = userService.login(loginForm.getUsername(), loginForm.getPassword(), req, res);
-
-        return ResponseEntity.ok().body(responseBody);
+        return ResponseEntity.ok(userService.login(loginForm.getUsername(), loginForm.getPassword(), req, res));
     }
 
     @PostMapping(path = "logout", produces = APPLICATION_JSON_VALUE)
@@ -62,16 +60,14 @@ public class UserController {
 
     @PostMapping(path = "refresh", produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<AuthResponseDTO> refreshToken(@CookieValue(value = "API_refresh-token", required = false) String refreshToken, HttpServletRequest req) {
-        AuthResponseDTO responseBody = userService.refreshToken(refreshToken, req);
-
-        return ResponseEntity.ok().body(responseBody);
+        return ResponseEntity.ok(userService.refreshToken(refreshToken, req));
     }
 
     // PUT
 
     @PutMapping(path = "{id}", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<UserDTO> update(@PathVariable Long id, @RequestBody @Valid UserDTO userDTO) {
-        return ResponseEntity.ok().body(userService.update(id, userDTO));
+        return ResponseEntity.ok(userService.update(id, userDTO));
     }
 
     // DELETE
