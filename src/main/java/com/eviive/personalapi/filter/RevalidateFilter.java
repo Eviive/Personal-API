@@ -1,7 +1,6 @@
 package com.eviive.personalapi.filter;
 
 import com.eviive.personalapi.dto.RevalidateRequestDTO;
-import com.eviive.personalapi.dto.RevalidateResponseDTO;
 import com.eviive.personalapi.service.webservice.PortfolioWebService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -44,15 +43,12 @@ public class RevalidateFilter extends OncePerRequestFilter {
             return;
         }
 
-        try {
-            RevalidateRequestDTO revalidateRequestDTO = new RevalidateRequestDTO();
-            revalidateRequestDTO.setSecret(portfolioApiSecret);
+        RevalidateRequestDTO revalidateRequest = new RevalidateRequestDTO();
+        revalidateRequest.setSecret(portfolioApiSecret);
 
-            RevalidateResponseDTO revalidateResponseDTO = portfolioWebService.revalidate(revalidateRequestDTO);
-            log.info("Revalidated portfolio API: {}", revalidateResponseDTO);
-        } catch (Exception e) {
-            log.error("Error revalidating portfolio API", e);
-        }
+        portfolioWebService.revalidate(revalidateRequest)
+                           .doOnError(e -> log.error("Error revalidating portfolio API", e))
+                           .subscribe(revalidateResponseDTO -> log.info("Revalidated portfolio API: {}", res));
     }
 
 }

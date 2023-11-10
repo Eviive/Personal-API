@@ -37,20 +37,20 @@ public class SkillController {
 
     @PostMapping(consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<SkillDTO> save(@RequestBody @Valid SkillDTO skillDTO) {
-        SkillDTO createdSkillDTO = skillService.save(skillDTO, null);
+        SkillDTO createdSkill = skillService.save(skillDTO, null);
 
-        URI uri = URI.create(String.format("/skill/%s", createdSkillDTO.getId()));
+        URI uri = URI.create(String.format("/skill/%s", createdSkill.getId()));
 
-        return ResponseEntity.created(uri).body(createdSkillDTO);
+        return ResponseEntity.created(uri).body(createdSkill);
     }
 
     @PostMapping(path = "with-image", consumes = MULTIPART_FORM_DATA_VALUE, produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<SkillDTO> saveWithImage(@RequestPart("skill") @Valid SkillDTO skillDTO, @RequestPart("file") MultipartFile file) {
-        SkillDTO createdSkillDTO = skillService.save(skillDTO, file);
+        SkillDTO createdSkill = skillService.save(skillDTO, file);
 
-        URI uri = URI.create(String.format("/skill/%s", createdSkillDTO.getId()));
+        URI uri = URI.create(String.format("/skill/%s", createdSkill.getId()));
 
-        return ResponseEntity.created(uri).body(createdSkillDTO);
+        return ResponseEntity.created(uri).body(createdSkill);
     }
 
     @PostMapping(path = "sort", consumes = APPLICATION_JSON_VALUE)

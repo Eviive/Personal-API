@@ -53,20 +53,20 @@ public class ProjectController {
 
     @PostMapping(consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<ProjectDTO> save(@RequestBody @Valid ProjectDTO projectDTO) {
-        ProjectDTO createdProjectDTO = projectService.save(projectDTO, null);
+        ProjectDTO createdProject = projectService.save(projectDTO, null);
 
-        URI uri = URI.create(String.format("/project/%s", createdProjectDTO.getId()));
+        URI uri = URI.create(String.format("/project/%s", createdProject.getId()));
 
-        return ResponseEntity.created(uri).body(createdProjectDTO);
+        return ResponseEntity.created(uri).body(createdProject);
     }
 
     @PostMapping(path = "with-image", consumes = MULTIPART_FORM_DATA_VALUE, produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<ProjectDTO> saveWithImage(@RequestPart("project") @Valid ProjectDTO projectDTO, @RequestPart("file") MultipartFile file) {
-        ProjectDTO createdProjectDTO = projectService.save(projectDTO, file);
+        ProjectDTO createdProject = projectService.save(projectDTO, file);
 
-        URI uri = URI.create(String.format("/project/%s", createdProjectDTO.getId()));
+        URI uri = URI.create(String.format("/project/%s", createdProject.getId()));
 
-        return ResponseEntity.created(uri).body(createdProjectDTO);
+        return ResponseEntity.created(uri).body(createdProject);
     }
 
     @PostMapping(path = "sort", consumes = APPLICATION_JSON_VALUE)

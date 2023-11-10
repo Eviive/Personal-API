@@ -39,11 +39,11 @@ public class UserController {
 
     @PostMapping(consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<UserDTO> save(@RequestBody @Valid UserDTO userDTO) {
-        UserDTO createdUserDTO = userService.save(userDTO);
+        UserDTO createdUser = userService.save(userDTO);
 
-        URI uri = URI.create(String.format("/user/%s", createdUserDTO.getId()));
+        URI uri = URI.create(String.format("/user/%s", createdUser.getId()));
 
-        return ResponseEntity.created(uri).body(createdUserDTO);
+        return ResponseEntity.created(uri).body(createdUser);
     }
 
     @PostMapping(path = "login", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
