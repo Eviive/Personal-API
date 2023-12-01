@@ -2,7 +2,7 @@ package com.eviive.personalapi.exception;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatusCode;
+import org.springframework.http.HttpStatus;
 
 import static org.springframework.http.HttpStatus.*;
 
@@ -13,8 +13,6 @@ public enum PersonalApiErrorsEnum {
     // 400 Bad Request
 
     API400_BAD_REQUEST("Bad request", BAD_REQUEST),
-    API400_PAGE_NUMBER_INVALID("The page number must be positive (currently %d).", BAD_REQUEST),
-    API400_PAGE_SIZE_INVALID("The page's size must be positive (currently %d).", BAD_REQUEST),
     API400_FILE_EMPTY("The received file is empty", BAD_REQUEST),
     API400_IMAGE_NO_NAME("The received image has no name", BAD_REQUEST),
     API400_MISSING_SERVLET_REQUEST_PARAMETER("The request parameter %s of type %s is missing", BAD_REQUEST),
@@ -55,6 +53,6 @@ public enum PersonalApiErrorsEnum {
     API500_IMAGE_NO_PARENT("The image %s is linked to nothing", INTERNAL_SERVER_ERROR);
 
     private final String message;
-    private final HttpStatusCode httpStatusCode;
+    private final HttpStatus httpStatus;
 
 }

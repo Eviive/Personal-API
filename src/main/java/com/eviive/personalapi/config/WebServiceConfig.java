@@ -12,7 +12,7 @@ import org.springframework.web.service.invoker.HttpServiceProxyFactory;
 public class WebServiceConfig {
 
     private <E> E buildWebClient(WebClient webClient, Class<E> webServiceInterface) {
-        return HttpServiceProxyFactory.builder(WebClientAdapter.forClient(webClient))
+        return HttpServiceProxyFactory.builderFor(WebClientAdapter.create(webClient))
                                       .build()
                                       .createClient(webServiceInterface);
     }

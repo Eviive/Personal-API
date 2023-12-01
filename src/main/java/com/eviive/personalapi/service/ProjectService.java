@@ -8,16 +8,14 @@ import com.eviive.personalapi.repository.ProjectRepository;
 import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
-import static com.eviive.personalapi.exception.PersonalApiErrorsEnum.*;
+import static com.eviive.personalapi.exception.PersonalApiErrorsEnum.API404_PROJECT_ID_NOT_FOUND;
 
 @Service
 @Transactional
@@ -47,17 +45,7 @@ public class ProjectService {
         return projectMapper.toListDTO(projectRepository.findAllByFeaturedIsFalse());
     }
 
-    public Page<ProjectDTO> findAllNotFeaturedPaginated(int page, int size) {
-        if (page < 1) {
-            throw PersonalApiException.format(API400_PAGE_NUMBER_INVALID, page);
-        }
-
-        if (size < 1) {
-            throw PersonalApiException.format(API400_PAGE_SIZE_INVALID, size);
-        }
-
-        Pageable pageable = PageRequest.of(page - 1, size, Sort.by("sort"));
-
+    public Page<ProjectDTO> findAllNotFeaturedPaginated(Pageable pageable) {
         return projectRepository.findAllByFeaturedIsFalse(pageable)
                                 .map(projectMapper::toDTO);
     }

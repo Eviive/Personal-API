@@ -48,7 +48,7 @@ public class RevalidateFilter extends OncePerRequestFilter {
 
         portfolioWebService.revalidate(revalidateRequest)
                            .doOnError(e -> log.error("Error revalidating portfolio API", e))
-                           .subscribe(revalidateResponseDTO -> log.info("Revalidated portfolio API: {}", res));
+                           .subscribe(revalidateResponse -> log.info("Revalidated portfolio API: {}", revalidateResponse));
     }
 
 }

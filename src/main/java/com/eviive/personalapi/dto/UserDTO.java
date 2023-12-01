@@ -14,15 +14,15 @@ public class UserDTO {
     private Long id;
 
     @NotBlank(message = "The user's username cannot be blank.")
-    @Length(max = 50, message = "The user's username cannot be longer than 50 characters.")
+    @Length(max = 50, message = "The user's username cannot be longer than {max} characters.")
     private String username;
 
     @NotBlank(message = "The user's password cannot be blank.")
-    @Length(max = 50, message = "The user's password cannot be longer than 50 characters.")
+    @Length(max = 50, message = "The user's password cannot be longer than {max} characters.")
     private String firstName;
 
     @NotBlank(message = "The user's password cannot be blank.")
-    @Length(max = 50, message = "The user's password cannot be longer than 50 characters.")
+    @Length(max = 50, message = "The user's password cannot be longer than {max} characters.")
     private String lastName;
 
     @NotNull(message = "The user's roles cannot be null.")

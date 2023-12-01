@@ -2,6 +2,7 @@ package com.eviive.personalapi.controller;
 
 import com.eviive.personalapi.dto.SkillDTO;
 import com.eviive.personalapi.service.SkillService;
+import com.eviive.personalapi.util.UriUtils;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +22,8 @@ public class SkillController {
 
 	private final SkillService skillService;
 
+    private final UriUtils uriUtils;
+
     // GET
 
     @GetMapping(path = "{id}", produces = APPLICATION_JSON_VALUE)
@@ -38,19 +41,17 @@ public class SkillController {
     @PostMapping(consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<SkillDTO> save(@RequestBody @Valid SkillDTO skillDTO) {
         SkillDTO createdSkill = skillService.save(skillDTO, null);
-
-        URI uri = URI.create(String.format("/skill/%s", createdSkill.getId()));
-
-        return ResponseEntity.created(uri).body(createdSkill);
+        URI location = uriUtils.buildLocation(createdSkill.getId());
+        return ResponseEntity.created(location)
+                             .body(createdSkill);
     }
 
     @PostMapping(path = "with-image", consumes = MULTIPART_FORM_DATA_VALUE, produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<SkillDTO> saveWithImage(@RequestPart("skill") @Valid SkillDTO skillDTO, @RequestPart("file") MultipartFile file) {
         SkillDTO createdSkill = skillService.save(skillDTO, file);
-
-        URI uri = URI.create(String.format("/skill/%s", createdSkill.getId()));
-
-        return ResponseEntity.created(uri).body(createdSkill);
+        URI location = uriUtils.buildLocation(createdSkill.getId(), "with-image");
+        return ResponseEntity.created(location)
+                             .body(createdSkill);
     }
 
     @PostMapping(path = "sort", consumes = APPLICATION_JSON_VALUE)

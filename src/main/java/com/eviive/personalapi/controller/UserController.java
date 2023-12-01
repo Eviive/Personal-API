@@ -4,6 +4,7 @@ import com.eviive.personalapi.dto.AuthRequestDTO;
 import com.eviive.personalapi.dto.AuthResponseDTO;
 import com.eviive.personalapi.dto.UserDTO;
 import com.eviive.personalapi.service.UserService;
+import com.eviive.personalapi.util.UriUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -23,6 +24,8 @@ public class UserController {
 
 	private final UserService userService;
 
+    private final UriUtils uriUtils;
+
     // GET
 
     @GetMapping(path = "{id}", produces = APPLICATION_JSON_VALUE)
@@ -40,10 +43,9 @@ public class UserController {
     @PostMapping(consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<UserDTO> save(@RequestBody @Valid UserDTO userDTO) {
         UserDTO createdUser = userService.save(userDTO);
-
-        URI uri = URI.create(String.format("/user/%s", createdUser.getId()));
-
-        return ResponseEntity.created(uri).body(createdUser);
+        URI location = uriUtils.buildLocation(createdUser.getId());
+        return ResponseEntity.created(location)
+                             .body(createdUser);
     }
 
     @PostMapping(path = "login", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)

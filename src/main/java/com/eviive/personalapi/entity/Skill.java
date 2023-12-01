@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
 
 import static jakarta.persistence.CascadeType.ALL;
@@ -40,18 +39,5 @@ public class Skill {
     @ManyToMany(mappedBy = "skills", fetch = LAZY)
     @ToString.Exclude
     private Set<Project> projects = new HashSet<>();
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Skill skill = (Skill) o;
-        return Objects.equals(id, skill.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
-    }
 
 }

@@ -13,11 +13,11 @@ public class SkillDTO {
     private Long id;
 
     @NotBlank(message = "The skill's name cannot be blank.")
-    @Length(max = 50, message = "The skill's name cannot be longer than 50 characters.")
+    @Length(max = 50, message = "The skill's name cannot be longer than {max} characters.")
     private String name;
 
     @NotNull(message = "The skill's sort cannot be null.")
-    @Min(value = 0, message = "The skill's sort cannot be less than 0.")
+    @Min(value = 0, message = "The skill's sort cannot be less than {min}.")
     private Integer sort;
 
     @NotNull(message = "The skill's image cannot be null.")

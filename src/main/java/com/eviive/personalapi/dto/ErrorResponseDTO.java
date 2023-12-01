@@ -1,14 +1,16 @@
 package com.eviive.personalapi.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
-public class ErrorResponseDTO {
+@AllArgsConstructor
+public class ErrorResponseDTO<E> {
 
     private Integer status;
 
     private String error;
 
-    private Object message;
+    private E message;
 
 }

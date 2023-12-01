@@ -2,9 +2,11 @@ package com.eviive.personalapi.controller;
 
 import com.eviive.personalapi.dto.ProjectDTO;
 import com.eviive.personalapi.service.ProjectService;
+import com.eviive.personalapi.util.UriUtils;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -21,6 +23,8 @@ import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
 public class ProjectController {
 
 	private final ProjectService projectService;
+
+    private final UriUtils uriUtils;
 
     // GET
 
@@ -45,8 +49,8 @@ public class ProjectController {
     }
 
 	@GetMapping(path = "not-featured/paginated", produces = APPLICATION_JSON_VALUE)
-	public ResponseEntity<Page<ProjectDTO>> findAllNotFeaturedPaginated(@RequestParam(value = "page", defaultValue = "1") Integer page, @RequestParam(value = "size", defaultValue = "6") Integer size) {
-        return ResponseEntity.ok(projectService.findAllNotFeaturedPaginated(page, size));
+	public ResponseEntity<Page<ProjectDTO>> findAllNotFeaturedPaginated(Pageable pageable) {
+        return ResponseEntity.ok(projectService.findAllNotFeaturedPaginated(pageable));
 	}
 
     // POST
@@ -54,19 +58,17 @@ public class ProjectController {
     @PostMapping(consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<ProjectDTO> save(@RequestBody @Valid ProjectDTO projectDTO) {
         ProjectDTO createdProject = projectService.save(projectDTO, null);
-
-        URI uri = URI.create(String.format("/project/%s", createdProject.getId()));
-
-        return ResponseEntity.created(uri).body(createdProject);
+        URI location = uriUtils.buildLocation(createdProject.getId());
+        return ResponseEntity.created(location)
+                             .body(createdProject);
     }
 
     @PostMapping(path = "with-image", consumes = MULTIPART_FORM_DATA_VALUE, produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<ProjectDTO> saveWithImage(@RequestPart("project") @Valid ProjectDTO projectDTO, @RequestPart("file") MultipartFile file) {
         ProjectDTO createdProject = projectService.save(projectDTO, file);
-
-        URI uri = URI.create(String.format("/project/%s", createdProject.getId()));
-
-        return ResponseEntity.created(uri).body(createdProject);
+        URI location = uriUtils.buildLocation(createdProject.getId(), "with-image");
+        return ResponseEntity.created(location)
+                             .body(createdProject);
     }
 
     @PostMapping(path = "sort", consumes = APPLICATION_JSON_VALUE)

@@ -1,28 +1,30 @@
 package com.eviive.personalapi.exception;
 
 import lombok.Getter;
-import org.springframework.http.HttpStatusCode;
+import org.springframework.http.HttpStatus;
 
 @Getter
 public class PersonalApiException extends RuntimeException {
 
-    private final HttpStatusCode httpStatusCode;
+    private final HttpStatus httpStatus;
 
-    private PersonalApiException(Throwable cause, String message, HttpStatusCode httpStatusCode) {
+    private PersonalApiException(Throwable cause, String message, HttpStatus httpStatus) {
         super(message, cause);
-        this.httpStatusCode = httpStatusCode;
+        this.httpStatus = httpStatus;
     }
 
-    private PersonalApiException(String message, HttpStatusCode httpStatusCode) {
-        this(null, message, httpStatusCode);
+    private PersonalApiException(String message, HttpStatus httpStatus) {
+        this(null, message, httpStatus);
     }
 
     public PersonalApiException(PersonalApiErrorsEnum personalApiErrorsEnum) {
-        this(personalApiErrorsEnum.getMessage(), personalApiErrorsEnum.getHttpStatusCode());
+        this(personalApiErrorsEnum.getMessage(), personalApiErrorsEnum.getHttpStatus());
     }
 
+    // Formatted messages
+
     public static PersonalApiException format(Throwable cause, PersonalApiErrorsEnum personalApiErrorsEnum, Object... args) {
-        return new PersonalApiException(cause, personalApiErrorsEnum.getMessage().formatted(args), personalApiErrorsEnum.getHttpStatusCode());
+        return new PersonalApiException(cause, personalApiErrorsEnum.getMessage().formatted(args), personalApiErrorsEnum.getHttpStatus());
     }
 
     public static PersonalApiException format(PersonalApiErrorsEnum personalApiErrorsEnum, Object... args) {

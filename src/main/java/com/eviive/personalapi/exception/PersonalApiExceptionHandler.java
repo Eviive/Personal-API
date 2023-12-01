@@ -13,8 +13,9 @@ import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.core.NestedRuntimeException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.lang.NonNull;
 import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
@@ -23,10 +24,10 @@ import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.transaction.TransactionSystemException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
-import org.springframework.web.bind.ServletRequestBindingException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import java.io.IOException;
@@ -34,7 +35,6 @@ import java.util.List;
 
 import static com.eviive.personalapi.exception.PersonalApiErrorsEnum.*;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestControllerAdvice
@@ -56,7 +56,7 @@ public class PersonalApiExceptionHandler extends ResponseEntityExceptionHandler 
     }
 
     private void sendError(HttpServletResponse res, PersonalApiErrorsEnum personalApiErrorsEnum) {
-        ErrorResponseDTO errorResponse = errorUtils.buildError(personalApiErrorsEnum);
+        ErrorResponseDTO<String> errorResponse = errorUtils.buildError(personalApiErrorsEnum);
 
         res.setStatus(errorResponse.getStatus());
         res.setContentType(APPLICATION_JSON_VALUE);
@@ -69,8 +69,8 @@ public class PersonalApiExceptionHandler extends ResponseEntityExceptionHandler 
     }
 
     @ExceptionHandler(Exception.class)
-    public final ResponseEntity<ErrorResponseDTO> handleAllExceptions(Exception e, WebRequest req) {
-        ErrorResponseDTO errorResponse;
+    public final ResponseEntity<ErrorResponseDTO<String>> handleAllExceptions(Exception e, WebRequest req) {
+        ErrorResponseDTO<String> errorResponse;
         boolean defaultExceptionHandler = false;
         boolean logException = true;
 
@@ -106,7 +106,6 @@ public class PersonalApiExceptionHandler extends ResponseEntityExceptionHandler 
         }
 
         return ResponseEntity.status(errorResponse.getStatus())
-                             .contentType(APPLICATION_JSON)
                              .body(errorResponse);
     }
 
@@ -126,13 +125,22 @@ public class PersonalApiExceptionHandler extends ResponseEntityExceptionHandler 
     }
 
     @Override
-    protected ResponseEntity<Object> handleMissingServletRequestParameter(MissingServletRequestParameterException e, @NotNull HttpHeaders headers, @NotNull HttpStatusCode status, @NotNull WebRequest req) {
-        return handleBadRequestException(API400_MISSING_SERVLET_REQUEST_PARAMETER, e.getParameterName(), e.getParameterType());
+    protected ResponseEntity<Object> handleHandlerMethodValidationException(@NonNull HandlerMethodValidationException ex, @NonNull HttpHeaders headers, @NonNull HttpStatusCode status, @NonNull WebRequest request) {
+        List<String> validationErrors = ex.getAllValidationResults()
+                .stream()
+                .flatMap(r ->
+                        r.getResolvableErrors()
+                         .stream()
+                         .map(e -> "The %s parameter %s.".formatted(r.getMethodParameter().getParameterName(), e.getDefaultMessage()))
+                )
+                .toList();
+
+        return handleBadRequestException(validationErrors);
     }
 
     @Override
-    protected ResponseEntity<Object> handleServletRequestBindingException(@NotNull ServletRequestBindingException e, @NotNull HttpHeaders headers, @NotNull HttpStatusCode status, @NotNull WebRequest req) {
-        return handleBadRequestException(e.getMessage());
+    protected ResponseEntity<Object> handleMissingServletRequestParameter(MissingServletRequestParameterException e, @NotNull HttpHeaders headers, @NotNull HttpStatusCode status, @NotNull WebRequest req) {
+        return handleBadRequestException(API400_MISSING_SERVLET_REQUEST_PARAMETER, e.getParameterName(), e.getParameterType());
     }
 
     @Override
@@ -140,21 +148,26 @@ public class PersonalApiExceptionHandler extends ResponseEntityExceptionHandler 
         return handleBadRequestException(API400_TYPE_MISMATCH, e.getPropertyName());
     }
 
-    @Override
-    protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException e, @NotNull HttpHeaders headers, @NotNull HttpStatusCode status, @NotNull WebRequest req) {
-        return handleBadRequestException(e.getLocalizedMessage());
-    }
-
-    private ResponseEntity<Object> handleBadRequestException(Object message) {
-        ErrorResponseDTO errorResponse = errorUtils.buildError(BAD_REQUEST, message);
-
+    private <E> ResponseEntity<Object> handleBadRequestException(E message) {
         return ResponseEntity.badRequest()
-                             .contentType(APPLICATION_JSON)
-                             .body(errorResponse);
+                             .body(errorUtils.buildError(BAD_REQUEST, message));
     }
 
     private ResponseEntity<Object> handleBadRequestException(PersonalApiErrorsEnum personalApiErrorsEnum, Object... args) {
         return handleBadRequestException(personalApiErrorsEnum.getMessage().formatted(args));
+    }
+
+    @Override
+    @NonNull
+    protected ResponseEntity<Object> createResponseEntity(Object body, @NonNull HttpHeaders headers, @NonNull HttpStatusCode statusCode, @NonNull WebRequest request) {
+        return super.createResponseEntity(
+                body instanceof ProblemDetail problemDetail
+                        ? errorUtils.buildError(statusCode, problemDetail)
+                        : body,
+                headers,
+                statusCode,
+                request
+        );
     }
 
 }
