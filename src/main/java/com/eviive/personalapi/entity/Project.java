@@ -51,15 +51,14 @@ public class Project {
     private Integer sort;
 
     @OneToOne(cascade = ALL, fetch = LAZY, orphanRemoval = true)
-    @JoinColumn(name = "IMAGE_ID", referencedColumnName = "ID", foreignKey = @ForeignKey(name = "FK_PROJECT_IMAGE"))
     @ToString.Exclude
     private Image image;
 
     @ManyToMany
     @JoinTable(
             name = "API_PROJECT_SKILL_MAP",
-            joinColumns = @JoinColumn(name = "PROJECT_ID", referencedColumnName = "ID", foreignKey = @ForeignKey(name = "FK_MAP_PROJECT")),
-            inverseJoinColumns = @JoinColumn(name = "SKILL_ID", referencedColumnName = "ID", foreignKey = @ForeignKey(name = "FK_MAP_SKILL"))
+            joinColumns = @JoinColumn(name = "PROJECT_ID"),
+            inverseJoinColumns = @JoinColumn(name = "SKILL_ID")
     )
     @ToString.Exclude
     private Set<Skill> skills = new HashSet<>();

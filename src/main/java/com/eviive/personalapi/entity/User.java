@@ -36,8 +36,8 @@ public class User {
     @ManyToMany
     @JoinTable(
             name = "API_USER_ROLE_MAP",
-            joinColumns = @JoinColumn(name = "USER_ID", referencedColumnName = "ID", foreignKey = @ForeignKey(name = "FK_MAP_USER")),
-            inverseJoinColumns = @JoinColumn(name = "ROLE_ID", referencedColumnName = "ID", foreignKey = @ForeignKey(name = "FK_MAP_ROLE"))
+            joinColumns = @JoinColumn(name = "USER_ID"),
+            inverseJoinColumns = @JoinColumn(name = "ROLE_ID")
     )
     @ToString.Exclude
     private Set<Role> roles = new HashSet<>();
