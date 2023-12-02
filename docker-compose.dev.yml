@@ -1,8 +1,8 @@
-version: '3.9'
+version: "3.9"
 
 services:
   database:
-    container_name: personal-api-postgres
+    container_name: personal-api-postgres-dev
     image: postgres:16.1-alpine
     restart: unless-stopped
     ports:
@@ -14,7 +14,7 @@ services:
       POSTGRES_HOST_AUTH_METHOD: scram-sha-256
       POSTGRES_INITDB_ARGS: --auth=scram-sha-256
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres-dev-data:/var/lib/postgresql/data
 
 volumes:
-  postgres_data:
+  postgres-dev-data:
