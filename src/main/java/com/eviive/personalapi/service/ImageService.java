@@ -5,20 +5,13 @@ import com.azure.storage.blob.BlobContainerClient;
 import com.azure.storage.blob.BlobServiceClient;
 import com.azure.storage.blob.models.BlobHttpHeaders;
 import com.eviive.personalapi.entity.Image;
-import com.eviive.personalapi.entity.Project;
-import com.eviive.personalapi.entity.Skill;
 import com.eviive.personalapi.exception.PersonalApiException;
-import com.eviive.personalapi.repository.ImageRepository;
-import com.eviive.personalapi.util.StreamUtils;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.util.Pair;
-import org.springframework.http.MediaType;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
-import java.io.IOException;
 import java.util.UUID;
 
 import static com.eviive.personalapi.exception.PersonalApiErrorsEnum.*;
@@ -28,13 +21,15 @@ import static com.eviive.personalapi.exception.PersonalApiErrorsEnum.*;
 @RequiredArgsConstructor
 public class ImageService {
 
-    private final ImageRepository imageRepository;
-
     private final BlobServiceClient blobServiceClient;
 
-    private final StreamUtils streamUtils;
+    @Value("${spring.cloud.azure.storage.blob.container-name.project}")
+    private String projectContainer;
 
-    public void upload(Image image, String containerName, MultipartFile file) {
+    @Value("${spring.cloud.azure.storage.blob.container-name.skill}")
+    private String skillContainer;
+
+    public void upload(Image image, UUID oldUuid, MultipartFile file) {
         if (file.isEmpty()) {
             throw new PersonalApiException(API400_FILE_EMPTY);
         }
@@ -48,11 +43,7 @@ public class ImageService {
             throw new PersonalApiException(API400_IMAGE_NO_NAME);
         }
 
-        BlobContainerClient containerClient = blobServiceClient.createBlobContainerIfNotExists(containerName);
-
-        UUID uuid = UUID.randomUUID();
-
-        BlobClient blobClient = containerClient.getBlobClient(uuid.toString());
+        BlobClient blobClient = getBlobClient(image);
 
         try {
             blobClient.upload(file.getInputStream(), file.getSize());
@@ -64,71 +55,40 @@ public class ImageService {
             throw PersonalApiException.format(e, API500_UPLOAD_ERROR, e.getMessage());
         }
 
-        if (image.getUuid() != null) {
-            delete(image, containerName);
+        if (oldUuid != null) {
+            delete(image, oldUuid);
         }
-
-        image.setUuid(uuid);
     }
 
-    public Pair<StreamingResponseBody, MediaType> download(UUID uuid) {
-        Image image = imageRepository.findByUuid(uuid)
-                                     .orElseThrow(() -> PersonalApiException.format(API404_IMAGE_NOT_FOUND, uuid));
-
-        BlobClient blobClient = getBlobClient(image);
-
-        StreamingResponseBody streamingResponseBody = outputStream -> {
-            try {
-                streamUtils.transferTo(blobClient.openInputStream(), outputStream);
-            } catch (IOException e) {
-                throw PersonalApiException.format(e, API500_DOWNLOAD_ERROR, e.getMessage());
-            }
-        };
-
-        MediaType mediaType = MediaType.parseMediaType(blobClient.getProperties().getContentType());
-
-        return Pair.of(streamingResponseBody, mediaType);
-    }
-
-    public void delete(UUID uuid) {
-        Image image = imageRepository.findByUuid(uuid)
-                                     .orElseThrow(() -> PersonalApiException.format(API404_IMAGE_NOT_FOUND, uuid));
-
-        delete(image);
-
-        imageRepository.save(image);
-    }
-
-    private void delete(Image image) {
+    public void delete(Image image) {
         getBlobClient(image).deleteIfExists();
 
         image.setUuid(null);
     }
 
-    public void delete(Image image, String containerName) {
-        getBlobClient(image, containerName).deleteIfExists();
+    private void delete(Image image, UUID oldUuid) {
+        getBlobClient(image, oldUuid).deleteIfExists();
+    }
 
-        image.setUuid(null);
+    private BlobContainerClient getBlobContainerClient(Image image) {
+        String containerName;
+        if (image.getProject() != null) {
+            containerName = projectContainer;
+        } else if (image.getSkill() != null) {
+            containerName = skillContainer;
+        } else {
+            throw PersonalApiException.format(API500_UNKNOWN_CONTAINER, image.getUuid().toString());
+        }
+
+        return blobServiceClient.createBlobContainerIfNotExists(containerName);
     }
 
     private BlobClient getBlobClient(Image image) {
-        String containerName;
-        if (image.getProject() != null) {
-            containerName = Project.AZURE_CONTAINER_NAME;
-        } else if (image.getSkill() != null) {
-            containerName = Skill.AZURE_CONTAINER_NAME;
-        } else {
-            throw PersonalApiException.format(API500_IMAGE_NO_PARENT, image.getUuid().toString());
-        }
-
-        return getBlobClient(image, containerName);
+        return getBlobClient(image, image.getUuid());
     }
 
-    private BlobClient getBlobClient(Image image, String containerName) {
-        String fileName = image.getUuid().toString();
-
-        return blobServiceClient.getBlobContainerClient(containerName)
-                                .getBlobClient(fileName);
+    private BlobClient getBlobClient(Image image, UUID uuid) {
+        return getBlobContainerClient(image).getBlobClient(uuid.toString());
     }
 
 }
