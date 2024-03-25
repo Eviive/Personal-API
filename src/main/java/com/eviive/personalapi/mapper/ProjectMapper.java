@@ -31,11 +31,11 @@ public interface ProjectMapper {
 
     @AfterMapping
     default void afterMapping(@MappingTarget Project project) {
-        if (project.getSkills() != null) {
-            project.getSkills().forEach(skill -> skill.getProjects().add(project));
-        }
         if (project.getImage() != null) {
             project.getImage().setProject(project);
+        }
+        if (project.getSkills() != null) {
+            project.getSkills().forEach(skill -> skill.getProjects().add(project));
         }
     }
 

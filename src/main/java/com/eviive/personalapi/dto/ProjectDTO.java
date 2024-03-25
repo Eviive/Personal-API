@@ -41,7 +41,6 @@ public class ProjectDTO {
     @NotNull(message = "The project's featured status cannot be null.")
     private Boolean featured;
 
-    @NotNull(message = "The project's sort cannot be null.")
     @Min(value = 0, message = "The project's sort cannot be less than {min}.")
     private Integer sort;
 

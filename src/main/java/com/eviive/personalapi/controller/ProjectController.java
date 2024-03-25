@@ -1,6 +1,7 @@
 package com.eviive.personalapi.controller;
 
 import com.eviive.personalapi.dto.ProjectDTO;
+import com.eviive.personalapi.dto.SortUpdateDTO;
 import com.eviive.personalapi.service.ProjectService;
 import com.eviive.personalapi.util.UriUtils;
 import jakarta.validation.Valid;
@@ -71,12 +72,6 @@ public class ProjectController {
                              .body(createdProject);
     }
 
-    @PostMapping(path = "sort", consumes = APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> sort(@RequestBody List<Long> sortedIds) {
-        projectService.sort(sortedIds);
-        return ResponseEntity.noContent().build();
-    }
-
     // PUT
 
     @PutMapping(path = "{id}", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
@@ -87,6 +82,14 @@ public class ProjectController {
     @PutMapping(path = "{id}/with-image", consumes = MULTIPART_FORM_DATA_VALUE, produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<ProjectDTO> updateWithImage(@PathVariable Long id, @RequestPart("project") @Valid ProjectDTO projectDTO, @RequestPart("file") MultipartFile file) {
         return ResponseEntity.ok(projectService.update(id, projectDTO, file));
+    }
+
+    // PATCH
+
+    @PatchMapping(path = "sort", consumes = APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> sort(@RequestBody List<SortUpdateDTO> sorts) {
+        projectService.sort(sorts);
+        return ResponseEntity.noContent().build();
     }
 
     // DELETE

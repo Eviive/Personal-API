@@ -33,11 +33,11 @@ public interface SkillMapper {
 
     @AfterMapping
     default void afterMapping(@MappingTarget Skill skill) {
-        if (skill.getProjects() != null) {
-            skill.getProjects().forEach(project -> project.getSkills().add(skill));
-        }
         if (skill.getImage() != null) {
             skill.getImage().setSkill(skill);
+        }
+        if (skill.getProjects() != null) {
+            skill.getProjects().forEach(project -> project.getSkills().add(skill));
         }
     }
 

@@ -1,6 +1,7 @@
 package com.eviive.personalapi.service;
 
 import com.eviive.personalapi.dto.ProjectDTO;
+import com.eviive.personalapi.dto.SortUpdateDTO;
 import com.eviive.personalapi.entity.Project;
 import com.eviive.personalapi.exception.PersonalApiException;
 import com.eviive.personalapi.mapper.ProjectMapper;
@@ -14,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.UUID;
 
 import static com.eviive.personalapi.exception.PersonalApiErrorsEnum.API404_PROJECT_ID_NOT_FOUND;
 
@@ -53,16 +55,35 @@ public class ProjectService {
     public ProjectDTO save(ProjectDTO projectDTO, @Nullable MultipartFile file) {
         Project project = projectMapper.toEntity(projectDTO);
 
-        if (file != null) {
-            imageService.upload(project.getImage(), Project.AZURE_CONTAINER_NAME, file);
-        }
+        Integer newSort = projectRepository
+                .findMaxSort()
+                .map(sort -> sort + 1)
+                .orElse(0);
 
-        return projectMapper.toDTO(projectRepository.save(project));
+        project.setSort(newSort);
+
+        return saveOrUpdate(project, file);
     }
 
-    public void sort(List<Long> sortedIds) {
-        for (Long id: sortedIds) {
-            projectRepository.updateSortById(sortedIds.indexOf(id), id);
+    private ProjectDTO saveOrUpdate(Project project, @Nullable MultipartFile file) {
+        UUID oldUuid = null;
+        if (file != null) {
+            oldUuid = project.getImage().getUuid();
+            project.getImage().setUuid(UUID.randomUUID());
+        }
+
+        Project savedProject = projectRepository.save(project);
+
+        if (file != null) {
+            imageService.upload(savedProject.getImage(), oldUuid, file);
+        }
+
+        return projectMapper.toDTO(savedProject);
+    }
+
+    public void sort(List<SortUpdateDTO> sorts) {
+        for (SortUpdateDTO sort: sorts) {
+            projectRepository.updateSortById(sort.getId(), sort.getSort());
         }
     }
 
@@ -75,11 +96,7 @@ public class ProjectService {
 
         project.setId(id);
 
-        if (file != null) {
-            imageService.upload(project.getImage(), Project.AZURE_CONTAINER_NAME, file);
-        }
-
-        return projectMapper.toDTO(projectRepository.save(project));
+        return saveOrUpdate(project, file);
     }
 
     public void delete(Long id) {
@@ -87,7 +104,7 @@ public class ProjectService {
                                            .orElseThrow(() -> PersonalApiException.format(API404_PROJECT_ID_NOT_FOUND, id));
 
         if (project.getImage().getUuid() != null) {
-            imageService.delete(project.getImage(), Project.AZURE_CONTAINER_NAME);
+            imageService.delete(project.getImage());
         }
 
         projectRepository.deleteById(id);

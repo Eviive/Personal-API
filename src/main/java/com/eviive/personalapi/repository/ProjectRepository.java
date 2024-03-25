@@ -6,11 +6,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ProjectRepository extends JpaRepository<Project, Long> {
@@ -21,9 +20,11 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
 
     Page<Project> findAllByFeaturedIsFalse(Pageable pageable);
 
-    @Transactional
+    @Query("select max(s.sort) from Skill s")
+    Optional<Integer> findMaxSort();
+
     @Modifying
     @Query("update Project p set p.sort = :sort where p.id = :id")
-    void updateSortById(@Param("sort") Integer sort, @Param("id") Long id);
+    void updateSortById(Long id, Integer sort);
 
 }

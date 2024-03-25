@@ -1,6 +1,7 @@
 package com.eviive.personalapi.controller;
 
 import com.eviive.personalapi.dto.SkillDTO;
+import com.eviive.personalapi.dto.SortUpdateDTO;
 import com.eviive.personalapi.service.SkillService;
 import com.eviive.personalapi.util.UriUtils;
 import jakarta.validation.Valid;
@@ -54,12 +55,6 @@ public class SkillController {
                              .body(createdSkill);
     }
 
-    @PostMapping(path = "sort", consumes = APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> sort(@RequestBody List<Long> sortedIds) {
-        skillService.sort(sortedIds);
-        return ResponseEntity.noContent().build();
-    }
-
     // PUT
 
     @PutMapping(path = "{id}", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
@@ -70,6 +65,14 @@ public class SkillController {
     @PutMapping(path = "{id}/with-image", consumes = MULTIPART_FORM_DATA_VALUE, produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<SkillDTO> updateWithImage(@PathVariable Long id, @RequestPart("skill") @Valid SkillDTO skillDTO, @RequestPart("file") MultipartFile file) {
         return ResponseEntity.ok(skillService.update(id, skillDTO, file));
+    }
+
+    // PATCH
+
+    @PatchMapping(path = "sort", consumes = APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> sort(@RequestBody List<SortUpdateDTO> sorts) {
+        skillService.sort(sorts);
+        return ResponseEntity.noContent().build();
     }
 
     // DELETE

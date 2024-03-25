@@ -20,8 +20,6 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 @AllArgsConstructor
 public class Project {
 
-    public static final String AZURE_CONTAINER_NAME = "project-images";
-
     @Id
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
@@ -51,6 +49,7 @@ public class Project {
     private Integer sort;
 
     @OneToOne(cascade = ALL, fetch = LAZY, orphanRemoval = true)
+    @JoinColumn(name = "IMAGE_ID")
     @ToString.Exclude
     private Image image;
 
