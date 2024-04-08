@@ -20,7 +20,7 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
 
     Page<Project> findAllByFeaturedIsFalse(Pageable pageable);
 
-    @Query("select max(s.sort) from Skill s")
+    @Query("select max(p.sort) from Project p")
     Optional<Integer> findMaxSort();
 
     @Modifying
