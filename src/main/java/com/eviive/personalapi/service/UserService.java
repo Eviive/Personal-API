@@ -28,7 +28,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import static com.eviive.personalapi.exception.PersonalApiErrorsEnum.*;
+import static com.eviive.personalapi.exception.PersonalApiErrorsEnum.API401_LOGIN_ERROR;
+import static com.eviive.personalapi.exception.PersonalApiErrorsEnum.API401_TOKEN_ERROR;
+import static com.eviive.personalapi.exception.PersonalApiErrorsEnum.API404_USERNAME_NOT_FOUND;
+import static com.eviive.personalapi.exception.PersonalApiErrorsEnum.API404_USER_ID_NOT_FOUND;
+import static com.eviive.personalapi.exception.PersonalApiErrorsEnum.API500_INTERNAL_SERVER_ERROR;
 
 @Service
 @Transactional
@@ -36,21 +40,24 @@ import static com.eviive.personalapi.exception.PersonalApiErrorsEnum.*;
 public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
+
     private final UserMapper userMapper;
 
     private final TokenUtils tokenUtils;
+
     private final AuthenticationConfiguration authenticationConfiguration;
+
     private final PasswordEncoder passwordEncoder;
 
-    public UserDTO findById(Long id) {
-        User user = userRepository.findById(id)
-                                  .orElseThrow(() -> PersonalApiException.format(API404_USER_ID_NOT_FOUND, id));
+    public UserDTO findById(final Long id) {
+        final User user = userRepository.findById(id)
+            .orElseThrow(() -> PersonalApiException.format(API404_USER_ID_NOT_FOUND, id));
         return userMapper.toDTO(user);
     }
 
-    public UserDTO findByUsername(String username) {
-        User user = userRepository.findByUsername(username)
-                                  .orElseThrow(() -> PersonalApiException.format(API404_USERNAME_NOT_FOUND, username));
+    public UserDTO findByUsername(final String username) {
+        final User user = userRepository.findByUsername(username)
+            .orElseThrow(() -> PersonalApiException.format(API404_USERNAME_NOT_FOUND, username));
         return userMapper.toDTO(user);
     }
 
@@ -58,19 +65,19 @@ public class UserService implements UserDetailsService {
         return userMapper.toListDTO(userRepository.findAll());
     }
 
-    public UserDTO save(UserDTO userDTO) {
-        User user = userMapper.toEntity(userDTO);
+    public UserDTO save(final UserDTO userDTO) {
+        final User user = userMapper.toEntity(userDTO);
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
 
         return userMapper.toDTO(userRepository.save(user));
     }
 
-    public UserDTO update(Long id, UserDTO userDTO) {
-        User originalUser = userRepository.findById(id)
-                                          .orElseThrow(() -> PersonalApiException.format(API404_USER_ID_NOT_FOUND, id));
+    public UserDTO update(final Long id, final UserDTO userDTO) {
+        final User originalUser = userRepository.findById(id)
+            .orElseThrow(() -> PersonalApiException.format(API404_USER_ID_NOT_FOUND, id));
 
-        User user = userMapper.toEntity(userDTO);
+        final User user = userMapper.toEntity(userDTO);
 
         user.setId(id);
         user.setPassword(originalUser.getPassword());
@@ -78,7 +85,7 @@ public class UserService implements UserDetailsService {
         return userMapper.toDTO(userRepository.save(user));
     }
 
-    public void delete(Long id) {
+    public void delete(final Long id) {
         if (!userRepository.existsById(id)) {
             throw PersonalApiException.format(API404_USER_ID_NOT_FOUND, id);
         }
@@ -86,20 +93,29 @@ public class UserService implements UserDetailsService {
         userRepository.deleteById(id);
     }
 
-    public AuthResponseDTO login(String username, String password, HttpServletRequest req, HttpServletResponse res) {
+    @SuppressWarnings("checkstyle:IllegalCatch")
+    public AuthResponseDTO login(
+        final String username,
+        final String password,
+        final HttpServletRequest req,
+        final HttpServletResponse res
+    ) {
         try {
-            Authentication authentication = authenticationConfiguration.getAuthenticationManager()
-                                                                       .authenticate(new UsernamePasswordAuthenticationToken(username, password));
+            final Authentication authentication =
+                authenticationConfiguration.getAuthenticationManager()
+                    .authenticate(new UsernamePasswordAuthenticationToken(username, password));
 
-            org.springframework.security.core.userdetails.User user = (org.springframework.security.core.userdetails.User) authentication.getPrincipal();
-            String subject = user.getUsername();
-            String issuer = req.getRequestURL().toString();
-            List<String> claims = user.getAuthorities()
-                                      .stream()
-                                      .map(GrantedAuthority::getAuthority)
-                                      .toList();
+            final org.springframework.security.core.userdetails.User user =
+                (org.springframework.security.core.userdetails.User) authentication.getPrincipal();
 
-            AuthResponseDTO responseBody = new AuthResponseDTO();
+            final String subject = user.getUsername();
+            final String issuer = req.getRequestURL().toString();
+            final List<String> claims = user.getAuthorities()
+                .stream()
+                .map(GrantedAuthority::getAuthority)
+                .toList();
+
+            final AuthResponseDTO responseBody = new AuthResponseDTO();
             responseBody.setUsername(subject);
             responseBody.setRoles(claims);
             responseBody.setAccessToken(tokenUtils.generateAccessToken(subject, issuer, claims));
@@ -114,28 +130,31 @@ public class UserService implements UserDetailsService {
         }
     }
 
-    public void logout(HttpServletResponse res) {
+    public void logout(final HttpServletResponse res) {
         res.addCookie(tokenUtils.createCookie(null, 0));
     }
 
-    public AuthResponseDTO refreshToken(String refreshToken, HttpServletRequest req) {
+    public AuthResponseDTO refreshToken(final String refreshToken, final HttpServletRequest req) {
         if (refreshToken == null) {
             throw PersonalApiException.format(API401_TOKEN_ERROR, "Refresh token not found");
         }
 
         try {
-            DecodedJWT decodedToken = tokenUtils.verifyToken(refreshToken);
+            final DecodedJWT decodedToken = tokenUtils.verifyToken(refreshToken);
 
-            UserDTO user = findByUsername(decodedToken.getSubject());
+            final UserDTO user = findByUsername(decodedToken.getSubject());
 
-            List<String> claims = user.getRoles()
-                                      .stream()
-                                      .map(RoleDTO::getName)
-                                      .toList();
+            final List<String> claims = user.getRoles()
+                .stream()
+                .map(RoleDTO::getName)
+                .toList();
 
-            String accessToken = tokenUtils.generateAccessToken(user.getUsername(), req.getRequestURL().toString(), claims);
+            final String accessToken =
+                tokenUtils.generateAccessToken(user.getUsername(), req.getRequestURL().toString(),
+                    claims
+                );
 
-            AuthResponseDTO responseBody = new AuthResponseDTO();
+            final AuthResponseDTO responseBody = new AuthResponseDTO();
             responseBody.setUsername(user.getUsername());
             responseBody.setRoles(claims);
             responseBody.setAccessToken(accessToken);
@@ -146,16 +165,19 @@ public class UserService implements UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String username) {
-        User user = userRepository.findByUsername(username)
-                                  .orElseThrow(() -> new UsernameNotFoundException(String.format("User %s not found", username)));
+    public UserDetails loadUserByUsername(final String username) {
+        final User user = userRepository.findByUsername(username)
+            .orElseThrow(
+                () -> new UsernameNotFoundException(String.format("User %s not found", username)));
 
-        List<SimpleGrantedAuthority> authorities = user.getRoles()
-                                                       .stream()
-                                                       .map(r -> new SimpleGrantedAuthority(r.getName().toString()))
-                                                       .toList();
+        final List<SimpleGrantedAuthority> authorities = user.getRoles()
+            .stream()
+            .map(r -> new SimpleGrantedAuthority(r.getName().toString()))
+            .toList();
 
-        return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), authorities);
+        return new org.springframework.security.core.userdetails.User(user.getUsername(),
+            user.getPassword(), authorities
+        );
     }
 
 }

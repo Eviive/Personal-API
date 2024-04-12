@@ -1,7 +1,19 @@
 package com.eviive.personalapi.entity;
 
-import jakarta.persistence.*;
-import lombok.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 import java.time.LocalDate;
 import java.util.HashSet;
@@ -55,9 +67,9 @@ public class Project {
 
     @ManyToMany
     @JoinTable(
-            name = "API_PROJECT_SKILL_MAP",
-            joinColumns = @JoinColumn(name = "PROJECT_ID"),
-            inverseJoinColumns = @JoinColumn(name = "SKILL_ID")
+        name = "API_PROJECT_SKILL_MAP",
+        joinColumns = @JoinColumn(name = "PROJECT_ID"),
+        inverseJoinColumns = @JoinColumn(name = "SKILL_ID")
     )
     @ToString.Exclude
     private Set<Skill> skills = new HashSet<>();

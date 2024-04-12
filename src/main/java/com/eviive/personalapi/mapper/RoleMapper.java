@@ -15,9 +15,9 @@ import static org.mapstruct.InjectionStrategy.CONSTRUCTOR;
 import static org.mapstruct.ReportingPolicy.ERROR;
 
 @Mapper(
-        unmappedTargetPolicy = ERROR,
-        componentModel = "spring",
-        injectionStrategy = CONSTRUCTOR
+    unmappedTargetPolicy = ERROR,
+    componentModel = "spring",
+    injectionStrategy = CONSTRUCTOR
 )
 public interface RoleMapper {
 
@@ -26,9 +26,9 @@ public interface RoleMapper {
     @Mapping(target = "users", ignore = true)
     Role toEntity(RoleDTO roleDTO);
 
-    List<Role> toListEntity(Collection<RoleDTO> roleDTOs);
+    List<Role> toListEntity(Collection<RoleDTO> rolesDTO);
 
-    Set<Role> toSetEntity(Collection<RoleDTO> roleDTOs);
+    Set<Role> toSetEntity(Collection<RoleDTO> rolesDTO);
 
     @AfterMapping
     default void afterMapping(@MappingTarget Role role) {

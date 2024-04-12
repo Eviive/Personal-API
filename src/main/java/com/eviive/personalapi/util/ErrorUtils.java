@@ -11,20 +11,35 @@ import org.springframework.stereotype.Component;
 @Component
 public final class ErrorUtils {
 
-    public <E> ErrorResponseDTO<E> buildError(HttpStatus httpStatus, E message) {
+    public <E> ErrorResponseDTO<E> buildError(final HttpStatus httpStatus, final E message) {
         return new ErrorResponseDTO<>(httpStatus.value(), httpStatus.getReasonPhrase(), message);
     }
 
-    public ErrorResponseDTO<String> buildError(PersonalApiErrorsEnum personalApiErrorsEnum, Object... args) {
-        return this.buildError(personalApiErrorsEnum.getHttpStatus(), personalApiErrorsEnum.getMessage().formatted(args));
+    public ErrorResponseDTO<String> buildError(
+        final PersonalApiErrorsEnum personalApiErrorsEnum,
+        final Object... args
+    ) {
+        return this.buildError(
+            personalApiErrorsEnum.getHttpStatus(),
+            personalApiErrorsEnum.getMessage().formatted(args)
+        );
     }
 
-    public ErrorResponseDTO<String> buildError(PersonalApiException personalApiException) {
-        return this.buildError(personalApiException.getHttpStatus(), personalApiException.getMessage());
+    public ErrorResponseDTO<String> buildError(final PersonalApiException personalApiException) {
+        return this.buildError(
+            personalApiException.getHttpStatus(),
+            personalApiException.getMessage()
+        );
     }
 
-    public ErrorResponseDTO<String> buildError(HttpStatusCode httpStatusCode, ProblemDetail problemDetail) {
-        return this.buildError(HttpStatus.valueOf(httpStatusCode.value()), problemDetail.getDetail());
+    public ErrorResponseDTO<String> buildError(
+        final HttpStatusCode httpStatusCode,
+        final ProblemDetail problemDetail
+    ) {
+        return this.buildError(
+            HttpStatus.valueOf(httpStatusCode.value()),
+            problemDetail.getDetail()
+        );
     }
 
 }

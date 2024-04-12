@@ -8,21 +8,23 @@ import java.net.URI;
 @Component
 public final class UriUtils {
 
-    public URI buildLocation(Long id, String pathToRemove) {
+    public URI buildLocation(final Long id, final String pathToRemove) {
         String path = ServletUriComponentsBuilder.fromCurrentRequest()
-                                                 .path("/{id}")
-                                                 .buildAndExpand(id)
-                                                 .getPath();
+            .path("/{id}")
+            .buildAndExpand(id)
+            .getPath();
 
         if (path != null && pathToRemove != null) {
-            pathToRemove = pathToRemove.startsWith("/") ? pathToRemove : "/%s".formatted(pathToRemove);
-            path = path.replace(pathToRemove, "");
+            path = path.replace(
+                pathToRemove.startsWith("/") ? pathToRemove : "/%s".formatted(pathToRemove),
+                ""
+            );
         }
 
         return URI.create(path != null ? path : "");
     }
 
-    public URI buildLocation(Long id) {
+    public URI buildLocation(final Long id) {
         return buildLocation(id, null);
     }
 

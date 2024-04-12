@@ -15,9 +15,9 @@ import static org.mapstruct.InjectionStrategy.CONSTRUCTOR;
 import static org.mapstruct.ReportingPolicy.ERROR;
 
 @Mapper(
-        unmappedTargetPolicy = ERROR,
-        componentModel = "spring",
-        injectionStrategy = CONSTRUCTOR
+    unmappedTargetPolicy = ERROR,
+    componentModel = "spring",
+    injectionStrategy = CONSTRUCTOR
 )
 public interface ImageMapper {
 
@@ -27,9 +27,9 @@ public interface ImageMapper {
     @Mapping(target = "skill", ignore = true)
     Image toEntity(ImageDTO projectDTO);
 
-    List<Image> toListEntity(Collection<ImageDTO> projectDTOs);
+    List<Image> toListEntity(Collection<ImageDTO> projectsDTO);
 
-    Set<Image> toSetEntity(Collection<ImageDTO> projectDTOs);
+    Set<Image> toSetEntity(Collection<ImageDTO> projectsDTO);
 
     @AfterMapping
     default void afterMapping(@MappingTarget Image image) {

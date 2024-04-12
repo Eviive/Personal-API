@@ -19,11 +19,12 @@ import static com.eviive.personalapi.exception.PersonalApiErrorsEnum.API404_ROLE
 public class RoleService {
 
     private final RoleRepository roleRepository;
+
     private final RoleMapper roleMapper;
 
-    public RoleDTO findById(Long id) {
-        Role role = roleRepository.findById(id)
-                                     .orElseThrow(() -> PersonalApiException.format(API404_ROLE_ID_NOT_FOUND, id));
+    public RoleDTO findById(final Long id) {
+        final Role role = roleRepository.findById(id)
+            .orElseThrow(() -> PersonalApiException.format(API404_ROLE_ID_NOT_FOUND, id));
         return roleMapper.toDTO(role);
     }
 

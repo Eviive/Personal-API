@@ -20,18 +20,27 @@ public class ProjectDTO {
     private String title;
 
     @NotBlank(message = "The project's english description cannot be blank.")
-    @Length(max = 510, message = "The project's english description cannot be longer than {max} characters.")
+    @Length(
+        max = 510,
+        message = "The project's english description cannot be longer than {max} characters."
+    )
     private String descriptionEn;
 
     @NotBlank(message = "The project's french description cannot be blank.")
-    @Length(max = 510, message = "The project's french description cannot be longer than {max} characters.")
+    @Length(
+        max = 510,
+        message = "The project's french description cannot be longer than {max} characters."
+    )
     private String descriptionFr;
 
     @NotNull(message = "The project's creation date cannot be null.")
     private LocalDate creationDate;
 
     @NotBlank(message = "The project's repository URL cannot be blank.")
-    @Length(max = 255, message = "The project's repository URL cannot be longer than {max} characters.")
+    @Length(
+        max = 255,
+        message = "The project's repository URL cannot be longer than {max} characters."
+    )
     private String repoUrl;
 
     @NotBlank(message = "The project's demo URL cannot be blank.")

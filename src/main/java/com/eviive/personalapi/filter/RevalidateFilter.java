@@ -28,27 +28,40 @@ public class RevalidateFilter extends OncePerRequestFilter {
     private String portfolioApiSecret;
 
     @Override
-    protected void doFilterInternal(@NonNull HttpServletRequest req, @NonNull HttpServletResponse res, @NonNull FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(
+        @NonNull final HttpServletRequest req,
+        @NonNull final HttpServletResponse res,
+        @NonNull final FilterChain filterChain
+    )
+        throws ServletException, IOException {
         filterChain.doFilter(req, res);
 
-        if (!List.of("POST", "PUT", "PATCH", "DELETE").contains(req.getMethod())) {
+        if (!shouldFilter(req, res)) {
             return;
         }
 
-        if (!HttpStatus.valueOf(res.getStatus()).is2xxSuccessful()) {
-            return;
-        }
-
-        if (!req.getRequestURI().startsWith("/project") && !req.getRequestURI().startsWith("/skill")) {
-            return;
-        }
-
-        RevalidateRequestDTO revalidateRequest = new RevalidateRequestDTO();
+        final RevalidateRequestDTO revalidateRequest = new RevalidateRequestDTO();
         revalidateRequest.setSecret(portfolioApiSecret);
 
         portfolioWebService.revalidate(revalidateRequest)
-                           .doOnError(e -> log.error("Error revalidating portfolio API", e))
-                           .subscribe(revalidateResponse -> log.info("Revalidated portfolio API: {}", revalidateResponse));
+            .doOnError(e -> log.error("Error revalidating portfolio API", e))
+            .subscribe(revalidateResponse -> log.info(
+                "Revalidated portfolio API: {}",
+                revalidateResponse
+            ));
+    }
+
+    private boolean shouldFilter(final HttpServletRequest req, final HttpServletResponse res) {
+        if (!List.of("POST", "PUT", "PATCH", "DELETE").contains(req.getMethod())) {
+            return false;
+        }
+
+        if (!req.getRequestURI().startsWith("/project") &&
+            !req.getRequestURI().startsWith("/skill")) {
+            return false;
+        }
+
+        return HttpStatus.valueOf(res.getStatus()).is2xxSuccessful();
     }
 
 }

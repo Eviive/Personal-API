@@ -21,7 +21,9 @@ import java.util.List;
 
 import static com.eviive.personalapi.entity.RoleEnum.ROLE_ADMIN;
 import static com.eviive.personalapi.entity.RoleEnum.ROLE_USER;
-import static org.springframework.http.HttpHeaders.*;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
+import static org.springframework.http.HttpHeaders.ORIGIN;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
@@ -39,50 +41,53 @@ public class SecurityConfig {
     private List<String> allowedOrigins;
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    @SuppressWarnings({"checkstyle:LambdaBodyLength", "checkstyle:MultipleStringLiterals"})
+    public SecurityFilterChain filterChain(final HttpSecurity http) throws Exception {
         return http.csrf(AbstractHttpConfigurer::disable)
 
-                   .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
 
-                   .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))
+            .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))
 
-                   .addFilterBefore(authorizationFilter, UsernamePasswordAuthenticationFilter.class)
+            .addFilterBefore(authorizationFilter, UsernamePasswordAuthenticationFilter.class)
 
-                   .authorizeHttpRequests(auth ->
-                           auth.requestMatchers(POST, "/user/login", "/user/logout", "/user/refresh").permitAll()
-                               .requestMatchers("/user/**").hasAuthority(ROLE_ADMIN.toString())
+            .authorizeHttpRequests(auth ->
+                auth.requestMatchers(POST, "/user/login", "/user/logout", "/user/refresh")
+                    .permitAll()
+                    .requestMatchers("/user/**").hasAuthority(ROLE_ADMIN.toString())
 
-                               .requestMatchers("/role/**").hasAuthority(ROLE_ADMIN.toString())
+                    .requestMatchers("/role/**").hasAuthority(ROLE_ADMIN.toString())
 
-                               .requestMatchers(GET, "/project/**").permitAll()
-                               .requestMatchers("/project/**").hasAuthority(ROLE_USER.toString())
+                    .requestMatchers(GET, "/project/**").permitAll()
+                    .requestMatchers("/project/**").hasAuthority(ROLE_USER.toString())
 
-                               .requestMatchers(GET, "/skill/**").permitAll()
-                               .requestMatchers("/skill/**").hasAuthority(ROLE_USER.toString())
+                    .requestMatchers(GET, "/skill/**").permitAll()
+                    .requestMatchers("/skill/**").hasAuthority(ROLE_USER.toString())
 
-                               .requestMatchers(GET, "/image/**").permitAll()
-                               .requestMatchers("/image/**").hasAuthority(ROLE_USER.toString())
+                    .requestMatchers(GET, "/image/**").permitAll()
+                    .requestMatchers("/image/**").hasAuthority(ROLE_USER.toString())
 
-                               .requestMatchers("/actuator/**").hasAuthority(ROLE_ADMIN.toString())
+                    .requestMatchers("/actuator/**").hasAuthority(ROLE_ADMIN.toString())
 
-                               .anyRequest().denyAll() // deny-by-default policy
-                   )
+                    // deny-by-default policy
+                    .anyRequest().denyAll()
+            )
 
-                   .exceptionHandling(exceptionHandling ->
-                           exceptionHandling.authenticationEntryPoint(personalApiExceptionHandler)
-                                            .accessDeniedHandler(personalApiExceptionHandler)
-                   )
+            .exceptionHandling(exceptionHandling ->
+                exceptionHandling.authenticationEntryPoint(personalApiExceptionHandler)
+                    .accessDeniedHandler(personalApiExceptionHandler)
+            )
 
-                   .build();
+            .build();
     }
 
     private CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
+        final CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(allowedOrigins);
         configuration.addAllowedMethod("*");
         configuration.setAllowedHeaders(List.of(AUTHORIZATION, ORIGIN, CONTENT_TYPE));
         configuration.setAllowCredentials(true);
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }

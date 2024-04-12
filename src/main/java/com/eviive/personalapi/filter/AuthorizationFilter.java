@@ -1,5 +1,6 @@
 package com.eviive.personalapi.filter;
 
+import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.eviive.personalapi.util.TokenUtils;
@@ -28,8 +29,13 @@ public class AuthorizationFilter extends OncePerRequestFilter {
     private final TokenUtils tokenUtils;
 
     @Override
-    protected void doFilterInternal(@NonNull HttpServletRequest req, @NonNull HttpServletResponse res, @NonNull FilterChain filterChain) throws ServletException, IOException {
-        String authorizationHeader = req.getHeader(AUTHORIZATION);
+    protected void doFilterInternal(
+        @NonNull final HttpServletRequest req,
+        @NonNull final HttpServletResponse res,
+        @NonNull final FilterChain filterChain
+    )
+        throws ServletException, IOException {
+        final String authorizationHeader = req.getHeader(AUTHORIZATION);
 
         if (authorizationHeader == null) {
             filterChain.doFilter(req, res);
@@ -37,30 +43,34 @@ public class AuthorizationFilter extends OncePerRequestFilter {
         }
 
         try {
-            if (!authorizationHeader.startsWith("Bearer ")) {
+            final String tokenPrefix = "Bearer ";
+
+            if (!authorizationHeader.startsWith(tokenPrefix)) {
                 throw new IllegalStateException("The access token must be a bearer token.");
             }
 
-            String token = authorizationHeader.substring("Bearer ".length());
+            final String token = authorizationHeader.substring(tokenPrefix.length());
 
-            DecodedJWT decodedToken = tokenUtils.verifyToken(token);
+            final DecodedJWT decodedToken = tokenUtils.verifyToken(token);
 
-            String username = decodedToken.getSubject();
+            final String username = decodedToken.getSubject();
 
-            Claim claim = decodedToken.getClaim("roles");
+            final Claim claim = decodedToken.getClaim("roles");
 
             if (claim.isNull() || claim.isMissing()) {
                 throw new IllegalStateException("Roles are missing from the token.");
             }
 
-            List<SimpleGrantedAuthority> authorities = claim.asList(String.class)
-                                                            .stream()
-                                                            .map(SimpleGrantedAuthority::new)
-                                                            .toList();
+            final List<SimpleGrantedAuthority> authorities = claim.asList(String.class)
+                .stream()
+                .map(SimpleGrantedAuthority::new)
+                .toList();
 
-            Authentication authenticationToken = new UsernamePasswordAuthenticationToken(username, null, authorities);
+            final Authentication authenticationToken =
+                new UsernamePasswordAuthenticationToken(username, null, authorities);
+
             SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-        } catch (Exception e) {
+        } catch (IllegalStateException | JWTVerificationException e) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Authentication failed: %s".formatted(e.getMessage()), e);
             }

@@ -15,7 +15,7 @@ public class AzureConfig {
     @Bean
     public BlobServiceClient blobServiceClient() {
         return new BlobServiceClientBuilder().connectionString(connectionString)
-                                             .buildClient();
+            .buildClient();
     }
 
 }

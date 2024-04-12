@@ -15,10 +15,10 @@ import static org.mapstruct.InjectionStrategy.CONSTRUCTOR;
 import static org.mapstruct.ReportingPolicy.ERROR;
 
 @Mapper(
-        unmappedTargetPolicy = ERROR,
-        componentModel = "spring",
-        injectionStrategy = CONSTRUCTOR,
-        uses = {RoleMapper.class}
+    unmappedTargetPolicy = ERROR,
+    componentModel = "spring",
+    injectionStrategy = CONSTRUCTOR,
+    uses = RoleMapper.class
 )
 public interface UserMapper {
 
@@ -27,9 +27,9 @@ public interface UserMapper {
     @Mapping(target = "password", ignore = true)
     User toEntity(UserDTO userDTO);
 
-    List<User> toListEntity(Collection<UserDTO> userDTOs);
+    List<User> toListEntity(Collection<UserDTO> usersDTO);
 
-    Set<User> toSetEntity(Collection<UserDTO> userDTOs);
+    Set<User> toSetEntity(Collection<UserDTO> usersDTO);
 
     @AfterMapping
     default void afterMapping(@MappingTarget User user) {

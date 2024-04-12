@@ -33,30 +33,47 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import java.io.IOException;
 import java.util.List;
 
-import static com.eviive.personalapi.exception.PersonalApiErrorsEnum.*;
+import static com.eviive.personalapi.exception.PersonalApiErrorsEnum.API400_MISSING_SERVLET_REQUEST_PARAMETER;
+import static com.eviive.personalapi.exception.PersonalApiErrorsEnum.API400_TYPE_MISMATCH;
+import static com.eviive.personalapi.exception.PersonalApiErrorsEnum.API401_UNAUTHORIZED;
+import static com.eviive.personalapi.exception.PersonalApiErrorsEnum.API403_FORBIDDEN;
+import static com.eviive.personalapi.exception.PersonalApiErrorsEnum.API408_REQUEST_TIMEOUT;
+import static com.eviive.personalapi.exception.PersonalApiErrorsEnum.API500_INTERNAL_SERVER_ERROR;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestControllerAdvice
 @RequiredArgsConstructor
-public class PersonalApiExceptionHandler extends ResponseEntityExceptionHandler implements AuthenticationEntryPoint, AccessDeniedHandler {
+public class PersonalApiExceptionHandler extends ResponseEntityExceptionHandler
+    implements AuthenticationEntryPoint, AccessDeniedHandler {
 
     private final ErrorUtils errorUtils;
 
     private final ObjectMapper objectMapper;
 
     @Override
-    public void commence(HttpServletRequest req, HttpServletResponse res, AuthenticationException authException) {
-         sendError(res, API401_UNAUTHORIZED);
+    public void commence(
+        final HttpServletRequest req,
+        final HttpServletResponse res,
+        final AuthenticationException authException
+    ) {
+        sendError(res, API401_UNAUTHORIZED);
     }
 
     @Override
-    public void handle(HttpServletRequest req, HttpServletResponse res, AccessDeniedException accessDeniedException) {
-         sendError(res, API403_FORBIDDEN);
+    public void handle(
+        final HttpServletRequest req,
+        final HttpServletResponse res,
+        final AccessDeniedException accessDeniedException
+    ) {
+        sendError(res, API403_FORBIDDEN);
     }
 
-    private void sendError(HttpServletResponse res, PersonalApiErrorsEnum personalApiErrorsEnum) {
-        ErrorResponseDTO<String> errorResponse = errorUtils.buildError(personalApiErrorsEnum);
+    private void sendError(
+        final HttpServletResponse res,
+        final PersonalApiErrorsEnum personalApiErrorsEnum
+    ) {
+        final ErrorResponseDTO<String> errorResponse = errorUtils.buildError(personalApiErrorsEnum);
 
         res.setStatus(errorResponse.getStatus());
         res.setContentType(APPLICATION_JSON_VALUE);
@@ -69,8 +86,11 @@ public class PersonalApiExceptionHandler extends ResponseEntityExceptionHandler 
     }
 
     @ExceptionHandler(Exception.class)
-    public final ResponseEntity<ErrorResponseDTO<String>> handleAllExceptions(Exception e, WebRequest req) {
-        ErrorResponseDTO<String> errorResponse;
+    public final ResponseEntity<ErrorResponseDTO<String>> handleAllExceptions(
+        final Exception e,
+        final WebRequest req
+    ) {
+        final ErrorResponseDTO<String> errorResponse;
         boolean defaultExceptionHandler = false;
         boolean logException = true;
 
@@ -78,16 +98,28 @@ public class PersonalApiExceptionHandler extends ResponseEntityExceptionHandler 
             errorResponse = errorUtils.buildError(personalApiException);
 
         } else if (e instanceof JpaSystemException jpaSystemException) {
-            errorResponse = errorUtils.buildError(API500_INTERNAL_SERVER_ERROR, jpaSystemException.getMostSpecificCause().getMessage());
+            errorResponse = errorUtils.buildError(
+                API500_INTERNAL_SERVER_ERROR,
+                jpaSystemException.getMostSpecificCause().getMessage()
+            );
 
         } else if (e instanceof TransactionSystemException transactionSystemException) {
-            errorResponse = errorUtils.buildError(API500_INTERNAL_SERVER_ERROR, transactionSystemException.getMostSpecificCause().getMessage());
+            errorResponse = errorUtils.buildError(
+                API500_INTERNAL_SERVER_ERROR,
+                transactionSystemException.getMostSpecificCause().getMessage()
+            );
 
         } else if (e instanceof NestedRuntimeException nestedRuntimeException) {
-            errorResponse = errorUtils.buildError(API500_INTERNAL_SERVER_ERROR, nestedRuntimeException.getMostSpecificCause().getMessage());
+            errorResponse = errorUtils.buildError(
+                API500_INTERNAL_SERVER_ERROR,
+                nestedRuntimeException.getMostSpecificCause().getMessage()
+            );
 
         } else if (e instanceof ClientAbortException clientAbortException) {
-            errorResponse = errorUtils.buildError(API408_REQUEST_TIMEOUT, clientAbortException.getLocalizedMessage());
+            errorResponse = errorUtils.buildError(
+                API408_REQUEST_TIMEOUT,
+                clientAbortException.getLocalizedMessage()
+            );
             logException = false;
 
         } else {
@@ -96,7 +128,9 @@ public class PersonalApiExceptionHandler extends ResponseEntityExceptionHandler 
         }
 
         if (logException) {
-            String loggerMessage = getExceptionHandlerName(e, defaultExceptionHandler) + ": " + req.getDescription(false);
+            final String loggerMessage =
+                getExceptionHandlerName(e, defaultExceptionHandler) + ": " +
+                    req.getDescription(false);
 
             if (HttpStatusCode.valueOf(errorResponse.getStatus()).is5xxServerError()) {
                 logger.error(loggerMessage, e);
@@ -106,67 +140,104 @@ public class PersonalApiExceptionHandler extends ResponseEntityExceptionHandler 
         }
 
         return ResponseEntity.status(errorResponse.getStatus())
-                             .body(errorResponse);
+            .body(errorResponse);
     }
 
-    private String getExceptionHandlerName(Exception e, boolean defaultExceptionHandler) {
-        return (defaultExceptionHandler ? "DefaultExceptionHandler (%s)" : "%sHandler").formatted(e.getClass().getSimpleName());
+    private String getExceptionHandlerName(
+        final Exception e,
+        final boolean defaultExceptionHandler
+    ) {
+        return (defaultExceptionHandler ? "DefaultExceptionHandler (%s)" : "%sHandler").formatted(
+            e.getClass().getSimpleName());
     }
 
     @Override
-    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException e, @NotNull HttpHeaders headers, @NotNull HttpStatusCode status, @NotNull WebRequest req) {
-        List<String> validationErrors = e.getBindingResult()
-                                         .getAllErrors()
-                                         .stream()
-                                         .map(DefaultMessageSourceResolvable::getDefaultMessage)
-                                         .toList();
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(
+        final MethodArgumentNotValidException e,
+        @NotNull final HttpHeaders headers,
+        @NotNull final HttpStatusCode status,
+        @NotNull final WebRequest req
+    ) {
+        final List<String> validationErrors = e.getBindingResult()
+            .getAllErrors()
+            .stream()
+            .map(DefaultMessageSourceResolvable::getDefaultMessage)
+            .toList();
 
         return handleBadRequestException(validationErrors);
     }
 
     @Override
-    protected ResponseEntity<Object> handleHandlerMethodValidationException(@NonNull HandlerMethodValidationException ex, @NonNull HttpHeaders headers, @NonNull HttpStatusCode status, @NonNull WebRequest request) {
-        List<String> validationErrors = ex.getAllValidationResults()
-                .stream()
-                .flatMap(r ->
-                        r.getResolvableErrors()
-                         .stream()
-                         .map(e -> "The %s parameter %s.".formatted(r.getMethodParameter().getParameterName(), e.getDefaultMessage()))
-                )
-                .toList();
+    protected ResponseEntity<Object> handleHandlerMethodValidationException(
+        @NonNull final HandlerMethodValidationException ex,
+        @NonNull final HttpHeaders headers,
+        @NonNull final HttpStatusCode status,
+        @NonNull final WebRequest request
+    ) {
+        final List<String> validationErrors = ex.getAllValidationResults()
+            .stream()
+            .flatMap(r ->
+                r.getResolvableErrors()
+                    .stream()
+                    .map(e -> "The %s parameter %s.".formatted(
+                        r.getMethodParameter().getParameterName(), e.getDefaultMessage()))
+            )
+            .toList();
 
         return handleBadRequestException(validationErrors);
     }
 
     @Override
-    protected ResponseEntity<Object> handleMissingServletRequestParameter(MissingServletRequestParameterException e, @NotNull HttpHeaders headers, @NotNull HttpStatusCode status, @NotNull WebRequest req) {
-        return handleBadRequestException(API400_MISSING_SERVLET_REQUEST_PARAMETER, e.getParameterName(), e.getParameterType());
+    protected ResponseEntity<Object> handleMissingServletRequestParameter(
+        final MissingServletRequestParameterException e,
+        @NotNull final HttpHeaders headers,
+        @NotNull final HttpStatusCode status,
+        @NotNull final WebRequest req
+    ) {
+        return handleBadRequestException(
+            API400_MISSING_SERVLET_REQUEST_PARAMETER,
+            e.getParameterName(),
+            e.getParameterType()
+        );
     }
 
     @Override
-    protected ResponseEntity<Object> handleTypeMismatch(TypeMismatchException e, @NotNull HttpHeaders headers, @NotNull HttpStatusCode status, @NotNull WebRequest req) {
+    protected ResponseEntity<Object> handleTypeMismatch(
+        final TypeMismatchException e,
+        @NotNull final HttpHeaders headers,
+        @NotNull final HttpStatusCode status,
+        @NotNull final WebRequest req
+    ) {
         return handleBadRequestException(API400_TYPE_MISMATCH, e.getPropertyName());
     }
 
-    private <E> ResponseEntity<Object> handleBadRequestException(E message) {
+    private <E> ResponseEntity<Object> handleBadRequestException(final E message) {
         return ResponseEntity.badRequest()
-                             .body(errorUtils.buildError(BAD_REQUEST, message));
+            .body(errorUtils.buildError(BAD_REQUEST, message));
     }
 
-    private ResponseEntity<Object> handleBadRequestException(PersonalApiErrorsEnum personalApiErrorsEnum, Object... args) {
+    private ResponseEntity<Object> handleBadRequestException(
+        final PersonalApiErrorsEnum personalApiErrorsEnum,
+        final Object... args
+    ) {
         return handleBadRequestException(personalApiErrorsEnum.getMessage().formatted(args));
     }
 
     @Override
     @NonNull
-    protected ResponseEntity<Object> createResponseEntity(Object body, @NonNull HttpHeaders headers, @NonNull HttpStatusCode statusCode, @NonNull WebRequest request) {
+    protected ResponseEntity<Object> createResponseEntity(
+        final Object body,
+        @NonNull final HttpHeaders headers,
+        @NonNull final HttpStatusCode statusCode,
+        @NonNull final WebRequest request
+    ) {
         return super.createResponseEntity(
-                body instanceof ProblemDetail problemDetail
-                        ? errorUtils.buildError(statusCode, problemDetail)
-                        : body,
-                headers,
-                statusCode,
-                request
+            body instanceof ProblemDetail problemDetail ?
+                errorUtils.buildError(statusCode, problemDetail) :
+                body,
+            headers,
+            statusCode,
+            request
         );
     }
 

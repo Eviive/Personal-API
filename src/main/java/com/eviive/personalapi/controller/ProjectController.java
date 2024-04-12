@@ -9,7 +9,16 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.net.URI;
@@ -23,71 +32,89 @@ import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
 @RequiredArgsConstructor
 public class ProjectController {
 
-	private final ProjectService projectService;
+    private final ProjectService projectService;
 
     private final UriUtils uriUtils;
 
     // GET
 
     @GetMapping(path = "{id}", produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<ProjectDTO> findById(@PathVariable Long id) {
+    public ResponseEntity<ProjectDTO> findById(@PathVariable final Long id) {
         return ResponseEntity.ok(projectService.findById(id));
     }
 
-	@GetMapping(produces = APPLICATION_JSON_VALUE)
-	public ResponseEntity<List<ProjectDTO>> findAll() {
-		return ResponseEntity.ok(projectService.findAll());
-	}
+    @GetMapping(produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<ProjectDTO>> findAll() {
+        return ResponseEntity.ok(projectService.findAll());
+    }
 
-	@GetMapping(path = "featured", produces = APPLICATION_JSON_VALUE)
-	public ResponseEntity<List<ProjectDTO>> findAllFeatured() {
-		return ResponseEntity.ok(projectService.findAllFeatured());
-	}
+    @GetMapping(path = "featured", produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<ProjectDTO>> findAllFeatured() {
+        return ResponseEntity.ok(projectService.findAllFeatured());
+    }
 
     @GetMapping(path = "not-featured", produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<List<ProjectDTO>> findAllNotFeatured() {
         return ResponseEntity.ok(projectService.findAllNotFeatured());
     }
 
-	@GetMapping(path = "not-featured/paginated", produces = APPLICATION_JSON_VALUE)
-	public ResponseEntity<Page<ProjectDTO>> findAllNotFeaturedPaginated(Pageable pageable) {
+    @GetMapping(path = "not-featured/paginated", produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity<Page<ProjectDTO>> findAllNotFeaturedPaginated(final Pageable pageable) {
         return ResponseEntity.ok(projectService.findAllNotFeaturedPaginated(pageable));
-	}
+    }
 
     // POST
 
     @PostMapping(consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<ProjectDTO> save(@RequestBody @Valid ProjectDTO projectDTO) {
-        ProjectDTO createdProject = projectService.save(projectDTO, null);
-        URI location = uriUtils.buildLocation(createdProject.getId());
+    public ResponseEntity<ProjectDTO> save(@RequestBody @Valid final ProjectDTO projectDTO) {
+        final ProjectDTO createdProject = projectService.save(projectDTO, null);
+        final URI location = uriUtils.buildLocation(createdProject.getId());
         return ResponseEntity.created(location)
-                             .body(createdProject);
+            .body(createdProject);
     }
 
-    @PostMapping(path = "with-image", consumes = MULTIPART_FORM_DATA_VALUE, produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<ProjectDTO> saveWithImage(@RequestPart("project") @Valid ProjectDTO projectDTO, @RequestPart("file") MultipartFile file) {
-        ProjectDTO createdProject = projectService.save(projectDTO, file);
-        URI location = uriUtils.buildLocation(createdProject.getId(), "with-image");
+    @PostMapping(
+        path = "with-image",
+        consumes = MULTIPART_FORM_DATA_VALUE,
+        produces = APPLICATION_JSON_VALUE
+    )
+    public ResponseEntity<ProjectDTO> saveWithImage(
+        @RequestPart("project") @Valid final ProjectDTO projectDTO,
+        @RequestPart("file") final MultipartFile file
+    ) {
+        final ProjectDTO createdProject = projectService.save(projectDTO, file);
+        final URI location = uriUtils.buildLocation(createdProject.getId(), "with-image");
         return ResponseEntity.created(location)
-                             .body(createdProject);
+            .body(createdProject);
     }
 
     // PUT
 
     @PutMapping(path = "{id}", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<ProjectDTO> update(@PathVariable Long id, @RequestBody @Valid ProjectDTO projectDTO) {
+    public ResponseEntity<ProjectDTO> update(
+        @PathVariable final Long id,
+        @RequestBody @Valid final ProjectDTO projectDTO
+    ) {
         return ResponseEntity.ok(projectService.update(id, projectDTO, null));
     }
 
-    @PutMapping(path = "{id}/with-image", consumes = MULTIPART_FORM_DATA_VALUE, produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<ProjectDTO> updateWithImage(@PathVariable Long id, @RequestPart("project") @Valid ProjectDTO projectDTO, @RequestPart("file") MultipartFile file) {
+    @PutMapping(
+        path = "{id}/with-image",
+        consumes = MULTIPART_FORM_DATA_VALUE,
+        produces = APPLICATION_JSON_VALUE
+    )
+    public ResponseEntity<ProjectDTO> updateWithImage(
+        @PathVariable final Long id,
+        @RequestPart("project") final @Valid ProjectDTO projectDTO,
+        @RequestPart("file") final MultipartFile file
+    ) {
         return ResponseEntity.ok(projectService.update(id, projectDTO, file));
     }
 
     // PATCH
 
     @PatchMapping(path = "sort", consumes = APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> sort(@RequestBody List<SortUpdateDTO> sorts) {
+    public ResponseEntity<Void> sort(@RequestBody final List<SortUpdateDTO> sorts) {
         projectService.sort(sorts);
         return ResponseEntity.noContent().build();
     }
@@ -95,9 +122,8 @@ public class ProjectController {
     // DELETE
 
     @DeleteMapping(path = "{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
+    public ResponseEntity<Void> delete(@PathVariable final Long id) {
         projectService.delete(id);
-
         return ResponseEntity.noContent().build();
     }
 

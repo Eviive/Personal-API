@@ -11,17 +11,19 @@ import org.springframework.web.service.invoker.HttpServiceProxyFactory;
 @Configuration
 public class WebServiceConfig {
 
-    private <E> E buildWebClient(WebClient webClient, Class<E> webServiceInterface) {
+    private <E> E buildWebClient(final WebClient webClient, final Class<E> webServiceInterface) {
         return HttpServiceProxyFactory.builderFor(WebClientAdapter.create(webClient))
-                                      .build()
-                                      .createClient(webServiceInterface);
+            .build()
+            .createClient(webServiceInterface);
     }
 
     @Bean
-    public PortfolioWebService portfolioWebService(@Value("${portfolio.api.url}") String portfolioApiUrl) {
-        WebClient webClient = WebClient.builder()
-                                       .baseUrl(portfolioApiUrl)
-                                       .build();
+    public PortfolioWebService portfolioWebService(
+        @Value("${portfolio.api.url}") final String portfolioApiUrl
+    ) {
+        final WebClient webClient = WebClient.builder()
+            .baseUrl(portfolioApiUrl)
+            .build();
 
         return buildWebClient(webClient, PortfolioWebService.class);
     }

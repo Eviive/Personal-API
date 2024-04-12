@@ -14,10 +14,10 @@ import static org.mapstruct.InjectionStrategy.CONSTRUCTOR;
 import static org.mapstruct.ReportingPolicy.ERROR;
 
 @Mapper(
-        unmappedTargetPolicy = ERROR,
-        componentModel = "spring",
-        injectionStrategy = CONSTRUCTOR,
-        uses = {SkillMapper.class, ImageMapper.class}
+    unmappedTargetPolicy = ERROR,
+    componentModel = "spring",
+    injectionStrategy = CONSTRUCTOR,
+    uses = {SkillMapper.class, ImageMapper.class}
 )
 public interface ProjectMapper {
 
@@ -25,9 +25,9 @@ public interface ProjectMapper {
 
     Project toEntity(ProjectDTO projectDTO);
 
-    List<Project> toListEntity(Collection<ProjectDTO> projectDTOs);
+    List<Project> toListEntity(Collection<ProjectDTO> projectsDTO);
 
-    Set<Project> toSetEntity(Collection<ProjectDTO> projectDTOs);
+    Set<Project> toSetEntity(Collection<ProjectDTO> projectsDTO);
 
     @AfterMapping
     default void afterMapping(@MappingTarget Project project) {

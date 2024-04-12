@@ -6,9 +6,10 @@ import org.springframework.scheduling.annotation.EnableAsync;
 
 @SpringBootApplication
 @EnableAsync
+@SuppressWarnings("checkstyle:HideUtilityClassConstructor")
 public class PersonalApiApplication {
 
-    public static void main(String[] args) {
+    public static void main(final String[] args) {
         SpringApplication.run(PersonalApiApplication.class, args);
     }
 

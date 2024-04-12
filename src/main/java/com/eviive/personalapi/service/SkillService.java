@@ -23,13 +23,14 @@ import static com.eviive.personalapi.exception.PersonalApiErrorsEnum.API404_SKIL
 public class SkillService {
 
     private final SkillRepository skillRepository;
+
     private final SkillMapper skillMapper;
 
     private final ImageService imageService;
 
-    public SkillDTO findById(Long id) {
-        Skill skill = skillRepository.findById(id)
-                                     .orElseThrow(() -> PersonalApiException.format(API404_SKILL_ID_NOT_FOUND, id));
+    public SkillDTO findById(final Long id) {
+        final Skill skill = skillRepository.findById(id)
+            .orElseThrow(() -> PersonalApiException.format(API404_SKILL_ID_NOT_FOUND, id));
         return skillMapper.toDTO(skill);
     }
 
@@ -37,27 +38,27 @@ public class SkillService {
         return skillMapper.toListDTO(skillRepository.findAll());
     }
 
-    public SkillDTO save(SkillDTO skillDTO, @Nullable MultipartFile file) {
-        Skill skill = skillMapper.toEntity(skillDTO);
+    public SkillDTO save(final SkillDTO skillDTO, @Nullable final MultipartFile file) {
+        final Skill skill = skillMapper.toEntity(skillDTO);
 
-        Integer newSort = skillRepository
-                .findMaxSort()
-                .map(sort -> sort + 1)
-                .orElse(0);
+        final Integer newSort = skillRepository
+            .findMaxSort()
+            .map(sort -> sort + 1)
+            .orElse(0);
 
         skill.setSort(newSort);
 
         return saveOrUpdate(skill, file);
     }
 
-    private SkillDTO saveOrUpdate(Skill skill, MultipartFile file) {
+    private SkillDTO saveOrUpdate(final Skill skill, final MultipartFile file) {
         UUID oldUuid = null;
         if (file != null) {
             oldUuid = skill.getImage().getUuid();
             skill.getImage().setUuid(UUID.randomUUID());
         }
 
-        Skill savedSkill = skillRepository.save(skill);
+        final Skill savedSkill = skillRepository.save(skill);
 
         if (file != null) {
             imageService.upload(savedSkill.getImage(), oldUuid, file);
@@ -66,27 +67,31 @@ public class SkillService {
         return skillMapper.toDTO(savedSkill);
     }
 
-    public void sort(List<SortUpdateDTO> sorts) {
-        for (SortUpdateDTO sort: sorts) {
+    public void sort(final List<SortUpdateDTO> sorts) {
+        for (SortUpdateDTO sort : sorts) {
             skillRepository.updateSortById(sort.getId(), sort.getSort());
         }
     }
 
-    public SkillDTO update(Long id, SkillDTO skillDTO, @Nullable MultipartFile file) {
+    public SkillDTO update(
+        final Long id,
+        final SkillDTO skillDTO,
+        @Nullable final MultipartFile file
+    ) {
         if (!skillRepository.existsById(id)) {
             throw PersonalApiException.format(API404_SKILL_ID_NOT_FOUND, id);
         }
 
-        Skill skill = skillMapper.toEntity(skillDTO);
+        final Skill skill = skillMapper.toEntity(skillDTO);
 
         skill.setId(id);
 
         return saveOrUpdate(skill, file);
     }
 
-    public void delete(Long id) {
-        Skill skill = skillRepository.findById(id)
-                                     .orElseThrow(() -> PersonalApiException.format(API404_SKILL_ID_NOT_FOUND, id));
+    public void delete(final Long id) {
+        final Skill skill = skillRepository.findById(id)
+            .orElseThrow(() -> PersonalApiException.format(API404_SKILL_ID_NOT_FOUND, id));
 
         if (skill.getImage().getUuid() != null) {
             imageService.delete(skill.getImage());

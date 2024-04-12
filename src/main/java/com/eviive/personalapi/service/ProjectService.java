@@ -25,13 +25,14 @@ import static com.eviive.personalapi.exception.PersonalApiErrorsEnum.API404_PROJ
 public class ProjectService {
 
     private final ProjectRepository projectRepository;
+
     private final ProjectMapper projectMapper;
 
     private final ImageService imageService;
 
-    public ProjectDTO findById(Long id) {
-        Project project = projectRepository.findById(id)
-                                           .orElseThrow(() -> PersonalApiException.format(API404_PROJECT_ID_NOT_FOUND, id));
+    public ProjectDTO findById(final Long id) {
+        final Project project = projectRepository.findById(id)
+            .orElseThrow(() -> PersonalApiException.format(API404_PROJECT_ID_NOT_FOUND, id));
         return projectMapper.toDTO(project);
     }
 
@@ -47,32 +48,32 @@ public class ProjectService {
         return projectMapper.toListDTO(projectRepository.findAllByFeaturedIsFalse());
     }
 
-    public Page<ProjectDTO> findAllNotFeaturedPaginated(Pageable pageable) {
+    public Page<ProjectDTO> findAllNotFeaturedPaginated(final Pageable pageable) {
         return projectRepository.findAllByFeaturedIsFalse(pageable)
-                                .map(projectMapper::toDTO);
+            .map(projectMapper::toDTO);
     }
 
-    public ProjectDTO save(ProjectDTO projectDTO, @Nullable MultipartFile file) {
-        Project project = projectMapper.toEntity(projectDTO);
+    public ProjectDTO save(final ProjectDTO projectDTO, @Nullable final MultipartFile file) {
+        final Project project = projectMapper.toEntity(projectDTO);
 
-        Integer newSort = projectRepository
-                .findMaxSort()
-                .map(sort -> sort + 1)
-                .orElse(0);
+        final Integer newSort = projectRepository
+            .findMaxSort()
+            .map(sort -> sort + 1)
+            .orElse(0);
 
         project.setSort(newSort);
 
         return saveOrUpdate(project, file);
     }
 
-    private ProjectDTO saveOrUpdate(Project project, @Nullable MultipartFile file) {
+    private ProjectDTO saveOrUpdate(final Project project, final @Nullable MultipartFile file) {
         UUID oldUuid = null;
         if (file != null) {
             oldUuid = project.getImage().getUuid();
             project.getImage().setUuid(UUID.randomUUID());
         }
 
-        Project savedProject = projectRepository.save(project);
+        final Project savedProject = projectRepository.save(project);
 
         if (file != null) {
             imageService.upload(savedProject.getImage(), oldUuid, file);
@@ -81,27 +82,29 @@ public class ProjectService {
         return projectMapper.toDTO(savedProject);
     }
 
-    public void sort(List<SortUpdateDTO> sorts) {
-        for (SortUpdateDTO sort: sorts) {
+    public void sort(final List<SortUpdateDTO> sorts) {
+        for (SortUpdateDTO sort : sorts) {
             projectRepository.updateSortById(sort.getId(), sort.getSort());
         }
     }
 
-    public ProjectDTO update(Long id, ProjectDTO projectDTO, @Nullable MultipartFile file) {
+    public ProjectDTO update(
+        final Long id, final ProjectDTO projectDTO, @Nullable final MultipartFile file
+    ) {
         if (!projectRepository.existsById(id)) {
             throw PersonalApiException.format(API404_PROJECT_ID_NOT_FOUND, id);
         }
 
-        Project project = projectMapper.toEntity(projectDTO);
+        final Project project = projectMapper.toEntity(projectDTO);
 
         project.setId(id);
 
         return saveOrUpdate(project, file);
     }
 
-    public void delete(Long id) {
-        Project project = projectRepository.findById(id)
-                                           .orElseThrow(() -> PersonalApiException.format(API404_PROJECT_ID_NOT_FOUND, id));
+    public void delete(final Long id) {
+        final Project project = projectRepository.findById(id)
+            .orElseThrow(() -> PersonalApiException.format(API404_PROJECT_ID_NOT_FOUND, id));
 
         if (project.getImage().getUuid() != null) {
             imageService.delete(project.getImage());

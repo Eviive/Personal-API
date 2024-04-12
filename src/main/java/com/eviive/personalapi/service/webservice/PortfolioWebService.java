@@ -10,6 +10,8 @@ import reactor.core.publisher.Mono;
 public interface PortfolioWebService {
 
     @PostExchange("/revalidate")
-    Mono<RevalidateResponseDTO> revalidate(@RequestBody @Valid RevalidateRequestDTO revalidateRequestDTO);
+    Mono<RevalidateResponseDTO> revalidate(
+        @RequestBody @Valid RevalidateRequestDTO revalidateRequestDTO
+    );
 
 }
