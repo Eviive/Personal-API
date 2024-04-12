@@ -30,12 +30,6 @@ public class ProjectService {
 
     private final ImageService imageService;
 
-    public ProjectDTO findById(final Long id) {
-        final Project project = projectRepository.findById(id)
-            .orElseThrow(() -> PersonalApiException.format(API404_PROJECT_ID_NOT_FOUND, id));
-        return projectMapper.toDTO(project);
-    }
-
     public List<ProjectDTO> findAll() {
         return projectMapper.toListDTO(projectRepository.findAll());
     }
@@ -44,11 +38,7 @@ public class ProjectService {
         return projectMapper.toListDTO(projectRepository.findAllByFeaturedIsTrue());
     }
 
-    public List<ProjectDTO> findAllNotFeatured() {
-        return projectMapper.toListDTO(projectRepository.findAllByFeaturedIsFalse());
-    }
-
-    public Page<ProjectDTO> findAllNotFeaturedPaginated(final Pageable pageable) {
+    public Page<ProjectDTO> findAllNotFeatured(final Pageable pageable) {
         return projectRepository.findAllByFeaturedIsFalse(pageable)
             .map(projectMapper::toDTO);
     }

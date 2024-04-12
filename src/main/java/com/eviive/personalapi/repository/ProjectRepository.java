@@ -16,8 +16,6 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
 
     List<Project> findAllByFeaturedIsTrue();
 
-    List<Project> findAllByFeaturedIsFalse();
-
     Page<Project> findAllByFeaturedIsFalse(Pageable pageable);
 
     @Query("select max(p.sort) from Project p")

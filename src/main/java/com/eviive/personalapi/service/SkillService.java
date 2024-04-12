@@ -28,12 +28,6 @@ public class SkillService {
 
     private final ImageService imageService;
 
-    public SkillDTO findById(final Long id) {
-        final Skill skill = skillRepository.findById(id)
-            .orElseThrow(() -> PersonalApiException.format(API404_SKILL_ID_NOT_FOUND, id));
-        return skillMapper.toDTO(skill);
-    }
-
     public List<SkillDTO> findAll() {
         return skillMapper.toListDTO(skillRepository.findAll());
     }

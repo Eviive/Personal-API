@@ -38,11 +38,6 @@ public class ProjectController {
 
     // GET
 
-    @GetMapping(path = "{id}", produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<ProjectDTO> findById(@PathVariable final Long id) {
-        return ResponseEntity.ok(projectService.findById(id));
-    }
-
     @GetMapping(produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<List<ProjectDTO>> findAll() {
         return ResponseEntity.ok(projectService.findAll());
@@ -54,13 +49,8 @@ public class ProjectController {
     }
 
     @GetMapping(path = "not-featured", produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<ProjectDTO>> findAllNotFeatured() {
-        return ResponseEntity.ok(projectService.findAllNotFeatured());
-    }
-
-    @GetMapping(path = "not-featured/paginated", produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<Page<ProjectDTO>> findAllNotFeaturedPaginated(final Pageable pageable) {
-        return ResponseEntity.ok(projectService.findAllNotFeaturedPaginated(pageable));
+    public ResponseEntity<Page<ProjectDTO>> findAllNotFeatured(final Pageable pageable) {
+        return ResponseEntity.ok(projectService.findAllNotFeatured(pageable));
     }
 
     // POST

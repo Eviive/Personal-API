@@ -36,11 +36,6 @@ public class SkillController {
 
     // GET
 
-    @GetMapping(path = "{id}", produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<SkillDTO> findById(@PathVariable final Long id) {
-        return ResponseEntity.ok(skillService.findById(id));
-    }
-
     @GetMapping(produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<List<SkillDTO>> findAll() {
         return ResponseEntity.ok(skillService.findAll());

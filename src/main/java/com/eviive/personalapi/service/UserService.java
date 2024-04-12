@@ -21,7 +21,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,7 +29,6 @@ import java.util.List;
 import static com.eviive.personalapi.exception.PersonalApiErrorsEnum.API401_LOGIN_ERROR;
 import static com.eviive.personalapi.exception.PersonalApiErrorsEnum.API401_TOKEN_ERROR;
 import static com.eviive.personalapi.exception.PersonalApiErrorsEnum.API404_USERNAME_NOT_FOUND;
-import static com.eviive.personalapi.exception.PersonalApiErrorsEnum.API404_USER_ID_NOT_FOUND;
 import static com.eviive.personalapi.exception.PersonalApiErrorsEnum.API500_INTERNAL_SERVER_ERROR;
 
 @Service
@@ -46,50 +44,10 @@ public class UserService implements UserDetailsService {
 
     private final AuthenticationConfiguration authenticationConfiguration;
 
-    private final PasswordEncoder passwordEncoder;
-
-    public UserDTO findById(final Long id) {
-        final User user = userRepository.findById(id)
-            .orElseThrow(() -> PersonalApiException.format(API404_USER_ID_NOT_FOUND, id));
-        return userMapper.toDTO(user);
-    }
-
     public UserDTO findByUsername(final String username) {
         final User user = userRepository.findByUsername(username)
             .orElseThrow(() -> PersonalApiException.format(API404_USERNAME_NOT_FOUND, username));
         return userMapper.toDTO(user);
-    }
-
-    public List<UserDTO> findAll() {
-        return userMapper.toListDTO(userRepository.findAll());
-    }
-
-    public UserDTO save(final UserDTO userDTO) {
-        final User user = userMapper.toEntity(userDTO);
-
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-
-        return userMapper.toDTO(userRepository.save(user));
-    }
-
-    public UserDTO update(final Long id, final UserDTO userDTO) {
-        final User originalUser = userRepository.findById(id)
-            .orElseThrow(() -> PersonalApiException.format(API404_USER_ID_NOT_FOUND, id));
-
-        final User user = userMapper.toEntity(userDTO);
-
-        user.setId(id);
-        user.setPassword(originalUser.getPassword());
-
-        return userMapper.toDTO(userRepository.save(user));
-    }
-
-    public void delete(final Long id) {
-        if (!userRepository.existsById(id)) {
-            throw PersonalApiException.format(API404_USER_ID_NOT_FOUND, id);
-        }
-
-        userRepository.deleteById(id);
     }
 
     @SuppressWarnings("checkstyle:IllegalCatch")
