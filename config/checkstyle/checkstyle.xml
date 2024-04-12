@@ -45,7 +45,6 @@
         <module name="BooleanExpressionComplexity"/>
         <module name="CatchParameterName"/>
         <module name="ClassDataAbstractionCoupling"/>
-        <module name="ClassMemberImpliedModifier"/>
         <module name="ClassTypeParameterName"/>
         <module name="CommentsIndentation"/>
         <module name="ConstantName"/>
