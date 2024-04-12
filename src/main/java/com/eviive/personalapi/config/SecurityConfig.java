@@ -47,25 +47,51 @@ public class SecurityConfig {
             .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))
             .addFilterBefore(authorizationFilter, UsernamePasswordAuthenticationFilter.class)
             .authorizeHttpRequests(auth ->
-                auth.requestMatchers(POST, "/user/login", "/user/logout", "/user/refresh")
+                auth.requestMatchers(
+                        "/v2/api-docs",
+                        "/v3/api-docs",
+                        "/v3/api-docs/**",
+                        "/swagger-resources",
+                        "/swagger-resources/**",
+                        "/configuration/ui",
+                        "/configuration/security",
+                        "/swagger-ui/**",
+                        "/webjars/**",
+                        "/swagger-ui.html"
+                    )
                     .permitAll()
-                    .requestMatchers("/user/**").hasAuthority(ROLE_ADMIN.toString())
 
-                    .requestMatchers("/role/**").hasAuthority(ROLE_ADMIN.toString())
 
-                    .requestMatchers(GET, "/project/**").permitAll()
-                    .requestMatchers("/project/**").hasAuthority(ROLE_USER.toString())
+                    .requestMatchers(POST, "/user/login", "/user/logout", "/user/refresh")
+                    .permitAll()
 
-                    .requestMatchers(GET, "/skill/**").permitAll()
-                    .requestMatchers("/skill/**").hasAuthority(ROLE_USER.toString())
+                    .requestMatchers("/user/**")
+                    .hasAuthority(ROLE_ADMIN.toString())
 
-                    .requestMatchers(GET, "/image/**").permitAll()
-                    .requestMatchers("/image/**").hasAuthority(ROLE_USER.toString())
+                    .requestMatchers("/role/**")
+                    .hasAuthority(ROLE_ADMIN.toString())
 
-                    .requestMatchers("/actuator/**").hasAuthority(ROLE_ADMIN.toString())
+                    .requestMatchers(GET, "/project/**")
+                    .permitAll()
+                    .requestMatchers("/project/**")
+                    .hasAuthority(ROLE_USER.toString())
+
+                    .requestMatchers(GET, "/skill/**")
+                    .permitAll()
+                    .requestMatchers("/skill/**")
+                    .hasAuthority(ROLE_USER.toString())
+
+                    .requestMatchers(GET, "/image/**")
+                    .permitAll()
+                    .requestMatchers("/image/**")
+                    .hasAuthority(ROLE_USER.toString())
+
+                    .requestMatchers("/actuator/**")
+                    .hasAuthority(ROLE_ADMIN.toString())
 
                     // deny-by-default policy
-                    .anyRequest().denyAll()
+                    .anyRequest()
+                    .denyAll()
             )
             .exceptionHandling(exceptionHandling ->
                 exceptionHandling

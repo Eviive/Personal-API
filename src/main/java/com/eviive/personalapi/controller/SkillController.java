@@ -4,6 +4,9 @@ import com.eviive.personalapi.dto.SkillDTO;
 import com.eviive.personalapi.dto.SortUpdateDTO;
 import com.eviive.personalapi.service.SkillService;
 import com.eviive.personalapi.util.UriUtilities;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +31,7 @@ import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
 @RestController
 @RequestMapping("skill")
 @RequiredArgsConstructor
+@Tag(name = "SkillController")
 public class SkillController {
 
     private final SkillService skillService;
@@ -37,6 +41,10 @@ public class SkillController {
     // GET
 
     @GetMapping(produces = APPLICATION_JSON_VALUE)
+    @Operation(
+        summary = "Find all skills",
+        responses = @ApiResponse(responseCode = "200", description = "OK")
+    )
     public ResponseEntity<List<SkillDTO>> findAll() {
         return ResponseEntity.ok(skillService.findAll());
     }
@@ -44,6 +52,13 @@ public class SkillController {
     // POST
 
     @PostMapping(consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
+    @Operation(
+        summary = "Save a skill",
+        responses = {
+            @ApiResponse(responseCode = "201", description = "Created"),
+            @ApiResponse(responseCode = "400", description = "Bad Request")
+        }
+    )
     public ResponseEntity<SkillDTO> save(@RequestBody @Valid final SkillDTO skillDTO) {
         final SkillDTO createdSkill = skillService.save(skillDTO, null);
         final URI location = uriUtilities.buildLocation(createdSkill.getId());
@@ -55,6 +70,14 @@ public class SkillController {
         path = "with-image",
         consumes = MULTIPART_FORM_DATA_VALUE,
         produces = APPLICATION_JSON_VALUE
+    )
+    @Operation(
+        summary = "Save a skill with an image",
+        responses = {
+            @ApiResponse(responseCode = "201", description = "Created"),
+            @ApiResponse(responseCode = "400", description = "Bad Request"),
+            @ApiResponse(responseCode = "415", description = "Unsupported Media Type")
+        }
     )
     public ResponseEntity<SkillDTO> saveWithImage(
         @RequestPart("skill") @Valid final SkillDTO skillDTO,
@@ -69,6 +92,14 @@ public class SkillController {
     // PUT
 
     @PutMapping(path = "{id}", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
+    @Operation(
+        summary = "Update a skill",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "400", description = "Bad Request"),
+            @ApiResponse(responseCode = "404", description = "Not Found")
+        }
+    )
     public ResponseEntity<SkillDTO> update(
         @PathVariable final Long id,
         @RequestBody @Valid final SkillDTO skillDTO
@@ -81,6 +112,15 @@ public class SkillController {
         consumes = MULTIPART_FORM_DATA_VALUE,
         produces = APPLICATION_JSON_VALUE
     )
+    @Operation(
+        summary = "Update a skill with an image",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "400", description = "Bad Request"),
+            @ApiResponse(responseCode = "404", description = "Not Found"),
+            @ApiResponse(responseCode = "415", description = "Unsupported Media Type")
+        }
+    )
     public ResponseEntity<SkillDTO> updateWithImage(
         @PathVariable final Long id,
         @RequestPart("skill") @Valid final SkillDTO skillDTO,
@@ -92,6 +132,10 @@ public class SkillController {
     // PATCH
 
     @PatchMapping(path = "sort", consumes = APPLICATION_JSON_VALUE)
+    @Operation(
+        summary = "Sort skills",
+        responses = @ApiResponse(responseCode = "204", description = "No Content")
+    )
     public ResponseEntity<Void> sort(@RequestBody final List<SortUpdateDTO> sorts) {
         skillService.sort(sorts);
         return ResponseEntity.noContent().build();
@@ -100,6 +144,13 @@ public class SkillController {
     // DELETE
 
     @DeleteMapping(path = "{id}")
+    @Operation(
+        summary = "Delete a skill",
+        responses = {
+            @ApiResponse(responseCode = "204", description = "No Content"),
+            @ApiResponse(responseCode = "404", description = "Not Found")
+        }
+    )
     public ResponseEntity<Void> delete(@PathVariable final Long id) {
         skillService.delete(id);
         return ResponseEntity.noContent().build();

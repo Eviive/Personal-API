@@ -4,6 +4,9 @@ import com.eviive.personalapi.dto.ProjectDTO;
 import com.eviive.personalapi.dto.SortUpdateDTO;
 import com.eviive.personalapi.service.ProjectService;
 import com.eviive.personalapi.util.UriUtilities;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -30,6 +33,7 @@ import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
 @RestController
 @RequestMapping("project")
 @RequiredArgsConstructor
+@Tag(name = "ProjectController")
 public class ProjectController {
 
     private final ProjectService projectService;
@@ -39,16 +43,28 @@ public class ProjectController {
     // GET
 
     @GetMapping(produces = APPLICATION_JSON_VALUE)
+    @Operation(
+        summary = "Find all projects",
+        responses = @ApiResponse(responseCode = "200", description = "OK")
+    )
     public ResponseEntity<List<ProjectDTO>> findAll() {
         return ResponseEntity.ok(projectService.findAll());
     }
 
     @GetMapping(path = "featured", produces = APPLICATION_JSON_VALUE)
+    @Operation(
+        summary = "Find all featured projects",
+        responses = @ApiResponse(responseCode = "200", description = "OK")
+    )
     public ResponseEntity<List<ProjectDTO>> findAllFeatured() {
         return ResponseEntity.ok(projectService.findAllFeatured());
     }
 
     @GetMapping(path = "not-featured", produces = APPLICATION_JSON_VALUE)
+    @Operation(
+        summary = "Find a page of not featured projects",
+        responses = @ApiResponse(responseCode = "200", description = "OK")
+    )
     public ResponseEntity<Page<ProjectDTO>> findAllNotFeatured(final Pageable pageable) {
         return ResponseEntity.ok(projectService.findAllNotFeatured(pageable));
     }
@@ -56,6 +72,13 @@ public class ProjectController {
     // POST
 
     @PostMapping(consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
+    @Operation(
+        summary = "Save a project",
+        responses = {
+            @ApiResponse(responseCode = "201", description = "Created"),
+            @ApiResponse(responseCode = "400", description = "Bad Request")
+        }
+    )
     public ResponseEntity<ProjectDTO> save(@RequestBody @Valid final ProjectDTO projectDTO) {
         final ProjectDTO createdProject = projectService.save(projectDTO, null);
         final URI location = uriUtilities.buildLocation(createdProject.getId());
@@ -67,6 +90,14 @@ public class ProjectController {
         path = "with-image",
         consumes = MULTIPART_FORM_DATA_VALUE,
         produces = APPLICATION_JSON_VALUE
+    )
+    @Operation(
+        summary = "Save a project with an image",
+        responses = {
+            @ApiResponse(responseCode = "201", description = "Created"),
+            @ApiResponse(responseCode = "400", description = "Bad Request"),
+            @ApiResponse(responseCode = "415", description = "Unsupported Media Type")
+        }
     )
     public ResponseEntity<ProjectDTO> saveWithImage(
         @RequestPart("project") @Valid final ProjectDTO projectDTO,
@@ -81,6 +112,14 @@ public class ProjectController {
     // PUT
 
     @PutMapping(path = "{id}", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
+    @Operation(
+        summary = "Update a project",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "400", description = "Bad Request"),
+            @ApiResponse(responseCode = "404", description = "Not Found")
+        }
+    )
     public ResponseEntity<ProjectDTO> update(
         @PathVariable final Long id,
         @RequestBody @Valid final ProjectDTO projectDTO
@@ -93,6 +132,14 @@ public class ProjectController {
         consumes = MULTIPART_FORM_DATA_VALUE,
         produces = APPLICATION_JSON_VALUE
     )
+    @Operation(
+        summary = "Update a project with an image",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "400", description = "Bad Request"),
+            @ApiResponse(responseCode = "415", description = "Unsupported Media Type")
+        }
+    )
     public ResponseEntity<ProjectDTO> updateWithImage(
         @PathVariable final Long id,
         @RequestPart("project") final @Valid ProjectDTO projectDTO,
@@ -104,6 +151,13 @@ public class ProjectController {
     // PATCH
 
     @PatchMapping(path = "sort", consumes = APPLICATION_JSON_VALUE)
+    @Operation(
+        summary = "Sort projects",
+        responses = {
+            @ApiResponse(responseCode = "204", description = "No Content"),
+            @ApiResponse(responseCode = "400", description = "Bad Request")
+        }
+    )
     public ResponseEntity<Void> sort(@RequestBody final List<SortUpdateDTO> sorts) {
         projectService.sort(sorts);
         return ResponseEntity.noContent().build();
@@ -112,6 +166,13 @@ public class ProjectController {
     // DELETE
 
     @DeleteMapping(path = "{id}")
+    @Operation(
+        summary = "Delete a project",
+        responses = {
+            @ApiResponse(responseCode = "204", description = "No Content"),
+            @ApiResponse(responseCode = "400", description = "Bad Request")
+        }
+    )
     public ResponseEntity<Void> delete(@PathVariable final Long id) {
         projectService.delete(id);
         return ResponseEntity.noContent().build();

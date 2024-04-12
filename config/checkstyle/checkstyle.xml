@@ -25,7 +25,7 @@
     <module name="TreeWalker">
         <module name="AbbreviationAsWordInName">
             <property name="allowedAbbreviationLength" value="0"/>
-            <property name="allowedAbbreviations" value="DTO"/>
+            <property name="allowedAbbreviations" value="DTO,API"/>
             <property name="ignoreFinal" value="false"/>
             <property name="ignoreStatic" value="false"/>
             <property name="ignoreStaticFinal" value="false"/>
