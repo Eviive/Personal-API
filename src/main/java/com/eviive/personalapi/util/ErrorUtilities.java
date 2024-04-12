@@ -9,7 +9,7 @@ import org.springframework.http.ProblemDetail;
 import org.springframework.stereotype.Component;
 
 @Component
-public final class ErrorUtils {
+public final class ErrorUtilities {
 
     public <E> ErrorResponseDTO<E> buildError(final HttpStatus httpStatus, final E message) {
         return new ErrorResponseDTO<>(httpStatus.value(), httpStatus.getReasonPhrase(), message);

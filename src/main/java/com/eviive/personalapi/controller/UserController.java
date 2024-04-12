@@ -4,8 +4,7 @@ import com.eviive.personalapi.dto.AuthRequestDTO;
 import com.eviive.personalapi.dto.AuthResponseDTO;
 import com.eviive.personalapi.dto.UserDTO;
 import com.eviive.personalapi.service.UserService;
-import com.eviive.personalapi.util.UriUtils;
-import jakarta.servlet.http.HttpServletRequest;
+import com.eviive.personalapi.util.UriUtilities;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -32,7 +31,7 @@ public class UserController {
 
     private final UserService userService;
 
-    private final UriUtils uriUtils;
+    private final UriUtilities uriUtilities;
 
     // GET
 
@@ -51,7 +50,7 @@ public class UserController {
     @PostMapping(consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<UserDTO> save(@RequestBody @Valid final UserDTO userDTO) {
         final UserDTO createdUser = userService.save(userDTO);
-        final URI location = uriUtils.buildLocation(createdUser.getId());
+        final URI location = uriUtilities.buildLocation(createdUser.getId());
         return ResponseEntity.created(location)
             .body(createdUser);
     }
@@ -63,14 +62,12 @@ public class UserController {
     )
     public ResponseEntity<AuthResponseDTO> login(
         @RequestBody @Valid final AuthRequestDTO loginForm,
-        final HttpServletRequest req,
         final HttpServletResponse res
     ) {
         return ResponseEntity.ok(
             userService.login(
                 loginForm.getUsername(),
                 loginForm.getPassword(),
-                req,
                 res
             )
         );
@@ -84,10 +81,9 @@ public class UserController {
 
     @PostMapping(path = "refresh", produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<AuthResponseDTO> refreshToken(
-        @CookieValue(value = "API_refresh-token", required = false) final String refreshToken,
-        final HttpServletRequest req
+        @CookieValue(value = "API_refresh-token", required = false) final String refreshToken
     ) {
-        return ResponseEntity.ok(userService.refreshToken(refreshToken, req));
+        return ResponseEntity.ok(userService.refreshToken(refreshToken));
     }
 
     // PUT

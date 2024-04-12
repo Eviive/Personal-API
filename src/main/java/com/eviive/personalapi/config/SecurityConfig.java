@@ -2,10 +2,11 @@ package com.eviive.personalapi.config;
 
 import com.eviive.personalapi.exception.PersonalApiExceptionHandler;
 import com.eviive.personalapi.filter.AuthorizationFilter;
+import com.eviive.personalapi.properties.CorsPropertiesConfig;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -37,20 +38,14 @@ public class SecurityConfig {
 
     private final PersonalApiExceptionHandler personalApiExceptionHandler;
 
-    @Value("${allowed-origins}")
-    private List<String> allowedOrigins;
-
     @Bean
     @SuppressWarnings({"checkstyle:LambdaBodyLength", "checkstyle:MultipleStringLiterals"})
     public SecurityFilterChain filterChain(final HttpSecurity http) throws Exception {
-        return http.csrf(AbstractHttpConfigurer::disable)
-
-            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-
+        return http
+            .csrf(AbstractHttpConfigurer::disable)
+            .cors(Customizer.withDefaults())
             .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))
-
             .addFilterBefore(authorizationFilter, UsernamePasswordAuthenticationFilter.class)
-
             .authorizeHttpRequests(auth ->
                 auth.requestMatchers(POST, "/user/login", "/user/logout", "/user/refresh")
                     .permitAll()
@@ -72,18 +67,20 @@ public class SecurityConfig {
                     // deny-by-default policy
                     .anyRequest().denyAll()
             )
-
             .exceptionHandling(exceptionHandling ->
-                exceptionHandling.authenticationEntryPoint(personalApiExceptionHandler)
+                exceptionHandling
+                    .authenticationEntryPoint(personalApiExceptionHandler)
                     .accessDeniedHandler(personalApiExceptionHandler)
             )
-
             .build();
     }
 
-    private CorsConfigurationSource corsConfigurationSource() {
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource(
+        final CorsPropertiesConfig corsPropertiesConfig
+    ) {
         final CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(allowedOrigins);
+        configuration.setAllowedOrigins(corsPropertiesConfig.allowedOrigins());
         configuration.addAllowedMethod("*");
         configuration.setAllowedHeaders(List.of(AUTHORIZATION, ORIGIN, CONTENT_TYPE));
         configuration.setAllowCredentials(true);

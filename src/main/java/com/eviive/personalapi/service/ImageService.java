@@ -6,8 +6,8 @@ import com.azure.storage.blob.BlobServiceClient;
 import com.azure.storage.blob.models.BlobHttpHeaders;
 import com.eviive.personalapi.entity.Image;
 import com.eviive.personalapi.exception.PersonalApiException;
+import com.eviive.personalapi.properties.AzureStoragePropertiesConfig;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -28,11 +28,7 @@ public class ImageService {
 
     private final BlobServiceClient blobServiceClient;
 
-    @Value("${spring.cloud.azure.storage.blob.container-name.project}")
-    private String projectContainer;
-
-    @Value("${spring.cloud.azure.storage.blob.container-name.skill}")
-    private String skillContainer;
+    private final AzureStoragePropertiesConfig azureStoragePropertiesConfig;
 
     public void upload(final Image image, final UUID oldUuid, final MultipartFile file) {
         if (file.isEmpty()) {
@@ -79,9 +75,9 @@ public class ImageService {
     private BlobContainerClient getBlobContainerClient(final Image image) {
         final String containerName;
         if (image.getProject() != null) {
-            containerName = projectContainer;
+            containerName = azureStoragePropertiesConfig.blob().projects().containerName();
         } else if (image.getSkill() != null) {
-            containerName = skillContainer;
+            containerName = azureStoragePropertiesConfig.blob().skills().containerName();
         } else {
             throw PersonalApiException.format(API500_UNKNOWN_CONTAINER, image.getUuid().toString());
         }

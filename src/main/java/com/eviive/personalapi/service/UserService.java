@@ -9,8 +9,7 @@ import com.eviive.personalapi.entity.User;
 import com.eviive.personalapi.exception.PersonalApiException;
 import com.eviive.personalapi.mapper.UserMapper;
 import com.eviive.personalapi.repository.UserRepository;
-import com.eviive.personalapi.util.TokenUtils;
-import jakarta.servlet.http.HttpServletRequest;
+import com.eviive.personalapi.util.TokenUtilities;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -43,7 +42,7 @@ public class UserService implements UserDetailsService {
 
     private final UserMapper userMapper;
 
-    private final TokenUtils tokenUtils;
+    private final TokenUtilities tokenUtilities;
 
     private final AuthenticationConfiguration authenticationConfiguration;
 
@@ -97,7 +96,6 @@ public class UserService implements UserDetailsService {
     public AuthResponseDTO login(
         final String username,
         final String password,
-        final HttpServletRequest req,
         final HttpServletResponse res
     ) {
         try {
@@ -109,7 +107,6 @@ public class UserService implements UserDetailsService {
                 (org.springframework.security.core.userdetails.User) authentication.getPrincipal();
 
             final String subject = user.getUsername();
-            final String issuer = req.getRequestURL().toString();
             final List<String> claims = user.getAuthorities()
                 .stream()
                 .map(GrantedAuthority::getAuthority)
@@ -118,9 +115,9 @@ public class UserService implements UserDetailsService {
             final AuthResponseDTO responseBody = new AuthResponseDTO();
             responseBody.setUsername(subject);
             responseBody.setRoles(claims);
-            responseBody.setAccessToken(tokenUtils.generateAccessToken(subject, issuer, claims));
+            responseBody.setAccessToken(tokenUtilities.generateAccessToken(subject, claims));
 
-            res.addCookie(tokenUtils.generateRefreshTokenCookie(subject, issuer));
+            res.addCookie(tokenUtilities.generateRefreshTokenCookie(subject));
 
             return responseBody;
         } catch (AuthenticationException e) {
@@ -131,16 +128,16 @@ public class UserService implements UserDetailsService {
     }
 
     public void logout(final HttpServletResponse res) {
-        res.addCookie(tokenUtils.createCookie(null, 0));
+        res.addCookie(tokenUtilities.deleteCookie());
     }
 
-    public AuthResponseDTO refreshToken(final String refreshToken, final HttpServletRequest req) {
+    public AuthResponseDTO refreshToken(final String refreshToken) {
         if (refreshToken == null) {
             throw PersonalApiException.format(API401_TOKEN_ERROR, "Refresh token not found");
         }
 
         try {
-            final DecodedJWT decodedToken = tokenUtils.verifyToken(refreshToken);
+            final DecodedJWT decodedToken = tokenUtilities.verifyToken(refreshToken);
 
             final UserDTO user = findByUsername(decodedToken.getSubject());
 
@@ -150,9 +147,7 @@ public class UserService implements UserDetailsService {
                 .toList();
 
             final String accessToken =
-                tokenUtils.generateAccessToken(user.getUsername(), req.getRequestURL().toString(),
-                    claims
-                );
+                tokenUtilities.generateAccessToken(user.getUsername(), claims);
 
             final AuthResponseDTO responseBody = new AuthResponseDTO();
             responseBody.setUsername(user.getUsername());

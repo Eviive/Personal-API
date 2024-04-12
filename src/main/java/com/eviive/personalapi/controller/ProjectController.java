@@ -3,7 +3,7 @@ package com.eviive.personalapi.controller;
 import com.eviive.personalapi.dto.ProjectDTO;
 import com.eviive.personalapi.dto.SortUpdateDTO;
 import com.eviive.personalapi.service.ProjectService;
-import com.eviive.personalapi.util.UriUtils;
+import com.eviive.personalapi.util.UriUtilities;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -34,7 +34,7 @@ public class ProjectController {
 
     private final ProjectService projectService;
 
-    private final UriUtils uriUtils;
+    private final UriUtilities uriUtilities;
 
     // GET
 
@@ -68,7 +68,7 @@ public class ProjectController {
     @PostMapping(consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<ProjectDTO> save(@RequestBody @Valid final ProjectDTO projectDTO) {
         final ProjectDTO createdProject = projectService.save(projectDTO, null);
-        final URI location = uriUtils.buildLocation(createdProject.getId());
+        final URI location = uriUtilities.buildLocation(createdProject.getId());
         return ResponseEntity.created(location)
             .body(createdProject);
     }
@@ -83,7 +83,7 @@ public class ProjectController {
         @RequestPart("file") final MultipartFile file
     ) {
         final ProjectDTO createdProject = projectService.save(projectDTO, file);
-        final URI location = uriUtils.buildLocation(createdProject.getId(), "with-image");
+        final URI location = uriUtilities.buildLocation(createdProject.getId(), "with-image");
         return ResponseEntity.created(location)
             .body(createdProject);
     }

@@ -6,10 +6,18 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.net.URI;
 
 @Component
-public final class UriUtils {
+public final class UriUtilities {
+
+    public URI getCurrentUri() {
+        return ServletUriComponentsBuilder
+            .fromCurrentRequest()
+            .build()
+            .toUri();
+    }
 
     public URI buildLocation(final Long id, final String pathToRemove) {
-        String path = ServletUriComponentsBuilder.fromCurrentRequest()
+        String path = ServletUriComponentsBuilder
+            .fromCurrentRequest()
             .path("/{id}")
             .buildAndExpand(id)
             .getPath();

@@ -3,7 +3,7 @@ package com.eviive.personalapi.controller;
 import com.eviive.personalapi.dto.SkillDTO;
 import com.eviive.personalapi.dto.SortUpdateDTO;
 import com.eviive.personalapi.service.SkillService;
-import com.eviive.personalapi.util.UriUtils;
+import com.eviive.personalapi.util.UriUtilities;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -32,7 +32,7 @@ public class SkillController {
 
     private final SkillService skillService;
 
-    private final UriUtils uriUtils;
+    private final UriUtilities uriUtilities;
 
     // GET
 
@@ -51,7 +51,7 @@ public class SkillController {
     @PostMapping(consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<SkillDTO> save(@RequestBody @Valid final SkillDTO skillDTO) {
         final SkillDTO createdSkill = skillService.save(skillDTO, null);
-        final URI location = uriUtils.buildLocation(createdSkill.getId());
+        final URI location = uriUtilities.buildLocation(createdSkill.getId());
         return ResponseEntity.created(location)
             .body(createdSkill);
     }
@@ -66,7 +66,7 @@ public class SkillController {
         @RequestPart("file") final MultipartFile file
     ) {
         final SkillDTO createdSkill = skillService.save(skillDTO, file);
-        final URI location = uriUtils.buildLocation(createdSkill.getId(), "with-image");
+        final URI location = uriUtilities.buildLocation(createdSkill.getId(), "with-image");
         return ResponseEntity.created(location)
             .body(createdSkill);
     }

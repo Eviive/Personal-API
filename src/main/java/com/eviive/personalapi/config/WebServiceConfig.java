@@ -1,7 +1,7 @@
 package com.eviive.personalapi.config;
 
+import com.eviive.personalapi.properties.PortfolioPropertiesConfig;
 import com.eviive.personalapi.service.webservice.PortfolioWebService;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -19,10 +19,10 @@ public class WebServiceConfig {
 
     @Bean
     public PortfolioWebService portfolioWebService(
-        @Value("${portfolio.api.url}") final String portfolioApiUrl
+        final PortfolioPropertiesConfig portfolioPropertiesConfig
     ) {
         final WebClient webClient = WebClient.builder()
-            .baseUrl(portfolioApiUrl)
+            .baseUrl(portfolioPropertiesConfig.api().url())
             .build();
 
         return buildWebClient(webClient, PortfolioWebService.class);

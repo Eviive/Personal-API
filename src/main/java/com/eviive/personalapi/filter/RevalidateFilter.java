@@ -1,6 +1,7 @@
 package com.eviive.personalapi.filter;
 
 import com.eviive.personalapi.dto.RevalidateRequestDTO;
+import com.eviive.personalapi.properties.PortfolioPropertiesConfig;
 import com.eviive.personalapi.service.webservice.PortfolioWebService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -8,7 +9,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
@@ -24,8 +24,7 @@ public class RevalidateFilter extends OncePerRequestFilter {
 
     private final PortfolioWebService portfolioWebService;
 
-    @Value("${portfolio.api.secret}")
-    private String portfolioApiSecret;
+    private final PortfolioPropertiesConfig portfolioPropertiesConfig;
 
     @Override
     protected void doFilterInternal(
@@ -41,7 +40,7 @@ public class RevalidateFilter extends OncePerRequestFilter {
         }
 
         final RevalidateRequestDTO revalidateRequest = new RevalidateRequestDTO();
-        revalidateRequest.setSecret(portfolioApiSecret);
+        revalidateRequest.setSecret(portfolioPropertiesConfig.api().secret());
 
         portfolioWebService.revalidate(revalidateRequest)
             .doOnError(e -> log.error("Error revalidating portfolio API", e))

@@ -1,7 +1,7 @@
 package com.eviive.personalapi.exception;
 
 import com.eviive.personalapi.dto.ErrorResponseDTO;
-import com.eviive.personalapi.util.ErrorUtils;
+import com.eviive.personalapi.util.ErrorUtilities;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -47,7 +47,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 public class PersonalApiExceptionHandler extends ResponseEntityExceptionHandler
     implements AuthenticationEntryPoint, AccessDeniedHandler {
 
-    private final ErrorUtils errorUtils;
+    private final ErrorUtilities errorUtilities;
 
     private final ObjectMapper objectMapper;
 
@@ -73,7 +73,8 @@ public class PersonalApiExceptionHandler extends ResponseEntityExceptionHandler
         final HttpServletResponse res,
         final PersonalApiErrorsEnum personalApiErrorsEnum
     ) {
-        final ErrorResponseDTO<String> errorResponse = errorUtils.buildError(personalApiErrorsEnum);
+        final ErrorResponseDTO<String> errorResponse =
+            errorUtilities.buildError(personalApiErrorsEnum);
 
         res.setStatus(errorResponse.getStatus());
         res.setContentType(APPLICATION_JSON_VALUE);
@@ -95,35 +96,35 @@ public class PersonalApiExceptionHandler extends ResponseEntityExceptionHandler
         boolean logException = true;
 
         if (e instanceof PersonalApiException personalApiException) {
-            errorResponse = errorUtils.buildError(personalApiException);
+            errorResponse = errorUtilities.buildError(personalApiException);
 
         } else if (e instanceof JpaSystemException jpaSystemException) {
-            errorResponse = errorUtils.buildError(
+            errorResponse = errorUtilities.buildError(
                 API500_INTERNAL_SERVER_ERROR,
                 jpaSystemException.getMostSpecificCause().getMessage()
             );
 
         } else if (e instanceof TransactionSystemException transactionSystemException) {
-            errorResponse = errorUtils.buildError(
+            errorResponse = errorUtilities.buildError(
                 API500_INTERNAL_SERVER_ERROR,
                 transactionSystemException.getMostSpecificCause().getMessage()
             );
 
         } else if (e instanceof NestedRuntimeException nestedRuntimeException) {
-            errorResponse = errorUtils.buildError(
+            errorResponse = errorUtilities.buildError(
                 API500_INTERNAL_SERVER_ERROR,
                 nestedRuntimeException.getMostSpecificCause().getMessage()
             );
 
         } else if (e instanceof ClientAbortException clientAbortException) {
-            errorResponse = errorUtils.buildError(
+            errorResponse = errorUtilities.buildError(
                 API408_REQUEST_TIMEOUT,
                 clientAbortException.getLocalizedMessage()
             );
             logException = false;
 
         } else {
-            errorResponse = errorUtils.buildError(API500_INTERNAL_SERVER_ERROR, e.getMessage());
+            errorResponse = errorUtilities.buildError(API500_INTERNAL_SERVER_ERROR, e.getMessage());
             defaultExceptionHandler = true;
         }
 
@@ -213,7 +214,7 @@ public class PersonalApiExceptionHandler extends ResponseEntityExceptionHandler
 
     private <E> ResponseEntity<Object> handleBadRequestException(final E message) {
         return ResponseEntity.badRequest()
-            .body(errorUtils.buildError(BAD_REQUEST, message));
+            .body(errorUtilities.buildError(BAD_REQUEST, message));
     }
 
     private ResponseEntity<Object> handleBadRequestException(
@@ -233,7 +234,7 @@ public class PersonalApiExceptionHandler extends ResponseEntityExceptionHandler
     ) {
         return super.createResponseEntity(
             body instanceof ProblemDetail problemDetail ?
-                errorUtils.buildError(statusCode, problemDetail) :
+                errorUtilities.buildError(statusCode, problemDetail) :
                 body,
             headers,
             statusCode,
