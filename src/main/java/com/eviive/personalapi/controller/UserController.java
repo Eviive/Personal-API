@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import static com.eviive.personalapi.util.TokenUtilities.REFRESH_TOKEN_COOKIE_NAME;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController
@@ -69,11 +70,12 @@ public class UserController {
         summary = "Refresh token",
         responses = {
             @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "400", description = "Bad Request"),
             @ApiResponse(responseCode = "401", description = "Unauthorized")
         }
     )
     public ResponseEntity<AuthResponseDTO> refreshToken(
-        @CookieValue(value = "API_refresh-token", required = false) final String refreshToken
+        @CookieValue(value = REFRESH_TOKEN_COOKIE_NAME, required = false) final String refreshToken
     ) {
         return ResponseEntity.ok(userService.refreshToken(refreshToken));
     }

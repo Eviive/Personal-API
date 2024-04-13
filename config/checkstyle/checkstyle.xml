@@ -28,7 +28,6 @@
             <property name="allowedAbbreviations" value="DTO,API"/>
             <property name="ignoreFinal" value="false"/>
             <property name="ignoreStatic" value="false"/>
-            <property name="ignoreStaticFinal" value="false"/>
         </module>
         <module name="AbstractClassName"/>
         <module name="AnnotationLocation">

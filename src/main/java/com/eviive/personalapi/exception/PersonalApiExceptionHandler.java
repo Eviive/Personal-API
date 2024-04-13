@@ -1,6 +1,5 @@
 package com.eviive.personalapi.exception;
 
-import com.eviive.personalapi.dto.ErrorResponseDTO;
 import com.eviive.personalapi.util.ErrorUtilities;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
@@ -31,7 +30,7 @@ import org.springframework.web.method.annotation.HandlerMethodValidationExceptio
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.eviive.personalapi.exception.PersonalApiErrorsEnum.API400_MISSING_SERVLET_REQUEST_PARAMETER;
 import static com.eviive.personalapi.exception.PersonalApiErrorsEnum.API400_TYPE_MISMATCH;
@@ -47,51 +46,18 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 public class PersonalApiExceptionHandler extends ResponseEntityExceptionHandler
     implements AuthenticationEntryPoint, AccessDeniedHandler {
 
+    private static final String NEW_LINE = "\n";
+
     private final ErrorUtilities errorUtilities;
 
     private final ObjectMapper objectMapper;
 
-    @Override
-    public void commence(
-        final HttpServletRequest req,
-        final HttpServletResponse res,
-        final AuthenticationException authException
-    ) {
-        sendError(res, API401_UNAUTHORIZED);
-    }
-
-    @Override
-    public void handle(
-        final HttpServletRequest req,
-        final HttpServletResponse res,
-        final AccessDeniedException accessDeniedException
-    ) {
-        sendError(res, API403_FORBIDDEN);
-    }
-
-    private void sendError(
-        final HttpServletResponse res,
-        final PersonalApiErrorsEnum personalApiErrorsEnum
-    ) {
-        final ErrorResponseDTO<String> errorResponse =
-            errorUtilities.buildError(personalApiErrorsEnum);
-
-        res.setStatus(errorResponse.getStatus());
-        res.setContentType(APPLICATION_JSON_VALUE);
-        try {
-            res.getOutputStream().print(objectMapper.writeValueAsString(errorResponse));
-            res.flushBuffer();
-        } catch (IOException e) {
-            logger.warn(e.getMessage(), e);
-        }
-    }
-
     @ExceptionHandler(Exception.class)
-    public final ResponseEntity<ErrorResponseDTO<String>> handleAllExceptions(
+    public final ResponseEntity<ProblemDetail> handleAllExceptions(
         final Exception e,
         final WebRequest req
     ) {
-        final ErrorResponseDTO<String> errorResponse;
+        final ProblemDetail errorResponse;
         boolean defaultExceptionHandler = false;
         boolean logException = true;
 
@@ -129,9 +95,10 @@ public class PersonalApiExceptionHandler extends ResponseEntityExceptionHandler
         }
 
         if (logException) {
-            final String loggerMessage =
-                getExceptionHandlerName(e, defaultExceptionHandler) + ": " +
-                    req.getDescription(false);
+            final String loggerMessage = "%s: %s".formatted(
+                getExceptionHandlerName(e, defaultExceptionHandler),
+                req.getDescription(false)
+            );
 
             if (HttpStatusCode.valueOf(errorResponse.getStatus()).is5xxServerError()) {
                 logger.error(loggerMessage, e);
@@ -149,7 +116,8 @@ public class PersonalApiExceptionHandler extends ResponseEntityExceptionHandler
         final boolean defaultExceptionHandler
     ) {
         return (defaultExceptionHandler ? "DefaultExceptionHandler (%s)" : "%sHandler").formatted(
-            e.getClass().getSimpleName());
+            e.getClass().getSimpleName()
+        );
     }
 
     @Override
@@ -159,13 +127,13 @@ public class PersonalApiExceptionHandler extends ResponseEntityExceptionHandler
         @NotNull final HttpStatusCode status,
         @NotNull final WebRequest req
     ) {
-        final List<String> validationErrors = e.getBindingResult()
-            .getAllErrors()
-            .stream()
-            .map(DefaultMessageSourceResolvable::getDefaultMessage)
-            .toList();
-
-        return handleBadRequestException(validationErrors);
+        return handleBadRequestException(
+            e.getBindingResult()
+                .getAllErrors()
+                .stream()
+                .map(DefaultMessageSourceResolvable::getDefaultMessage)
+                .collect(Collectors.joining(NEW_LINE))
+        );
     }
 
     @Override
@@ -175,17 +143,19 @@ public class PersonalApiExceptionHandler extends ResponseEntityExceptionHandler
         @NonNull final HttpStatusCode status,
         @NonNull final WebRequest request
     ) {
-        final List<String> validationErrors = ex.getAllValidationResults()
-            .stream()
-            .flatMap(r ->
-                r.getResolvableErrors()
-                    .stream()
-                    .map(e -> "The %s parameter %s.".formatted(
-                        r.getMethodParameter().getParameterName(), e.getDefaultMessage()))
-            )
-            .toList();
-
-        return handleBadRequestException(validationErrors);
+        return handleBadRequestException(
+            ex.getAllValidationResults()
+                .stream()
+                .flatMap(r ->
+                    r.getResolvableErrors()
+                        .stream()
+                        .map(e -> "The %s parameter %s.".formatted(
+                            r.getMethodParameter().getParameterName(),
+                            e.getDefaultMessage()
+                        ))
+                )
+                .collect(Collectors.joining(NEW_LINE))
+        );
     }
 
     @Override
@@ -212,9 +182,27 @@ public class PersonalApiExceptionHandler extends ResponseEntityExceptionHandler
         return handleBadRequestException(API400_TYPE_MISMATCH, e.getPropertyName());
     }
 
-    private <E> ResponseEntity<Object> handleBadRequestException(final E message) {
+    @Override
+    public void commence(
+        final HttpServletRequest req,
+        final HttpServletResponse res,
+        final AuthenticationException authException
+    ) {
+        sendError(res, API401_UNAUTHORIZED);
+    }
+
+    @Override
+    public void handle(
+        final HttpServletRequest req,
+        final HttpServletResponse res,
+        final AccessDeniedException accessDeniedException
+    ) {
+        sendError(res, API403_FORBIDDEN);
+    }
+
+    private ResponseEntity<Object> handleBadRequestException(final String detail) {
         return ResponseEntity.badRequest()
-            .body(errorUtilities.buildError(BAD_REQUEST, message));
+            .body(errorUtilities.buildError(BAD_REQUEST, detail));
     }
 
     private ResponseEntity<Object> handleBadRequestException(
@@ -224,22 +212,17 @@ public class PersonalApiExceptionHandler extends ResponseEntityExceptionHandler
         return handleBadRequestException(personalApiErrorsEnum.getMessage().formatted(args));
     }
 
-    @Override
-    @NonNull
-    protected ResponseEntity<Object> createResponseEntity(
-        final Object body,
-        @NonNull final HttpHeaders headers,
-        @NonNull final HttpStatusCode statusCode,
-        @NonNull final WebRequest request
-    ) {
-        return super.createResponseEntity(
-            body instanceof ProblemDetail problemDetail ?
-                errorUtilities.buildError(statusCode, problemDetail) :
-                body,
-            headers,
-            statusCode,
-            request
-        );
+    private void sendError(final HttpServletResponse res, final PersonalApiErrorsEnum personalApiErrorsEnum) {
+        final ProblemDetail errorResponse = errorUtilities.buildError(personalApiErrorsEnum);
+
+        res.setStatus(errorResponse.getStatus());
+        res.setContentType(APPLICATION_JSON_VALUE);
+        try {
+            res.getOutputStream().print(objectMapper.writeValueAsString(errorResponse));
+            res.flushBuffer();
+        } catch (IOException e) {
+            logger.warn(e.getMessage(), e);
+        }
     }
 
 }

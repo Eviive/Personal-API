@@ -17,6 +17,8 @@ import java.util.List;
 @Component
 public final class TokenUtilities {
 
+    public static final String REFRESH_TOKEN_COOKIE_NAME = "personal-api_refresh-token";
+
     private final Algorithm algorithm;
 
     private final JWTVerifier verifier;
@@ -77,7 +79,7 @@ public final class TokenUtilities {
     }
 
     public Cookie createCookie(final String value, final int maxAge) {
-        final Cookie cookie = new Cookie("personal-api_refresh-token", value);
+        final Cookie cookie = new Cookie(REFRESH_TOKEN_COOKIE_NAME, value);
         cookie.setMaxAge(maxAge);
         cookie.setSecure(personalApiPropertiesConfig.production());
         cookie.setHttpOnly(true);

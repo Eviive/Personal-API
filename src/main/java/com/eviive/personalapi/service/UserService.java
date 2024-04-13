@@ -18,9 +18,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import static com.eviive.personalapi.exception.PersonalApiErrorsEnum.API400_REFRESH_TOKEN_NOT_FOUND;
 import static com.eviive.personalapi.exception.PersonalApiErrorsEnum.API401_LOGIN_FAILED;
 import static com.eviive.personalapi.exception.PersonalApiErrorsEnum.API401_TOKEN_ERROR;
-import static com.eviive.personalapi.exception.PersonalApiErrorsEnum.API401_TOKEN_NOT_FOUND;
 import static com.eviive.personalapi.exception.PersonalApiErrorsEnum.API404_USERNAME_NOT_FOUND;
 import static com.eviive.personalapi.exception.PersonalApiErrorsEnum.API500_INTERNAL_SERVER_ERROR;
 
@@ -65,7 +65,7 @@ public class UserService implements UserDetailsService {
 
     public AuthResponseDTO refreshToken(final String refreshToken) {
         if (refreshToken == null) {
-            throw new PersonalApiException(API401_TOKEN_NOT_FOUND);
+            throw new PersonalApiException(API400_REFRESH_TOKEN_NOT_FOUND);
         }
 
         try {

@@ -18,6 +18,7 @@ public enum PersonalApiErrorsEnum {
 
     // 400 Bad Request
 
+    API400_REFRESH_TOKEN_NOT_FOUND("No refresh token was found in the request.", BAD_REQUEST),
     API400_FILE_EMPTY("The received file is empty.", BAD_REQUEST),
     API400_IMAGE_NO_NAME("The received image has no name.", BAD_REQUEST),
     API400_MISSING_SERVLET_REQUEST_PARAMETER(
@@ -30,7 +31,6 @@ public enum PersonalApiErrorsEnum {
 
     API401_UNAUTHORIZED("You are not authorized to access this resource.", UNAUTHORIZED),
     API401_LOGIN_FAILED("Login failed: %s.", UNAUTHORIZED),
-    API401_TOKEN_NOT_FOUND("No token was found in the request.", UNAUTHORIZED),
     API401_TOKEN_ERROR("An error occurred while processing the token: %s.", UNAUTHORIZED),
 
     // 403 Forbidden
