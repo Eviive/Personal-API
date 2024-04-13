@@ -11,7 +11,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -55,21 +54,27 @@ public class AuthorizationFilter extends OncePerRequestFilter {
 
             final String username = decodedToken.getSubject();
 
-            final Claim claim = decodedToken.getClaim("roles");
+            final Claim claim = decodedToken.getClaim("authorities");
 
-            if (claim.isNull() || claim.isMissing()) {
-                throw new IllegalStateException("Roles are missing from the token.");
+            if (claim.isMissing() || claim.isNull()) {
+                throw new IllegalStateException("Authorities are missing from the token.");
             }
 
-            final List<SimpleGrantedAuthority> authorities = claim.asList(String.class)
+            final List<SimpleGrantedAuthority> authorities = claim
+                .asList(String.class)
                 .stream()
                 .map(SimpleGrantedAuthority::new)
                 .toList();
 
-            final Authentication authenticationToken =
-                new UsernamePasswordAuthenticationToken(username, null, authorities);
-
-            SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+            SecurityContextHolder
+                .getContext()
+                .setAuthentication(
+                    new UsernamePasswordAuthenticationToken(
+                        username,
+                        null,
+                        authorities
+                    )
+                );
         } catch (IllegalStateException | JWTVerificationException e) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Authentication failed: %s".formatted(e.getMessage()), e);

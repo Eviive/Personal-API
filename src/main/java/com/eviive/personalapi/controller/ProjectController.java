@@ -86,11 +86,7 @@ public class ProjectController {
             .body(createdProject);
     }
 
-    @PostMapping(
-        path = "with-image",
-        consumes = MULTIPART_FORM_DATA_VALUE,
-        produces = APPLICATION_JSON_VALUE
-    )
+    @PostMapping(path = "with-image", consumes = MULTIPART_FORM_DATA_VALUE, produces = APPLICATION_JSON_VALUE)
     @Operation(
         summary = "Save a project with an image",
         responses = {
@@ -127,11 +123,7 @@ public class ProjectController {
         return ResponseEntity.ok(projectService.update(id, projectDTO, null));
     }
 
-    @PutMapping(
-        path = "{id}/with-image",
-        consumes = MULTIPART_FORM_DATA_VALUE,
-        produces = APPLICATION_JSON_VALUE
-    )
+    @PutMapping(path = "{id}/with-image", consumes = MULTIPART_FORM_DATA_VALUE, produces = APPLICATION_JSON_VALUE)
     @Operation(
         summary = "Update a project with an image",
         responses = {

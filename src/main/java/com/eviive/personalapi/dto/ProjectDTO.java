@@ -33,7 +33,7 @@ public class ProjectDTO {
     )
     private String descriptionFr;
 
-    @NotNull(message = "The project's creation date cannot be null.")
+    @NotNull(message = "The project's creation date is required.")
     private LocalDate creationDate;
 
     @NotBlank(message = "The project's repository URL cannot be blank.")
@@ -47,17 +47,17 @@ public class ProjectDTO {
     @Length(max = 255, message = "The project's demo URL cannot be longer than {max} characters.")
     private String demoUrl;
 
-    @NotNull(message = "The project's featured status cannot be null.")
+    @NotNull(message = "The project's featured status is required.")
     private Boolean featured;
 
     @Min(value = 0, message = "The project's sort cannot be less than {min}.")
     private Integer sort;
 
-    @NotNull(message = "The project's image cannot be null.")
+    @NotNull(message = "The project's image is required.")
     @Valid
     private ImageDTO image;
 
-    @NotNull(message = "The project's skills cannot be null.")
+    @NotNull(message = "The project's skills is required.")
     @Valid
     private Set<SkillDTO> skills;
 

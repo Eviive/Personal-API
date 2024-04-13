@@ -6,10 +6,10 @@ import lombok.Data;
 @Data
 public class AuthRequestDTO {
 
-    @NotBlank(message = "The username is required.")
+    @NotBlank(message = "The username cannot be blank.")
     private String username;
 
-    @NotBlank(message = "The password is required.")
+    @NotBlank(message = "The password cannot be blank.")
     private String password;
 
 }

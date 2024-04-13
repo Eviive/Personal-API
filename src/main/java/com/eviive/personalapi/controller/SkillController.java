@@ -66,11 +66,7 @@ public class SkillController {
             .body(createdSkill);
     }
 
-    @PostMapping(
-        path = "with-image",
-        consumes = MULTIPART_FORM_DATA_VALUE,
-        produces = APPLICATION_JSON_VALUE
-    )
+    @PostMapping(path = "with-image", consumes = MULTIPART_FORM_DATA_VALUE, produces = APPLICATION_JSON_VALUE)
     @Operation(
         summary = "Save a skill with an image",
         responses = {
@@ -107,11 +103,7 @@ public class SkillController {
         return ResponseEntity.ok(skillService.update(id, skillDTO, null));
     }
 
-    @PutMapping(
-        path = "{id}/with-image",
-        consumes = MULTIPART_FORM_DATA_VALUE,
-        produces = APPLICATION_JSON_VALUE
-    )
+    @PutMapping(path = "{id}/with-image", consumes = MULTIPART_FORM_DATA_VALUE, produces = APPLICATION_JSON_VALUE)
     @Operation(
         summary = "Update a skill with an image",
         responses = {

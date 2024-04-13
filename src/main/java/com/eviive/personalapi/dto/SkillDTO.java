@@ -19,7 +19,7 @@ public class SkillDTO {
     @Min(value = 0, message = "The skill's sort cannot be less than {min}.")
     private Integer sort;
 
-    @NotNull(message = "The skill's image cannot be null.")
+    @NotNull(message = "The skill's image is required.")
     @Valid
     private ImageDTO image;
 

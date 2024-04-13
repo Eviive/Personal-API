@@ -1,11 +1,14 @@
 package com.eviive.personalapi.config;
 
+import com.eviive.personalapi.entity.Role;
 import com.eviive.personalapi.exception.PersonalApiExceptionHandler;
 import com.eviive.personalapi.filter.AuthorizationFilter;
 import com.eviive.personalapi.properties.CorsPropertiesConfig;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -13,15 +16,21 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.expression.DefaultWebSecurityExpressionHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.util.Arrays;
 import java.util.List;
 
-import static com.eviive.personalapi.entity.RoleEnum.ROLE_ADMIN;
-import static com.eviive.personalapi.entity.RoleEnum.ROLE_USER;
+import static com.eviive.personalapi.entity.Authority.READ_ACTUATOR;
+import static com.eviive.personalapi.entity.Authority.READ_PROJECT;
+import static com.eviive.personalapi.entity.Authority.READ_SKILL;
+import static com.eviive.personalapi.entity.Authority.WRITE_PROJECT;
+import static com.eviive.personalapi.entity.Authority.WRITE_SKILL;
+import static com.eviive.personalapi.entity.Role.ANONYMOUS;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 import static org.springframework.http.HttpHeaders.ORIGIN;
@@ -44,8 +53,12 @@ public class SecurityConfig {
         return http
             .csrf(AbstractHttpConfigurer::disable)
             .cors(Customizer.withDefaults())
+
             .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))
+
             .addFilterBefore(authorizationFilter, UsernamePasswordAuthenticationFilter.class)
+            .anonymous(anonymous -> anonymous.authorities(ANONYMOUS.getAuthorities()))
+
             .authorizeHttpRequests(auth ->
                 auth.requestMatchers(
                         "/v2/api-docs",
@@ -65,34 +78,26 @@ public class SecurityConfig {
                     .requestMatchers(POST, "/user/login", "/user/logout", "/user/refresh")
                     .permitAll()
 
-                    .requestMatchers("/user/**")
-                    .hasAuthority(ROLE_ADMIN.toString())
-
-                    .requestMatchers("/role/**")
-                    .hasAuthority(ROLE_ADMIN.toString())
-
                     .requestMatchers(GET, "/project/**")
-                    .permitAll()
+                    .hasAuthority(READ_PROJECT.getAuthority())
+
                     .requestMatchers("/project/**")
-                    .hasAuthority(ROLE_USER.toString())
+                    .hasAuthority(WRITE_PROJECT.getAuthority())
 
                     .requestMatchers(GET, "/skill/**")
-                    .permitAll()
-                    .requestMatchers("/skill/**")
-                    .hasAuthority(ROLE_USER.toString())
+                    .hasAuthority(READ_SKILL.getAuthority())
 
-                    .requestMatchers(GET, "/image/**")
-                    .permitAll()
-                    .requestMatchers("/image/**")
-                    .hasAuthority(ROLE_USER.toString())
+                    .requestMatchers("/skill/**")
+                    .hasAuthority(WRITE_SKILL.getAuthority())
 
                     .requestMatchers("/actuator/**")
-                    .hasAuthority(ROLE_ADMIN.toString())
+                    .hasAuthority(READ_ACTUATOR.getAuthority())
 
                     // deny-by-default policy
                     .anyRequest()
                     .denyAll()
             )
+
             .exceptionHandling(exceptionHandling ->
                 exceptionHandling
                     .authenticationEntryPoint(personalApiExceptionHandler)
@@ -102,9 +107,39 @@ public class SecurityConfig {
     }
 
     @Bean
-    public CorsConfigurationSource corsConfigurationSource(
-        final CorsPropertiesConfig corsPropertiesConfig
-    ) {
+    public RoleHierarchy roleHierarchy() {
+        final RoleHierarchyImpl roleHierarchy = new RoleHierarchyImpl();
+        final Role[] roles = Role.values();
+        final StringBuilder roleHierarchyBuilder = new StringBuilder();
+
+        Arrays
+            .stream(roles)
+            .filter(r -> r.getSubRoles() != null)
+            .forEach(r -> {
+                final String roleName = r.toString();
+
+                for (Role subRole : r.getSubRoles()) {
+                    roleHierarchyBuilder
+                        .append(roleName)
+                        .append(" > ")
+                        .append(subRole.toString())
+                        .append("\n");
+                }
+            });
+
+        roleHierarchy.setHierarchy(roleHierarchyBuilder.toString());
+        return roleHierarchy;
+    }
+
+    @Bean
+    public DefaultWebSecurityExpressionHandler customWebSecurityExpressionHandler(final RoleHierarchy roleHierarchy) {
+        final DefaultWebSecurityExpressionHandler expressionHandler = new DefaultWebSecurityExpressionHandler();
+        expressionHandler.setRoleHierarchy(roleHierarchy);
+        return expressionHandler;
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource(final CorsPropertiesConfig corsPropertiesConfig) {
         final CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(corsPropertiesConfig.allowedOrigins());
         configuration.addAllowedMethod("*");

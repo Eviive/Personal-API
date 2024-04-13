@@ -4,9 +4,11 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.eviive.personalapi.entity.User;
 import com.eviive.personalapi.properties.JwtPropertiesConfig;
 import com.eviive.personalapi.properties.PersonalApiPropertiesConfig;
 import jakarta.servlet.http.Cookie;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
@@ -37,25 +39,28 @@ public final class TokenUtilities {
         this.jwtPropertiesConfig = jwtPropertiesConfig;
     }
 
-    public String generateAccessToken(
-        final String subject,
-        final List<String> claims
-    ) {
+    public String generateAccessToken(final User user) {
+        final List<String> authorities = user.getAuthorities()
+            .stream()
+            .map(GrantedAuthority::getAuthority)
+            .toList();
+
         return JWT.create()
-            .withSubject(subject)
+            .withSubject(user.getUsername())
             .withExpiresAt(
                 Instant
                     .now()
                     .plusSeconds(jwtPropertiesConfig.token().access().expiration())
             )
             .withIssuer(uriUtilities.getCurrentUri().toString())
-            .withClaim("roles", claims)
+            .withClaim("authorities", authorities)
             .sign(algorithm);
     }
 
-    public Cookie generateRefreshTokenCookie(final String subject) {
+
+    public Cookie generateRefreshTokenCookie(final User user) {
         final String refreshToken = JWT.create()
-            .withSubject(subject)
+            .withSubject(user.getUsername())
             .withExpiresAt(
                 Instant
                     .now()

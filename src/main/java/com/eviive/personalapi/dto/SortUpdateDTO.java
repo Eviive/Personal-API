@@ -7,11 +7,11 @@ import lombok.Data;
 @Data
 public class SortUpdateDTO {
 
-    @NotNull(message = "The id cannot be null.")
+    @NotNull(message = "The sort id is required.")
     private Long id;
 
-    @NotNull(message = "The sort cannot be null.")
-    @Min(value = 0, message = "The sort cannot be less than {min}.")
+    @NotNull(message = "The sort value is required.")
+    @Min(value = 0, message = "The sort value cannot be less than {min}.")
     private Integer sort;
 
 }

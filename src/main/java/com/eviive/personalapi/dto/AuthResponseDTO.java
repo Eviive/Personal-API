@@ -1,21 +1,14 @@
 package com.eviive.personalapi.dto;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import java.util.List;
-
 @Data
+@AllArgsConstructor
 public class AuthResponseDTO {
 
-    @NotBlank(message = "The username is required.")
-    private String username;
-
-    @NotNull(message = "Roles are required.")
-    private List<String> roles;
-
-    @NotBlank(message = "The access token is required.")
+    @NotBlank(message = "The access token cannot be blank.")
     private String accessToken;
 
 }
