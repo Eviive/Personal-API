@@ -3,11 +3,9 @@ package com.eviive.personalapi;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
-import org.springframework.scheduling.annotation.EnableAsync;
 
 @SpringBootApplication
 @ConfigurationPropertiesScan("com.eviive.personalapi.properties")
-@EnableAsync
 @SuppressWarnings("checkstyle:HideUtilityClassConstructor")
 public class PersonalApiApplication {
 

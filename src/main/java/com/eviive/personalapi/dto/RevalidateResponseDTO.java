@@ -3,7 +3,7 @@ package com.eviive.personalapi.dto;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 @Data
 public class RevalidateResponseDTO {
@@ -12,6 +12,6 @@ public class RevalidateResponseDTO {
     private Boolean revalidated;
 
     @NotBlank(message = "The timestamp is required.")
-    private Timestamp timestamp;
+    private LocalDateTime timestamp;
 
 }

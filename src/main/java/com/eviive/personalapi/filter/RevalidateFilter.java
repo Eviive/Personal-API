@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Component
@@ -25,6 +26,8 @@ public class RevalidateFilter extends OncePerRequestFilter {
     private final PortfolioWebService portfolioWebService;
 
     private final PortfolioPropertiesConfig portfolioPropertiesConfig;
+
+    private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     @Override
     protected void doFilterInternal(
@@ -42,12 +45,24 @@ public class RevalidateFilter extends OncePerRequestFilter {
         final RevalidateRequestDTO revalidateRequest = new RevalidateRequestDTO();
         revalidateRequest.setSecret(portfolioPropertiesConfig.api().secret());
 
-        portfolioWebService.revalidate(revalidateRequest)
-            .doOnError(e -> log.error("Error revalidating portfolio API", e))
-            .subscribe(revalidateResponse -> log.info(
-                "Revalidated portfolio API: {}",
-                revalidateResponse
-            ));
+        portfolioWebService
+            .revalidate(revalidateRequest)
+            .doOnError(e -> log.error("Failed to revalidate portfolio", e))
+            .subscribe(revalidateResponse -> {
+                final String timestamp = dateTimeFormatter.format(revalidateResponse.getTimestamp());
+
+                if (revalidateResponse.getRevalidated()) {
+                    log.info(
+                        "Revalidated portfolio: {}",
+                        timestamp
+                    );
+                } else {
+                    log.warn(
+                        "Failed to revalidate portfolio ({})",
+                        timestamp
+                    );
+                }
+            });
     }
 
     private boolean shouldFilter(final HttpServletRequest req, final HttpServletResponse res) {
