@@ -15,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 import java.util.UUID;
 
+import static com.eviive.personalapi.exception.PersonalApiErrorsEnum.API400_SKILL_ID_NOT_ALLOWED;
 import static com.eviive.personalapi.exception.PersonalApiErrorsEnum.API404_SKILL_ID_NOT_FOUND;
 
 @Service
@@ -32,7 +33,11 @@ public class SkillService {
         return skillMapper.toListDTO(skillRepository.findAll());
     }
 
-    public SkillDTO save(final SkillDTO skillDTO, @Nullable final MultipartFile file) {
+    public SkillDTO create(final SkillDTO skillDTO, @Nullable final MultipartFile file) {
+        if (skillDTO.getId() != null) {
+            throw new PersonalApiException(API400_SKILL_ID_NOT_ALLOWED);
+        }
+
         final Skill skill = skillMapper.toEntity(skillDTO);
 
         final Integer newSort = skillRepository
@@ -42,29 +47,7 @@ public class SkillService {
 
         skill.setSort(newSort);
 
-        return saveOrUpdate(skill, file);
-    }
-
-    private SkillDTO saveOrUpdate(final Skill skill, final MultipartFile file) {
-        UUID oldUuid = null;
-        if (file != null) {
-            oldUuid = skill.getImage().getUuid();
-            skill.getImage().setUuid(UUID.randomUUID());
-        }
-
-        final Skill savedSkill = skillRepository.save(skill);
-
-        if (file != null) {
-            imageService.upload(savedSkill.getImage(), oldUuid, file);
-        }
-
-        return skillMapper.toDTO(savedSkill);
-    }
-
-    public void sort(final List<SortUpdateDTO> sorts) {
-        for (SortUpdateDTO sort : sorts) {
-            skillRepository.updateSortById(sort.getId(), sort.getSort());
-        }
+        return save(skill, file);
     }
 
     public SkillDTO update(
@@ -80,7 +63,23 @@ public class SkillService {
 
         skill.setId(id);
 
-        return saveOrUpdate(skill, file);
+        return save(skill, file);
+    }
+
+    private SkillDTO save(final Skill skill, final MultipartFile file) {
+        UUID oldUuid = null;
+        if (file != null) {
+            oldUuid = skill.getImage().getUuid();
+            skill.getImage().setUuid(UUID.randomUUID());
+        }
+
+        final Skill savedSkill = skillRepository.save(skill);
+
+        if (file != null) {
+            imageService.upload(savedSkill.getImage(), oldUuid, file);
+        }
+
+        return skillMapper.toDTO(savedSkill);
     }
 
     public void delete(final Long id) {
@@ -94,6 +93,12 @@ public class SkillService {
         skill.getProjects().forEach(project -> project.getSkills().remove(skill));
 
         skillRepository.deleteById(id);
+    }
+
+    public void sort(final List<SortUpdateDTO> sorts) {
+        for (SortUpdateDTO sort : sorts) {
+            skillRepository.updateSortById(sort.getId(), sort.getSort());
+        }
     }
 
 }

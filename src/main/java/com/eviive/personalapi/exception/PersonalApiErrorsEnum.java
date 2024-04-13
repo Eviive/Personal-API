@@ -14,6 +14,7 @@ import static org.springframework.http.HttpStatus.UNSUPPORTED_MEDIA_TYPE;
 
 @RequiredArgsConstructor
 @Getter
+@SuppressWarnings("checkstyle:LineLength")
 public enum PersonalApiErrorsEnum {
 
     // 400 Bad Request
@@ -21,11 +22,10 @@ public enum PersonalApiErrorsEnum {
     API400_REFRESH_TOKEN_NOT_FOUND("No refresh token was found in the request.", BAD_REQUEST),
     API400_FILE_EMPTY("The received file is empty.", BAD_REQUEST),
     API400_IMAGE_NO_NAME("The received image has no name.", BAD_REQUEST),
-    API400_MISSING_SERVLET_REQUEST_PARAMETER(
-        "The request parameter %s of type %s is missing.",
-        BAD_REQUEST
-    ),
+    API400_MISSING_SERVLET_REQUEST_PARAMETER("The request parameter %s of type %s is missing.", BAD_REQUEST),
     API400_TYPE_MISMATCH("The received type for the property %s is not valid.", BAD_REQUEST),
+    API400_PROJECT_ID_NOT_ALLOWED("The project id must be null for a new project.", BAD_REQUEST),
+    API400_SKILL_ID_NOT_ALLOWED("The skill id must be null for a new skill.", BAD_REQUEST),
 
     // 401 Unauthorized
 
@@ -49,19 +49,13 @@ public enum PersonalApiErrorsEnum {
 
     // 415 Unsupported Media Type
 
-    API415_FILE_NOT_IMAGE(
-        "The received file is not an image (Content-Type: %s).",
-        UNSUPPORTED_MEDIA_TYPE
-    ),
+    API415_FILE_NOT_IMAGE("The received file is not an image (Content-Type: %s).", UNSUPPORTED_MEDIA_TYPE),
 
     // 500 Internal Server Error
 
     API500_INTERNAL_SERVER_ERROR("An internal server error occurred: %s.", INTERNAL_SERVER_ERROR),
     API500_UPLOAD_ERROR("An error occurred while uploading the image: %s.", INTERNAL_SERVER_ERROR),
-    API500_UNKNOWN_CONTAINER(
-        "The image %s is not linked to a known container.",
-        INTERNAL_SERVER_ERROR
-    );
+    API500_UNKNOWN_CONTAINER("The image %s is not linked to a known container.", INTERNAL_SERVER_ERROR);
 
     private final String message;
 

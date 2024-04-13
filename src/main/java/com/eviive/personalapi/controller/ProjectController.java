@@ -73,14 +73,14 @@ public class ProjectController {
 
     @PostMapping(consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
     @Operation(
-        summary = "Save a project",
+        summary = "Create a project",
         responses = {
             @ApiResponse(responseCode = "201", description = "Created"),
             @ApiResponse(responseCode = "400", description = "Bad Request")
         }
     )
     public ResponseEntity<ProjectDTO> save(@RequestBody @Valid final ProjectDTO projectDTO) {
-        final ProjectDTO createdProject = projectService.save(projectDTO, null);
+        final ProjectDTO createdProject = projectService.create(projectDTO, null);
         final URI location = uriUtilities.buildLocation(createdProject.getId());
         return ResponseEntity.created(location)
             .body(createdProject);
@@ -88,7 +88,7 @@ public class ProjectController {
 
     @PostMapping(path = "with-image", consumes = MULTIPART_FORM_DATA_VALUE, produces = APPLICATION_JSON_VALUE)
     @Operation(
-        summary = "Save a project with an image",
+        summary = "Create a project with an image",
         responses = {
             @ApiResponse(responseCode = "201", description = "Created"),
             @ApiResponse(responseCode = "400", description = "Bad Request"),
@@ -99,7 +99,7 @@ public class ProjectController {
         @RequestPart("project") @Valid final ProjectDTO projectDTO,
         @RequestPart("file") final MultipartFile file
     ) {
-        final ProjectDTO createdProject = projectService.save(projectDTO, file);
+        final ProjectDTO createdProject = projectService.create(projectDTO, file);
         final URI location = uriUtilities.buildLocation(createdProject.getId(), "with-image");
         return ResponseEntity.created(location)
             .body(createdProject);

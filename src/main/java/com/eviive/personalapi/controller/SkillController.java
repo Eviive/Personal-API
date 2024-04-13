@@ -53,14 +53,14 @@ public class SkillController {
 
     @PostMapping(consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
     @Operation(
-        summary = "Save a skill",
+        summary = "Create a skill",
         responses = {
             @ApiResponse(responseCode = "201", description = "Created"),
             @ApiResponse(responseCode = "400", description = "Bad Request")
         }
     )
     public ResponseEntity<SkillDTO> save(@RequestBody @Valid final SkillDTO skillDTO) {
-        final SkillDTO createdSkill = skillService.save(skillDTO, null);
+        final SkillDTO createdSkill = skillService.create(skillDTO, null);
         final URI location = uriUtilities.buildLocation(createdSkill.getId());
         return ResponseEntity.created(location)
             .body(createdSkill);
@@ -68,7 +68,7 @@ public class SkillController {
 
     @PostMapping(path = "with-image", consumes = MULTIPART_FORM_DATA_VALUE, produces = APPLICATION_JSON_VALUE)
     @Operation(
-        summary = "Save a skill with an image",
+        summary = "Create a skill with an image",
         responses = {
             @ApiResponse(responseCode = "201", description = "Created"),
             @ApiResponse(responseCode = "400", description = "Bad Request"),
@@ -79,7 +79,7 @@ public class SkillController {
         @RequestPart("skill") @Valid final SkillDTO skillDTO,
         @RequestPart("file") final MultipartFile file
     ) {
-        final SkillDTO createdSkill = skillService.save(skillDTO, file);
+        final SkillDTO createdSkill = skillService.create(skillDTO, file);
         final URI location = uriUtilities.buildLocation(createdSkill.getId(), "with-image");
         return ResponseEntity.created(location)
             .body(createdSkill);

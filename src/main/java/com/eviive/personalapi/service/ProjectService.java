@@ -17,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 import java.util.UUID;
 
+import static com.eviive.personalapi.exception.PersonalApiErrorsEnum.API400_PROJECT_ID_NOT_ALLOWED;
 import static com.eviive.personalapi.exception.PersonalApiErrorsEnum.API404_PROJECT_ID_NOT_FOUND;
 
 @Service
@@ -43,7 +44,11 @@ public class ProjectService {
             .map(projectMapper::toDTO);
     }
 
-    public ProjectDTO save(final ProjectDTO projectDTO, @Nullable final MultipartFile file) {
+    public ProjectDTO create(final ProjectDTO projectDTO, @Nullable final MultipartFile file) {
+        if (projectDTO.getId() != null) {
+            throw new PersonalApiException(API400_PROJECT_ID_NOT_ALLOWED);
+        }
+
         final Project project = projectMapper.toEntity(projectDTO);
 
         final Integer newSort = projectRepository
@@ -53,10 +58,22 @@ public class ProjectService {
 
         project.setSort(newSort);
 
-        return saveOrUpdate(project, file);
+        return save(project, file);
     }
 
-    private ProjectDTO saveOrUpdate(final Project project, final @Nullable MultipartFile file) {
+    public ProjectDTO update(final Long id, final ProjectDTO projectDTO, @Nullable final MultipartFile file) {
+        if (!projectRepository.existsById(id)) {
+            throw PersonalApiException.format(API404_PROJECT_ID_NOT_FOUND, id);
+        }
+
+        final Project project = projectMapper.toEntity(projectDTO);
+
+        project.setId(id);
+
+        return save(project, file);
+    }
+
+    private ProjectDTO save(final Project project, final @Nullable MultipartFile file) {
         UUID oldUuid = null;
         if (file != null) {
             oldUuid = project.getImage().getUuid();
@@ -72,26 +89,6 @@ public class ProjectService {
         return projectMapper.toDTO(savedProject);
     }
 
-    public void sort(final List<SortUpdateDTO> sorts) {
-        for (SortUpdateDTO sort : sorts) {
-            projectRepository.updateSortById(sort.getId(), sort.getSort());
-        }
-    }
-
-    public ProjectDTO update(
-        final Long id, final ProjectDTO projectDTO, @Nullable final MultipartFile file
-    ) {
-        if (!projectRepository.existsById(id)) {
-            throw PersonalApiException.format(API404_PROJECT_ID_NOT_FOUND, id);
-        }
-
-        final Project project = projectMapper.toEntity(projectDTO);
-
-        project.setId(id);
-
-        return saveOrUpdate(project, file);
-    }
-
     public void delete(final Long id) {
         final Project project = projectRepository.findById(id)
             .orElseThrow(() -> PersonalApiException.format(API404_PROJECT_ID_NOT_FOUND, id));
@@ -101,6 +98,12 @@ public class ProjectService {
         }
 
         projectRepository.deleteById(id);
+    }
+
+    public void sort(final List<SortUpdateDTO> sorts) {
+        for (SortUpdateDTO sort : sorts) {
+            projectRepository.updateSortById(sort.getId(), sort.getSort());
+        }
     }
 
 }
