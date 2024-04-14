@@ -25,17 +25,24 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.eviive.personalapi.entity.Authority.CREATE_PROJECTS;
+import static com.eviive.personalapi.entity.Authority.CREATE_SKILLS;
+import static com.eviive.personalapi.entity.Authority.DELETE_PROJECTS;
+import static com.eviive.personalapi.entity.Authority.DELETE_SKILLS;
 import static com.eviive.personalapi.entity.Authority.READ_ACTUATOR;
-import static com.eviive.personalapi.entity.Authority.READ_PROJECT;
-import static com.eviive.personalapi.entity.Authority.READ_SKILL;
-import static com.eviive.personalapi.entity.Authority.WRITE_PROJECT;
-import static com.eviive.personalapi.entity.Authority.WRITE_SKILL;
+import static com.eviive.personalapi.entity.Authority.READ_PROJECTS;
+import static com.eviive.personalapi.entity.Authority.READ_SKILLS;
+import static com.eviive.personalapi.entity.Authority.UPDATE_PROJECTS;
+import static com.eviive.personalapi.entity.Authority.UPDATE_SKILLS;
 import static com.eviive.personalapi.entity.Role.ANONYMOUS;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 import static org.springframework.http.HttpHeaders.ORIGIN;
+import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpMethod.GET;
+import static org.springframework.http.HttpMethod.PATCH;
 import static org.springframework.http.HttpMethod.POST;
+import static org.springframework.http.HttpMethod.PUT;
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
 @Configuration
@@ -74,21 +81,30 @@ public class SecurityConfig {
                     )
                     .permitAll()
 
-
                     .requestMatchers(POST, "/user/login", "/user/logout", "/user/refresh")
                     .permitAll()
 
                     .requestMatchers(GET, "/project/**")
-                    .hasAuthority(READ_PROJECT.getAuthority())
-
-                    .requestMatchers("/project/**")
-                    .hasAuthority(WRITE_PROJECT.getAuthority())
+                    .hasAuthority(READ_PROJECTS.getAuthority())
+                    .requestMatchers(POST, "/project/**")
+                    .hasAuthority(CREATE_PROJECTS.getAuthority())
+                    .requestMatchers(PUT, "/project/**")
+                    .hasAuthority(UPDATE_PROJECTS.getAuthority())
+                    .requestMatchers(PATCH, "/project/**")
+                    .hasAuthority(UPDATE_PROJECTS.getAuthority())
+                    .requestMatchers(DELETE, "/project/**")
+                    .hasAuthority(DELETE_PROJECTS.getAuthority())
 
                     .requestMatchers(GET, "/skill/**")
-                    .hasAuthority(READ_SKILL.getAuthority())
-
-                    .requestMatchers("/skill/**")
-                    .hasAuthority(WRITE_SKILL.getAuthority())
+                    .hasAuthority(READ_SKILLS.getAuthority())
+                    .requestMatchers(POST, "/skill/**")
+                    .hasAuthority(CREATE_SKILLS.getAuthority())
+                    .requestMatchers(PUT, "/skill/**")
+                    .hasAuthority(UPDATE_SKILLS.getAuthority())
+                    .requestMatchers(PATCH, "/skill/**")
+                    .hasAuthority(UPDATE_SKILLS.getAuthority())
+                    .requestMatchers(DELETE, "/skill/**")
+                    .hasAuthority(DELETE_SKILLS.getAuthority())
 
                     .requestMatchers("/actuator/**")
                     .hasAuthority(READ_ACTUATOR.getAuthority())
@@ -118,7 +134,7 @@ public class SecurityConfig {
             .forEach(r -> {
                 final String roleName = r.toString();
 
-                for (Role subRole : r.getSubRoles()) {
+                for (Role subRole: r.getSubRoles()) {
                     roleHierarchyBuilder
                         .append(roleName)
                         .append(" > ")

@@ -7,11 +7,15 @@ import lombok.RequiredArgsConstructor;
 @Getter
 public enum Authority {
 
-    READ_PROJECT("read:project"),
-    WRITE_PROJECT("write:project"),
+    READ_PROJECTS("read:projects"),
+    CREATE_PROJECTS("create:projects"),
+    UPDATE_PROJECTS("update:projects"),
+    DELETE_PROJECTS("delete:projects"),
 
-    READ_SKILL("read:skill"),
-    WRITE_SKILL("write:skill"),
+    READ_SKILLS("read:skills"),
+    CREATE_SKILLS("create:skills"),
+    UPDATE_SKILLS("update:skills"),
+    DELETE_SKILLS("delete:skills"),
 
     READ_ACTUATOR("read:actuator");
 

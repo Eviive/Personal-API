@@ -10,26 +10,30 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import static com.eviive.personalapi.entity.Authority.CREATE_PROJECTS;
+import static com.eviive.personalapi.entity.Authority.CREATE_SKILLS;
+import static com.eviive.personalapi.entity.Authority.DELETE_PROJECTS;
+import static com.eviive.personalapi.entity.Authority.DELETE_SKILLS;
 import static com.eviive.personalapi.entity.Authority.READ_ACTUATOR;
-import static com.eviive.personalapi.entity.Authority.READ_PROJECT;
-import static com.eviive.personalapi.entity.Authority.READ_SKILL;
-import static com.eviive.personalapi.entity.Authority.WRITE_PROJECT;
-import static com.eviive.personalapi.entity.Authority.WRITE_SKILL;
+import static com.eviive.personalapi.entity.Authority.READ_PROJECTS;
+import static com.eviive.personalapi.entity.Authority.READ_SKILLS;
+import static com.eviive.personalapi.entity.Authority.UPDATE_PROJECTS;
+import static com.eviive.personalapi.entity.Authority.UPDATE_SKILLS;
 
 @RequiredArgsConstructor
 public enum Role {
 
     ANONYMOUS(
         Set.of(
-            READ_PROJECT,
-            READ_SKILL
+            READ_PROJECTS,
+            READ_SKILLS
         ),
         null
     ),
     ADMIN(
         Set.of(
-            WRITE_PROJECT,
-            WRITE_SKILL,
+            CREATE_PROJECTS, UPDATE_PROJECTS, DELETE_PROJECTS,
+            CREATE_SKILLS, UPDATE_SKILLS, DELETE_SKILLS,
             READ_ACTUATOR
         ),
         Set.of(

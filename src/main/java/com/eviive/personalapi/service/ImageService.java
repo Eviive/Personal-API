@@ -15,7 +15,11 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.UUID;
 
-import static com.eviive.personalapi.exception.PersonalApiErrorsEnum.*;
+import static com.eviive.personalapi.exception.PersonalApiErrorsEnum.API400_FILE_EMPTY;
+import static com.eviive.personalapi.exception.PersonalApiErrorsEnum.API400_IMAGE_NO_NAME;
+import static com.eviive.personalapi.exception.PersonalApiErrorsEnum.API415_FILE_NOT_IMAGE;
+import static com.eviive.personalapi.exception.PersonalApiErrorsEnum.API500_UNKNOWN_CONTAINER;
+import static com.eviive.personalapi.exception.PersonalApiErrorsEnum.API500_UPLOAD_ERROR;
 
 @Service
 @Transactional
