@@ -19,11 +19,14 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.util.List;
 
+import static com.eviive.personalapi.util.TokenUtilities.AUTHORITIES_CLAIM;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
 @Component
 @RequiredArgsConstructor
 public class AuthorizationFilter extends OncePerRequestFilter {
+
+    private static final String BEARER_PREFIX = "Bearer ";
 
     private final TokenUtilities tokenUtilities;
 
@@ -42,19 +45,17 @@ public class AuthorizationFilter extends OncePerRequestFilter {
         }
 
         try {
-            final String tokenPrefix = "Bearer ";
-
-            if (!authorizationHeader.startsWith(tokenPrefix)) {
+            if (!authorizationHeader.startsWith(BEARER_PREFIX)) {
                 throw new IllegalStateException("The access token must be a bearer token.");
             }
 
-            final String token = authorizationHeader.substring(tokenPrefix.length());
+            final String token = authorizationHeader.substring(BEARER_PREFIX.length());
 
             final DecodedJWT decodedToken = tokenUtilities.verifyToken(token);
 
             final String username = decodedToken.getSubject();
 
-            final Claim claim = decodedToken.getClaim("authorities");
+            final Claim claim = decodedToken.getClaim(AUTHORITIES_CLAIM);
 
             if (claim.isMissing() || claim.isNull()) {
                 throw new IllegalStateException("Authorities are missing from the token.");

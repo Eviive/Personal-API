@@ -10,13 +10,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CookieValue;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import static com.eviive.personalapi.util.TokenUtilities.REFRESH_TOKEN_COOKIE_NAME;
+import static com.eviive.personalapi.util.TokenUtilities.REFRESH_TOKEN_COOKIE;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController
@@ -75,7 +71,7 @@ public class UserController {
         }
     )
     public ResponseEntity<AuthResponseDTO> refreshToken(
-        @CookieValue(value = REFRESH_TOKEN_COOKIE_NAME, required = false) final String refreshToken
+        @CookieValue(value = REFRESH_TOKEN_COOKIE, required = false) final String refreshToken
     ) {
         return ResponseEntity.ok(userService.refreshToken(refreshToken));
     }

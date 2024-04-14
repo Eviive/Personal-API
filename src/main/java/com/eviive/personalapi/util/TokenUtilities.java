@@ -17,7 +17,9 @@ import java.util.List;
 @Component
 public final class TokenUtilities {
 
-    public static final String REFRESH_TOKEN_COOKIE_NAME = "personal-api_refresh-token";
+    public static final String REFRESH_TOKEN_COOKIE = "personal-api_refresh-token";
+
+    public static final String AUTHORITIES_CLAIM = "authorities";
 
     private final Algorithm algorithm;
 
@@ -55,7 +57,7 @@ public final class TokenUtilities {
                     .plusSeconds(jwtPropertiesConfig.token().access().expiration())
             )
             .withIssuer(uriUtilities.getCurrentUri().toString())
-            .withClaim("authorities", authorities)
+            .withClaim(AUTHORITIES_CLAIM, authorities)
             .sign(algorithm);
     }
 
@@ -79,7 +81,7 @@ public final class TokenUtilities {
     }
 
     public Cookie createCookie(final String value, final int maxAge) {
-        final Cookie cookie = new Cookie(REFRESH_TOKEN_COOKIE_NAME, value);
+        final Cookie cookie = new Cookie(REFRESH_TOKEN_COOKIE, value);
         cookie.setMaxAge(maxAge);
         cookie.setSecure(personalApiPropertiesConfig.production());
         cookie.setHttpOnly(true);
