@@ -1,6 +1,7 @@
 package com.eviive.personalapi.mapper;
 
 import com.eviive.personalapi.dto.ProjectDTO;
+import com.eviive.personalapi.dto.ProjectLightDTO;
 import com.eviive.personalapi.entity.Project;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
@@ -46,5 +47,13 @@ public interface ProjectMapper {
     List<ProjectDTO> toListDTO(Collection<Project> projects);
 
     Set<ProjectDTO> toSetDTO(Collection<Project> projects);
+
+    // to Light DTO
+
+    ProjectLightDTO toLightDTO(Project project);
+
+    List<ProjectLightDTO> toLightListDTO(Collection<Project> projects);
+
+    Set<ProjectLightDTO> toLightSetDTO(Collection<Project> projects);
 
 }

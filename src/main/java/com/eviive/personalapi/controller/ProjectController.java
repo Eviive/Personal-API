@@ -1,6 +1,7 @@
 package com.eviive.personalapi.controller;
 
 import com.eviive.personalapi.dto.ProjectDTO;
+import com.eviive.personalapi.dto.ProjectLightDTO;
 import com.eviive.personalapi.dto.SortUpdateDTO;
 import com.eviive.personalapi.service.ProjectService;
 import com.eviive.personalapi.util.UriUtilities;
@@ -12,16 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.net.URI;
@@ -44,11 +36,20 @@ public class ProjectController {
 
     @GetMapping(produces = APPLICATION_JSON_VALUE)
     @Operation(
-        summary = "Find all projects",
+        summary = "Find a page of projects",
         responses = @ApiResponse(responseCode = "200", description = "OK")
     )
-    public ResponseEntity<List<ProjectDTO>> findAll() {
-        return ResponseEntity.ok(projectService.findAll());
+    public ResponseEntity<Page<ProjectDTO>> findAll(final Pageable pageable) {
+        return ResponseEntity.ok(projectService.findAll(pageable));
+    }
+
+    @GetMapping(path = "light", produces = APPLICATION_JSON_VALUE)
+    @Operation(
+        summary = "Find all light projects",
+        responses = @ApiResponse(responseCode = "200", description = "OK")
+    )
+    public ResponseEntity<List<ProjectLightDTO>> findAllLight() {
+        return ResponseEntity.ok(projectService.findAllLight());
     }
 
     @GetMapping(path = "featured", produces = APPLICATION_JSON_VALUE)

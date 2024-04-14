@@ -6,7 +6,7 @@ import lombok.Data;
 @Data
 public class RevalidateRequestDTO {
 
-    @NotBlank(message = "The secret is required.")
+    @NotBlank(message = "The secret cannot be blank.")
     private String secret;
 
     private String path;

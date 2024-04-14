@@ -1,6 +1,7 @@
 package com.eviive.personalapi.service;
 
 import com.eviive.personalapi.dto.ProjectDTO;
+import com.eviive.personalapi.dto.ProjectLightDTO;
 import com.eviive.personalapi.dto.SortUpdateDTO;
 import com.eviive.personalapi.entity.Project;
 import com.eviive.personalapi.exception.PersonalApiException;
@@ -31,8 +32,13 @@ public class ProjectService {
 
     private final ImageService imageService;
 
-    public List<ProjectDTO> findAll() {
-        return projectMapper.toListDTO(projectRepository.findAll());
+    public Page<ProjectDTO> findAll(final Pageable pageable) {
+        return projectRepository.findAll(pageable)
+            .map(projectMapper::toDTO);
+    }
+
+    public List<ProjectLightDTO> findAllLight() {
+        return projectMapper.toLightListDTO(projectRepository.findAll());
     }
 
     public List<ProjectDTO> findAllFeatured() {
