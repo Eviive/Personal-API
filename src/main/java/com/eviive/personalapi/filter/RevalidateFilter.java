@@ -42,16 +42,18 @@ public class RevalidateFilter extends OncePerRequestFilter {
             return;
         }
 
-        final RevalidateRequestDTO revalidateRequest = new RevalidateRequestDTO();
-        revalidateRequest.setSecret(portfolioPropertiesConfig.api().secret());
+        final RevalidateRequestDTO revalidateRequest = new RevalidateRequestDTO(
+            portfolioPropertiesConfig.api().secret(),
+            "/"
+        );
 
         portfolioWebService
             .revalidate(revalidateRequest)
             .doOnError(e -> log.error("Failed to revalidate portfolio", e))
             .subscribe(revalidateResponse -> {
-                final String timestamp = dateTimeFormatter.format(revalidateResponse.getTimestamp());
+                final String timestamp = dateTimeFormatter.format(revalidateResponse.timestamp());
 
-                if (revalidateResponse.getRevalidated()) {
+                if (revalidateResponse.revalidated()) {
                     log.info(
                         "Revalidated portfolio: {}",
                         timestamp

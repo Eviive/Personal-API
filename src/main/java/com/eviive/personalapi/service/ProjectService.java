@@ -32,26 +32,30 @@ public class ProjectService {
 
     private final ImageService imageService;
 
-    public Page<ProjectDTO> findAll(final Pageable pageable) {
-        return projectRepository.findAll(pageable)
+    @Transactional(readOnly = true)
+    public Page<ProjectDTO> findAll(final Pageable pageable, final String search) {
+        return projectRepository.findAll(pageable, search)
             .map(projectMapper::toDTO);
     }
 
+    @Transactional(readOnly = true)
     public List<ProjectLightDTO> findAllLight() {
-        return projectMapper.toLightListDTO(projectRepository.findAll());
+        return projectRepository.findAllLight();
     }
 
+    @Transactional(readOnly = true)
     public List<ProjectDTO> findAllFeatured() {
         return projectMapper.toListDTO(projectRepository.findAllByFeaturedIsTrue());
     }
 
+    @Transactional(readOnly = true)
     public Page<ProjectDTO> findAllNotFeatured(final Pageable pageable) {
         return projectRepository.findAllByFeaturedIsFalse(pageable)
             .map(projectMapper::toDTO);
     }
 
     public ProjectDTO create(final ProjectDTO projectDTO, @Nullable final MultipartFile file) {
-        if (projectDTO.getId() != null) {
+        if (projectDTO.id() != null) {
             throw new PersonalApiException(API400_PROJECT_ID_NOT_ALLOWED);
         }
 
@@ -108,7 +112,7 @@ public class ProjectService {
 
     public void sort(final List<SortUpdateDTO> sorts) {
         for (SortUpdateDTO sort: sorts) {
-            projectRepository.updateSortById(sort.getId(), sort.getSort());
+            projectRepository.updateSortById(sort.id(), sort.sort());
         }
     }
 

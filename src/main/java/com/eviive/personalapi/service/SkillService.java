@@ -8,6 +8,8 @@ import com.eviive.personalapi.mapper.SkillMapper;
 import com.eviive.personalapi.repository.SkillRepository;
 import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -29,12 +31,19 @@ public class SkillService {
 
     private final ImageService imageService;
 
+    @Transactional(readOnly = true)
     public List<SkillDTO> findAll() {
         return skillMapper.toListDTO(skillRepository.findAll());
     }
 
+    @Transactional(readOnly = true)
+    public Slice<SkillDTO> findAll(final Pageable pageable, final String search) {
+        return skillRepository.findAll(pageable, search)
+            .map(skillMapper::toDTO);
+    }
+
     public SkillDTO create(final SkillDTO skillDTO, @Nullable final MultipartFile file) {
-        if (skillDTO.getId() != null) {
+        if (skillDTO.id() != null) {
             throw new PersonalApiException(API400_SKILL_ID_NOT_ALLOWED);
         }
 
@@ -97,7 +106,7 @@ public class SkillService {
 
     public void sort(final List<SortUpdateDTO> sorts) {
         for (SortUpdateDTO sort: sorts) {
-            skillRepository.updateSortById(sort.getId(), sort.getSort());
+            skillRepository.updateSortById(sort.id(), sort.sort());
         }
     }
 

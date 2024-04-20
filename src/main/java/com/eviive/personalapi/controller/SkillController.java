@@ -9,6 +9,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.web.SortDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,6 +21,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -49,6 +53,15 @@ public class SkillController {
         return ResponseEntity.ok(skillService.findAll());
     }
 
+    @GetMapping(path = "slice", produces = APPLICATION_JSON_VALUE)
+    @Operation(
+        summary = "Find a slice of skills",
+        responses = @ApiResponse(responseCode = "200", description = "OK")
+    )
+    public ResponseEntity<Slice<SkillDTO>> findAll(@SortDefault("sort") final Pageable pageable, @RequestParam(required = false) final String search) {
+        return ResponseEntity.ok(skillService.findAll(pageable, search));
+    }
+
     // POST
 
     @PostMapping(consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
@@ -61,7 +74,7 @@ public class SkillController {
     )
     public ResponseEntity<SkillDTO> save(@RequestBody @Valid final SkillDTO skillDTO) {
         final SkillDTO createdSkill = skillService.create(skillDTO, null);
-        final URI location = uriUtilities.buildLocation(createdSkill.getId());
+        final URI location = uriUtilities.buildLocation(createdSkill.id());
         return ResponseEntity.created(location)
             .body(createdSkill);
     }
@@ -80,7 +93,7 @@ public class SkillController {
         @RequestPart("file") final MultipartFile file
     ) {
         final SkillDTO createdSkill = skillService.create(skillDTO, file);
-        final URI location = uriUtilities.buildLocation(createdSkill.getId(), "with-image");
+        final URI location = uriUtilities.buildLocation(createdSkill.id(), "with-image");
         return ResponseEntity.created(location)
             .body(createdSkill);
     }

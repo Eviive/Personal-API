@@ -48,8 +48,8 @@ public class UserController {
     ) {
         return ResponseEntity.ok(
             userService.login(
-                loginForm.getUsername(),
-                loginForm.getPassword(),
+                loginForm.username(),
+                loginForm.password(),
                 res
             )
         );

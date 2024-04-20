@@ -7,6 +7,9 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.NamedAttributeNode;
+import jakarta.persistence.NamedEntityGraph;
+import jakarta.persistence.NamedSubgraph;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -25,6 +28,20 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 
 @Entity
 @Table(name = "API_PROJECT")
+@NamedEntityGraph(name = "project-image", attributeNodes = @NamedAttributeNode("image"))
+@NamedEntityGraph(
+    name = "project-image-skills",
+    attributeNodes = {
+        @NamedAttributeNode(value = "skills", subgraph = "skills-image"),
+        @NamedAttributeNode("image")
+    },
+    subgraphs = {
+        @NamedSubgraph(
+            name = "skills-image",
+            attributeNodes = @NamedAttributeNode("image")
+        )
+    }
+)
 @Getter
 @Setter
 @ToString
@@ -60,12 +77,11 @@ public class Project {
     @Column(nullable = false)
     private Integer sort;
 
-    @OneToOne(cascade = ALL, fetch = LAZY, orphanRemoval = true)
-    @JoinColumn(name = "IMAGE_ID")
+    @OneToOne(cascade = ALL, mappedBy = "project", orphanRemoval = true)
     @ToString.Exclude
     private Image image;
 
-    @ManyToMany
+    @ManyToMany(fetch = LAZY)
     @JoinTable(
         name = "API_PROJECT_SKILL_MAP",
         joinColumns = @JoinColumn(name = "PROJECT_ID"),

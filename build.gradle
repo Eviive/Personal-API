@@ -36,6 +36,7 @@ ext {
     set("springCloudAzureVersion", "5.10.0")
     set("mapStructVersion", "1.5.5.Final")
     set("jwtVersion", "4.4.0")
+    set("swaggerVersion", "2.5.0")
 }
 
 dependencies {
@@ -74,7 +75,7 @@ dependencies {
     annotationProcessor "org.mapstruct:mapstruct-processor:${mapStructVersion}"
 
     // Swagger
-    implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0"
+    implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:${swaggerVersion}"
 }
 
 dependencyManagement {

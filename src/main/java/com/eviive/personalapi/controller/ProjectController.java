@@ -12,8 +12,19 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.SortDefault;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.net.URI;
@@ -34,13 +45,13 @@ public class ProjectController {
 
     // GET
 
-    @GetMapping(produces = APPLICATION_JSON_VALUE)
+    @GetMapping(path = "page", produces = APPLICATION_JSON_VALUE)
     @Operation(
         summary = "Find a page of projects",
         responses = @ApiResponse(responseCode = "200", description = "OK")
     )
-    public ResponseEntity<Page<ProjectDTO>> findAll(final Pageable pageable) {
-        return ResponseEntity.ok(projectService.findAll(pageable));
+    public ResponseEntity<Page<ProjectDTO>> findAll(@SortDefault("sort") final Pageable pageable, @RequestParam(required = false) final String search) {
+        return ResponseEntity.ok(projectService.findAll(pageable, search));
     }
 
     @GetMapping(path = "light", produces = APPLICATION_JSON_VALUE)
@@ -66,7 +77,7 @@ public class ProjectController {
         summary = "Find a page of not featured projects",
         responses = @ApiResponse(responseCode = "200", description = "OK")
     )
-    public ResponseEntity<Page<ProjectDTO>> findAllNotFeatured(final Pageable pageable) {
+    public ResponseEntity<Page<ProjectDTO>> findAllNotFeatured(@SortDefault("sort") final Pageable pageable) {
         return ResponseEntity.ok(projectService.findAllNotFeatured(pageable));
     }
 
@@ -82,7 +93,7 @@ public class ProjectController {
     )
     public ResponseEntity<ProjectDTO> save(@RequestBody @Valid final ProjectDTO projectDTO) {
         final ProjectDTO createdProject = projectService.create(projectDTO, null);
-        final URI location = uriUtilities.buildLocation(createdProject.getId());
+        final URI location = uriUtilities.buildLocation(createdProject.id());
         return ResponseEntity.created(location)
             .body(createdProject);
     }
@@ -101,7 +112,7 @@ public class ProjectController {
         @RequestPart("file") final MultipartFile file
     ) {
         final ProjectDTO createdProject = projectService.create(projectDTO, file);
-        final URI location = uriUtilities.buildLocation(createdProject.getId(), "with-image");
+        final URI location = uriUtilities.buildLocation(createdProject.id(), "with-image");
         return ResponseEntity.created(location)
             .body(createdProject);
     }

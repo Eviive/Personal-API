@@ -1,14 +1,14 @@
 package com.eviive.personalapi.dto;
 
 import jakarta.validation.constraints.NotBlank;
-import lombok.Data;
 
-@Data
-public class RevalidateRequestDTO {
+public record RevalidateRequestDTO(
 
     @NotBlank(message = "The secret cannot be blank.")
-    private String secret;
+    String secret,
 
-    private String path;
+    String path
+
+) {
 
 }
