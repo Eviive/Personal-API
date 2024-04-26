@@ -8,12 +8,12 @@ public class PersonalApiException extends RuntimeException {
 
     private final HttpStatus httpStatus;
 
-    private PersonalApiException(final Throwable cause, final String message, final HttpStatus httpStatus) {
+    public PersonalApiException(final Throwable cause, final String message, final HttpStatus httpStatus) {
         super(message, cause);
         this.httpStatus = httpStatus;
     }
 
-    private PersonalApiException(final String message, final HttpStatus httpStatus) {
+    public PersonalApiException(final String message, final HttpStatus httpStatus) {
         this(null, message, httpStatus);
     }
 
