@@ -32,6 +32,7 @@ import static com.eviive.personalapi.entity.Authority.DELETE_SKILLS;
 import static com.eviive.personalapi.entity.Authority.READ_ACTUATOR;
 import static com.eviive.personalapi.entity.Authority.READ_PROJECTS;
 import static com.eviive.personalapi.entity.Authority.READ_SKILLS;
+import static com.eviive.personalapi.entity.Authority.REVALIDATE_PORTFOLIO;
 import static com.eviive.personalapi.entity.Authority.UPDATE_PROJECTS;
 import static com.eviive.personalapi.entity.Authority.UPDATE_SKILLS;
 import static com.eviive.personalapi.entity.Role.ANONYMOUS;
@@ -105,6 +106,9 @@ public class SecurityConfig {
                     .hasAuthority(UPDATE_SKILLS.getAuthority())
                     .requestMatchers(DELETE, "/skill/**")
                     .hasAuthority(DELETE_SKILLS.getAuthority())
+
+                    .requestMatchers(POST, "/portfolio/revalidate")
+                    .hasAuthority(REVALIDATE_PORTFOLIO.getAuthority())
 
                     .requestMatchers("/actuator/**")
                     .hasAuthority(READ_ACTUATOR.getAuthority())

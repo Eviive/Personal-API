@@ -17,6 +17,8 @@ public enum Authority {
     UPDATE_SKILLS("update:skills"),
     DELETE_SKILLS("delete:skills"),
 
+    REVALIDATE_PORTFOLIO("revalidate:portfolio"),
+
     READ_ACTUATOR("read:actuator");
 
     private final String authority;

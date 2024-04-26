@@ -17,6 +17,7 @@ import static com.eviive.personalapi.entity.Authority.DELETE_SKILLS;
 import static com.eviive.personalapi.entity.Authority.READ_ACTUATOR;
 import static com.eviive.personalapi.entity.Authority.READ_PROJECTS;
 import static com.eviive.personalapi.entity.Authority.READ_SKILLS;
+import static com.eviive.personalapi.entity.Authority.REVALIDATE_PORTFOLIO;
 import static com.eviive.personalapi.entity.Authority.UPDATE_PROJECTS;
 import static com.eviive.personalapi.entity.Authority.UPDATE_SKILLS;
 
@@ -34,6 +35,7 @@ public enum Role {
         Set.of(
             CREATE_PROJECTS, UPDATE_PROJECTS, DELETE_PROJECTS,
             CREATE_SKILLS, UPDATE_SKILLS, DELETE_SKILLS,
+            REVALIDATE_PORTFOLIO,
             READ_ACTUATOR
         ),
         Set.of(
