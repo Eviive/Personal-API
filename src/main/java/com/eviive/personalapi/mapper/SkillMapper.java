@@ -15,10 +15,10 @@ import static org.mapstruct.InjectionStrategy.CONSTRUCTOR;
 import static org.mapstruct.ReportingPolicy.ERROR;
 
 @Mapper(
-        unmappedTargetPolicy = ERROR,
-        componentModel = "spring",
-        injectionStrategy = CONSTRUCTOR,
-        uses = {ImageMapper.class}
+    unmappedTargetPolicy = ERROR,
+    componentModel = "spring",
+    injectionStrategy = CONSTRUCTOR,
+    uses = ImageMapper.class
 )
 public interface SkillMapper {
 
@@ -27,17 +27,17 @@ public interface SkillMapper {
     @Mapping(target = "projects", ignore = true)
     Skill toEntity(SkillDTO skill);
 
-    List<Skill> toListEntity(Collection<SkillDTO> skillDTOs);
+    List<Skill> toListEntity(Collection<SkillDTO> skillsDTO);
 
-    Set<Skill> toSetEntity(Collection<SkillDTO> skillDTOs);
+    Set<Skill> toSetEntity(Collection<SkillDTO> skillsDTO);
 
     @AfterMapping
     default void afterMapping(@MappingTarget Skill skill) {
-        if (skill.getProjects() != null) {
-            skill.getProjects().forEach(project -> project.getSkills().add(skill));
-        }
         if (skill.getImage() != null) {
             skill.getImage().setSkill(skill);
+        }
+        if (skill.getProjects() != null) {
+            skill.getProjects().forEach(project -> project.getSkills().add(skill));
         }
     }
 

@@ -1,10 +1,21 @@
 package com.eviive.personalapi.entity;
 
-import jakarta.persistence.*;
-import lombok.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.NamedAttributeNode;
+import jakarta.persistence.NamedEntityGraph;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
 
 import static jakarta.persistence.CascadeType.ALL;
@@ -13,14 +24,13 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 
 @Entity
 @Table(name = "API_SKILL")
+@NamedEntityGraph(name = "skill-image", attributeNodes = @NamedAttributeNode("image"))
 @Getter
 @Setter
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
 public class Skill {
-
-    public static final String AZURE_CONTAINER_NAME = "skill-images";
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
@@ -32,26 +42,12 @@ public class Skill {
     @Column(nullable = false)
     private Integer sort;
 
-    @OneToOne(cascade = ALL, fetch = LAZY, orphanRemoval = true)
-    @JoinColumn(name = "IMAGE_ID", referencedColumnName = "ID", foreignKey = @ForeignKey(name = "FK_SKILL_IMAGE"))
+    @OneToOne(cascade = ALL, mappedBy = "skill", orphanRemoval = true)
     @ToString.Exclude
     private Image image;
 
     @ManyToMany(mappedBy = "skills", fetch = LAZY)
     @ToString.Exclude
     private Set<Project> projects = new HashSet<>();
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Skill skill = (Skill) o;
-        return Objects.equals(id, skill.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
-    }
 
 }

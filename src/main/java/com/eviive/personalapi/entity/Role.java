@@ -1,47 +1,78 @@
 package com.eviive.personalapi.entity;
 
-import jakarta.persistence.*;
-import lombok.*;
+import jakarta.annotation.Nullable;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
-import java.util.HashSet;
-import java.util.Objects;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Stream;
 
-import static jakarta.persistence.FetchType.LAZY;
-import static jakarta.persistence.GenerationType.IDENTITY;
+import static com.eviive.personalapi.entity.Authority.CREATE_PROJECTS;
+import static com.eviive.personalapi.entity.Authority.CREATE_SKILLS;
+import static com.eviive.personalapi.entity.Authority.DELETE_PROJECTS;
+import static com.eviive.personalapi.entity.Authority.DELETE_SKILLS;
+import static com.eviive.personalapi.entity.Authority.READ_ACTUATOR;
+import static com.eviive.personalapi.entity.Authority.READ_PROJECTS;
+import static com.eviive.personalapi.entity.Authority.READ_SKILLS;
+import static com.eviive.personalapi.entity.Authority.REVALIDATE_PORTFOLIO;
+import static com.eviive.personalapi.entity.Authority.UPDATE_PROJECTS;
+import static com.eviive.personalapi.entity.Authority.UPDATE_SKILLS;
 
-@Entity
-@Table(name = "API_ROLE")
-@Getter
-@Setter
-@ToString
-@NoArgsConstructor
-@AllArgsConstructor
-public class Role {
+@RequiredArgsConstructor
+public enum Role {
 
-    @Id
-    @GeneratedValue(strategy = IDENTITY)
-    private Long id;
+    ANONYMOUS(
+        Set.of(
+            READ_PROJECTS,
+            READ_SKILLS
+        ),
+        null
+    ),
+    ADMIN(
+        Set.of(
+            CREATE_PROJECTS, UPDATE_PROJECTS, DELETE_PROJECTS,
+            CREATE_SKILLS, UPDATE_SKILLS, DELETE_SKILLS,
+            REVALIDATE_PORTFOLIO,
+            READ_ACTUATOR
+        ),
+        Set.of(
+            ANONYMOUS
+        )
+    );
 
-    @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    private RoleEnum name;
+    private final Set<Authority> authorities;
 
-    @ManyToMany(mappedBy = "roles", fetch = LAZY)
-    @ToString.Exclude
-    private Set<User> users = new HashSet<>();
+    @Nullable
+    @Getter
+    private final Set<Role> subRoles;
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Role role = (Role) o;
-        return Objects.equals(id, role.id);
+    public List<GrantedAuthority> getAuthorities() {
+        final Stream<GrantedAuthority> grantedAuthorities = Stream
+            .concat(
+                Stream.of(toString()),
+                authorities.stream().map(Authority::getName)
+            )
+            .map(SimpleGrantedAuthority::new)
+            .map(GrantedAuthority.class::cast);
+
+        if (subRoles == null) {
+            return grantedAuthorities.toList();
+        }
+
+        return Stream
+            .concat(
+                grantedAuthorities,
+                subRoles.stream().flatMap(sR -> sR.getAuthorities().stream())
+            )
+            .toList();
     }
 
     @Override
-    public int hashCode() {
-        return Objects.hash(id);
+    public String toString() {
+        return "ROLE_" + name();
     }
 
 }

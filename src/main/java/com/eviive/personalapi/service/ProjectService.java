@@ -1,6 +1,8 @@
 package com.eviive.personalapi.service;
 
 import com.eviive.personalapi.dto.ProjectDTO;
+import com.eviive.personalapi.dto.ProjectLightDTO;
+import com.eviive.personalapi.dto.SortUpdateDTO;
 import com.eviive.personalapi.entity.Project;
 import com.eviive.personalapi.exception.PersonalApiException;
 import com.eviive.personalapi.mapper.ProjectMapper;
@@ -8,16 +10,16 @@ import com.eviive.personalapi.repository.ProjectRepository;
 import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.UUID;
 
-import static com.eviive.personalapi.exception.PersonalApiErrorsEnum.*;
+import static com.eviive.personalapi.exception.PersonalApiErrorsEnum.API400_PROJECT_ID_NOT_ALLOWED;
+import static com.eviive.personalapi.exception.PersonalApiErrorsEnum.API404_PROJECT_ID_NOT_FOUND;
 
 @Service
 @Transactional
@@ -25,84 +27,93 @@ import static com.eviive.personalapi.exception.PersonalApiErrorsEnum.*;
 public class ProjectService {
 
     private final ProjectRepository projectRepository;
+
     private final ProjectMapper projectMapper;
 
     private final ImageService imageService;
 
-    public ProjectDTO findById(Long id) {
-        Project project = projectRepository.findById(id)
-                                           .orElseThrow(() -> PersonalApiException.format(API404_PROJECT_ID_NOT_FOUND, id));
-        return projectMapper.toDTO(project);
+    @Transactional(readOnly = true)
+    public Page<ProjectDTO> findAll(final Pageable pageable, final String search) {
+        return projectRepository.findAll(pageable, search)
+            .map(projectMapper::toDTO);
     }
 
-    public List<ProjectDTO> findAll() {
-        return projectMapper.toListDTO(projectRepository.findAll());
+    @Transactional(readOnly = true)
+    public List<ProjectLightDTO> findAllLight() {
+        return projectRepository.findAllLight();
     }
 
+    @Transactional(readOnly = true)
     public List<ProjectDTO> findAllFeatured() {
         return projectMapper.toListDTO(projectRepository.findAllByFeaturedIsTrue());
     }
 
-    public List<ProjectDTO> findAllNotFeatured() {
-        return projectMapper.toListDTO(projectRepository.findAllByFeaturedIsFalse());
-    }
-
-    public Page<ProjectDTO> findAllNotFeaturedPaginated(int page, int size) {
-        if (page < 1) {
-            throw PersonalApiException.format(API400_PAGE_NUMBER_INVALID, page);
-        }
-
-        if (size < 1) {
-            throw PersonalApiException.format(API400_PAGE_SIZE_INVALID, size);
-        }
-
-        Pageable pageable = PageRequest.of(page - 1, size, Sort.by("sort"));
-
+    @Transactional(readOnly = true)
+    public Page<ProjectDTO> findAllNotFeatured(final Pageable pageable) {
         return projectRepository.findAllByFeaturedIsFalse(pageable)
-                                .map(projectMapper::toDTO);
+            .map(projectMapper::toDTO);
     }
 
-    public ProjectDTO save(ProjectDTO projectDTO, @Nullable MultipartFile file) {
-        Project project = projectMapper.toEntity(projectDTO);
-
-        if (file != null) {
-            imageService.upload(project.getImage(), Project.AZURE_CONTAINER_NAME, file);
+    public ProjectDTO create(final ProjectDTO projectDTO, @Nullable final MultipartFile file) {
+        if (projectDTO.id() != null) {
+            throw new PersonalApiException(API400_PROJECT_ID_NOT_ALLOWED);
         }
 
-        return projectMapper.toDTO(projectRepository.save(project));
+        final Project project = projectMapper.toEntity(projectDTO);
+
+        final Integer newSort = projectRepository
+            .findMaxSort()
+            .map(sort -> sort + 1)
+            .orElse(0);
+
+        project.setSort(newSort);
+
+        return save(project, file);
     }
 
-    public void sort(List<Long> sortedIds) {
-        for (Long id: sortedIds) {
-            projectRepository.updateSortById(sortedIds.indexOf(id), id);
-        }
-    }
-
-    public ProjectDTO update(Long id, ProjectDTO projectDTO, @Nullable MultipartFile file) {
+    public ProjectDTO update(final Long id, final ProjectDTO projectDTO, @Nullable final MultipartFile file) {
         if (!projectRepository.existsById(id)) {
             throw PersonalApiException.format(API404_PROJECT_ID_NOT_FOUND, id);
         }
 
-        Project project = projectMapper.toEntity(projectDTO);
+        final Project project = projectMapper.toEntity(projectDTO);
 
         project.setId(id);
 
-        if (file != null) {
-            imageService.upload(project.getImage(), Project.AZURE_CONTAINER_NAME, file);
-        }
-
-        return projectMapper.toDTO(projectRepository.save(project));
+        return save(project, file);
     }
 
-    public void delete(Long id) {
-        Project project = projectRepository.findById(id)
-                                           .orElseThrow(() -> PersonalApiException.format(API404_PROJECT_ID_NOT_FOUND, id));
+    private ProjectDTO save(final Project project, final @Nullable MultipartFile file) {
+        UUID oldUuid = null;
+        if (file != null) {
+            oldUuid = project.getImage().getUuid();
+            project.getImage().setUuid(UUID.randomUUID());
+        }
+
+        final Project savedProject = projectRepository.save(project);
+
+        if (file != null) {
+            imageService.upload(savedProject.getImage(), oldUuid, file);
+        }
+
+        return projectMapper.toDTO(savedProject);
+    }
+
+    public void delete(final Long id) {
+        final Project project = projectRepository.findById(id)
+            .orElseThrow(() -> PersonalApiException.format(API404_PROJECT_ID_NOT_FOUND, id));
 
         if (project.getImage().getUuid() != null) {
-            imageService.delete(project.getImage(), Project.AZURE_CONTAINER_NAME);
+            imageService.delete(project.getImage());
         }
 
         projectRepository.deleteById(id);
+    }
+
+    public void sort(final List<SortUpdateDTO> sorts) {
+        for (SortUpdateDTO sort: sorts) {
+            projectRepository.updateSortById(sort.id(), sort.sort());
+        }
     }
 
 }

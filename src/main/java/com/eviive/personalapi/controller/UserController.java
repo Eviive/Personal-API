@@ -2,85 +2,82 @@ package com.eviive.personalapi.controller;
 
 import com.eviive.personalapi.dto.AuthRequestDTO;
 import com.eviive.personalapi.dto.AuthResponseDTO;
-import com.eviive.personalapi.dto.UserDTO;
 import com.eviive.personalapi.service.UserService;
-import jakarta.servlet.http.HttpServletRequest;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CookieValue;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.net.URI;
-import java.util.List;
-
+import static com.eviive.personalapi.util.TokenUtilities.REFRESH_TOKEN_COOKIE;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController
 @RequestMapping("user")
 @RequiredArgsConstructor
+@Tag(name = "UserController")
 public class UserController {
 
-	private final UserService userService;
-
-    // GET
-
-    @GetMapping(path = "{id}", produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<UserDTO> findById(@PathVariable Long id) {
-        return ResponseEntity.ok().body(userService.findById(id));
-    }
-
-	@GetMapping(produces = APPLICATION_JSON_VALUE)
-	public ResponseEntity<List<UserDTO>> findAll() {
-		return ResponseEntity.ok().body(userService.findAll());
-	}
+    private final UserService userService;
 
     // POST
 
-    @PostMapping(consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<UserDTO> save(@RequestBody @Valid UserDTO userDTO) {
-        UserDTO createdUserDTO = userService.save(userDTO);
-
-        URI uri = URI.create(String.format("/user/%s", createdUserDTO.getId()));
-
-        return ResponseEntity.created(uri).body(createdUserDTO);
-    }
-
-    @PostMapping(path = "login", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<AuthResponseDTO> login(@RequestBody @Valid AuthRequestDTO loginForm, HttpServletRequest req, HttpServletResponse res) {
-        AuthResponseDTO responseBody = userService.login(loginForm.getUsername(), loginForm.getPassword(), req, res);
-
-        return ResponseEntity.ok().body(responseBody);
+    @PostMapping(
+        path = "login",
+        consumes = APPLICATION_JSON_VALUE,
+        produces = APPLICATION_JSON_VALUE
+    )
+    @Operation(
+        summary = "Login",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "400", description = "Bad Request"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized")
+        }
+    )
+    public ResponseEntity<AuthResponseDTO> login(
+        @RequestBody @Valid final AuthRequestDTO loginForm,
+        final HttpServletResponse res
+    ) {
+        return ResponseEntity.ok(
+            userService.login(
+                loginForm.username(),
+                loginForm.password(),
+                res
+            )
+        );
     }
 
     @PostMapping(path = "logout", produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> logout(HttpServletResponse res) {
+    @Operation(
+        summary = "Logout",
+        responses = @ApiResponse(responseCode = "204", description = "No Content")
+    )
+    public ResponseEntity<Void> logout(final HttpServletResponse res) {
         userService.logout(res);
-
         return ResponseEntity.noContent().build();
     }
 
     @PostMapping(path = "refresh", produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<AuthResponseDTO> refreshToken(@CookieValue(value = "API_refresh-token", required = false) String refreshToken, HttpServletRequest req) {
-        AuthResponseDTO responseBody = userService.refreshToken(refreshToken, req);
-
-        return ResponseEntity.ok().body(responseBody);
-    }
-
-    // PUT
-
-    @PutMapping(path = "{id}", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<UserDTO> update(@PathVariable Long id, @RequestBody @Valid UserDTO userDTO) {
-        return ResponseEntity.ok().body(userService.update(id, userDTO));
-    }
-
-    // DELETE
-
-    @DeleteMapping(path = "{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        userService.delete(id);
-
-        return ResponseEntity.noContent().build();
+    @Operation(
+        summary = "Refresh token",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "400", description = "Bad Request"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized")
+        }
+    )
+    public ResponseEntity<AuthResponseDTO> refreshToken(
+        @CookieValue(value = REFRESH_TOKEN_COOKIE, required = false) final String refreshToken
+    ) {
+        return ResponseEntity.ok(userService.refreshToken(refreshToken));
     }
 
 }
