@@ -21,6 +21,6 @@ public enum Authority {
 
     READ_ACTUATOR("read:actuator");
 
-    private final String authority;
+    private final String name;
 
 }

@@ -156,7 +156,6 @@
         <module name="ParameterNumber"/>
         <module name="ParenPad"/>
         <module name="PatternVariableName"/>
-        <module name="RecordComponentNumber"/>
         <module name="RecordComponentName"/>
         <module name="RecordTypeParameterName"/>
         <module name="RedundantImport"/>

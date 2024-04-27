@@ -58,7 +58,10 @@ public class SkillController {
         summary = "Find a slice of skills",
         responses = @ApiResponse(responseCode = "200", description = "OK")
     )
-    public ResponseEntity<Slice<SkillDTO>> findAll(@SortDefault("sort") final Pageable pageable, @RequestParam(required = false) final String search) {
+    public ResponseEntity<Slice<SkillDTO>> findAll(
+        @SortDefault("sort") final Pageable pageable,
+        @RequestParam(required = false) final String search
+    ) {
         return ResponseEntity.ok(skillService.findAll(pageable, search));
     }
 

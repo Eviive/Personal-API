@@ -30,17 +30,12 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 @Table(name = "API_PROJECT")
 @NamedEntityGraph(name = "project-image", attributeNodes = @NamedAttributeNode("image"))
 @NamedEntityGraph(
-    name = "project-image-skills",
+    name = "project-image-skills-image",
     attributeNodes = {
         @NamedAttributeNode(value = "skills", subgraph = "skills-image"),
         @NamedAttributeNode("image")
     },
-    subgraphs = {
-        @NamedSubgraph(
-            name = "skills-image",
-            attributeNodes = @NamedAttributeNode("image")
-        )
-    }
+    subgraphs = @NamedSubgraph(name = "skills-image", attributeNodes = @NamedAttributeNode("image"))
 )
 @Getter
 @Setter

@@ -28,7 +28,7 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
     List<ProjectLightDTO> findAllLight();
 
     @NotNull
-    @EntityGraph(value = "project-image-skills")
+    @EntityGraph(value = "project-image-skills-image")
     List<Project> findAllByFeaturedIsTrue();
 
     @NotNull

@@ -53,7 +53,7 @@ public enum Role {
         final Stream<GrantedAuthority> grantedAuthorities = Stream
             .concat(
                 Stream.of(toString()),
-                authorities.stream().map(Authority::getAuthority)
+                authorities.stream().map(Authority::getName)
             )
             .map(SimpleGrantedAuthority::new)
             .map(GrantedAuthority.class::cast);

@@ -50,7 +50,10 @@ public class ProjectController {
         summary = "Find a page of projects",
         responses = @ApiResponse(responseCode = "200", description = "OK")
     )
-    public ResponseEntity<Page<ProjectDTO>> findAll(@SortDefault("sort") final Pageable pageable, @RequestParam(required = false) final String search) {
+    public ResponseEntity<Page<ProjectDTO>> findAll(
+        @SortDefault("sort") final Pageable pageable,
+        @RequestParam(required = false) final String search
+    ) {
         return ResponseEntity.ok(projectService.findAll(pageable, search));
     }
 

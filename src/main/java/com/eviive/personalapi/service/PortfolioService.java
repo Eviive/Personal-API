@@ -26,12 +26,15 @@ public class PortfolioService {
             "/"
         );
 
-        final ResponseEntity<RevalidateResponseDTO> revalidateResponseEntity = portfolioWebService.revalidate(revalidateRequest);
+        final ResponseEntity<RevalidateResponseDTO> revalidateResponseEntity =
+            portfolioWebService.revalidate(revalidateRequest);
 
-        boolean isError = revalidateResponseEntity.getStatusCode().isError();
+        final boolean isError = revalidateResponseEntity.getStatusCode().isError();
 
         final RevalidateResponseDTO revalidateResponseDTO = revalidateResponseEntity.getBody();
-        boolean isRevalidated = !isError && revalidateResponseDTO != null && Boolean.TRUE.equals(revalidateResponseDTO.revalidated());
+        final boolean isRevalidated = !isError &&
+            revalidateResponseDTO != null &&
+            Boolean.TRUE.equals(revalidateResponseDTO.revalidated());
 
         if (isError || !isRevalidated) {
             throw new PersonalApiException(
