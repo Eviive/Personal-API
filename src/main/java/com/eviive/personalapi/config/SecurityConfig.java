@@ -1,29 +1,49 @@
 package com.eviive.personalapi.config;
 
+import com.eviive.personalapi.entity.Role;
 import com.eviive.personalapi.exception.PersonalApiExceptionHandler;
 import com.eviive.personalapi.filter.AuthorizationFilter;
+import com.eviive.personalapi.properties.CorsPropertiesConfig;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.expression.DefaultWebSecurityExpressionHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.util.Arrays;
 import java.util.List;
 
-import static com.eviive.personalapi.entity.RoleEnum.ROLE_ADMIN;
-import static com.eviive.personalapi.entity.RoleEnum.ROLE_USER;
-import static org.springframework.http.HttpHeaders.*;
+import static com.eviive.personalapi.entity.Authority.CREATE_PROJECTS;
+import static com.eviive.personalapi.entity.Authority.CREATE_SKILLS;
+import static com.eviive.personalapi.entity.Authority.DELETE_PROJECTS;
+import static com.eviive.personalapi.entity.Authority.DELETE_SKILLS;
+import static com.eviive.personalapi.entity.Authority.READ_ACTUATOR;
+import static com.eviive.personalapi.entity.Authority.READ_PROJECTS;
+import static com.eviive.personalapi.entity.Authority.READ_SKILLS;
+import static com.eviive.personalapi.entity.Authority.REVALIDATE_PORTFOLIO;
+import static com.eviive.personalapi.entity.Authority.UPDATE_PROJECTS;
+import static com.eviive.personalapi.entity.Authority.UPDATE_SKILLS;
+import static com.eviive.personalapi.entity.Role.ANONYMOUS;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
+import static org.springframework.http.HttpHeaders.ORIGIN;
+import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpMethod.GET;
+import static org.springframework.http.HttpMethod.PATCH;
 import static org.springframework.http.HttpMethod.POST;
+import static org.springframework.http.HttpMethod.PUT;
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
 @Configuration
@@ -35,54 +55,117 @@ public class SecurityConfig {
 
     private final PersonalApiExceptionHandler personalApiExceptionHandler;
 
-    @Value("${allowed-origins}")
-    private List<String> allowedOrigins;
-
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        return http.csrf(AbstractHttpConfigurer::disable)
+    @SuppressWarnings({"checkstyle:LambdaBodyLength", "checkstyle:MultipleStringLiterals"})
+    public SecurityFilterChain filterChain(final HttpSecurity http) throws Exception {
+        return http
+            .csrf(AbstractHttpConfigurer::disable)
+            .cors(Customizer.withDefaults())
 
-                   .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+            .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))
 
-                   .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))
+            .addFilterBefore(authorizationFilter, UsernamePasswordAuthenticationFilter.class)
+            .anonymous(anonymous -> anonymous.authorities(ANONYMOUS.getAuthorities()))
 
-                   .addFilterBefore(authorizationFilter, UsernamePasswordAuthenticationFilter.class)
+            .authorizeHttpRequests(auth ->
+                auth.requestMatchers(
+                        "/v2/api-docs",
+                        "/v3/api-docs",
+                        "/v3/api-docs/**",
+                        "/swagger-resources",
+                        "/swagger-resources/**",
+                        "/configuration/ui",
+                        "/configuration/security",
+                        "/swagger-ui/**",
+                        "/webjars/**",
+                        "/swagger-ui.html"
+                    )
+                    .permitAll()
 
-                   .authorizeHttpRequests(auth ->
-                           auth.requestMatchers(POST, "/user/login", "/user/logout", "/user/refresh").permitAll()
-                               .requestMatchers("/user/**").hasAuthority(ROLE_ADMIN.toString())
+                    .requestMatchers(POST, "/user/login", "/user/logout", "/user/refresh")
+                    .permitAll()
 
-                               .requestMatchers("/role/**").hasAuthority(ROLE_ADMIN.toString())
+                    .requestMatchers(GET, "/project/**")
+                    .hasAuthority(READ_PROJECTS.getName())
+                    .requestMatchers(POST, "/project/**")
+                    .hasAuthority(CREATE_PROJECTS.getName())
+                    .requestMatchers(PUT, "/project/**")
+                    .hasAuthority(UPDATE_PROJECTS.getName())
+                    .requestMatchers(PATCH, "/project/**")
+                    .hasAuthority(UPDATE_PROJECTS.getName())
+                    .requestMatchers(DELETE, "/project/**")
+                    .hasAuthority(DELETE_PROJECTS.getName())
 
-                               .requestMatchers(GET, "/project/**").permitAll()
-                               .requestMatchers("/project/**").hasAuthority(ROLE_USER.toString())
+                    .requestMatchers(GET, "/skill/**")
+                    .hasAuthority(READ_SKILLS.getName())
+                    .requestMatchers(POST, "/skill/**")
+                    .hasAuthority(CREATE_SKILLS.getName())
+                    .requestMatchers(PUT, "/skill/**")
+                    .hasAuthority(UPDATE_SKILLS.getName())
+                    .requestMatchers(PATCH, "/skill/**")
+                    .hasAuthority(UPDATE_SKILLS.getName())
+                    .requestMatchers(DELETE, "/skill/**")
+                    .hasAuthority(DELETE_SKILLS.getName())
 
-                               .requestMatchers(GET, "/skill/**").permitAll()
-                               .requestMatchers("/skill/**").hasAuthority(ROLE_USER.toString())
+                    .requestMatchers(POST, "/portfolio/revalidate")
+                    .hasAuthority(REVALIDATE_PORTFOLIO.getName())
 
-                               .requestMatchers(GET, "/image/**").permitAll()
-                               .requestMatchers("/image/**").hasAuthority(ROLE_USER.toString())
+                    .requestMatchers("/actuator/**")
+                    .hasAuthority(READ_ACTUATOR.getName())
 
-                               .requestMatchers("/actuator/**").hasAuthority(ROLE_ADMIN.toString())
+                    // deny-by-default policy
+                    .anyRequest()
+                    .denyAll()
+            )
 
-                               .anyRequest().denyAll() // deny-by-default policy
-                   )
-
-                   .exceptionHandling(exceptionHandling ->
-                           exceptionHandling.authenticationEntryPoint(personalApiExceptionHandler)
-                                            .accessDeniedHandler(personalApiExceptionHandler)
-                   )
-
-                   .build();
+            .exceptionHandling(exceptionHandling ->
+                exceptionHandling
+                    .authenticationEntryPoint(personalApiExceptionHandler)
+                    .accessDeniedHandler(personalApiExceptionHandler)
+            )
+            .build();
     }
 
-    private CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(allowedOrigins);
+    @Bean
+    public RoleHierarchy roleHierarchy() {
+        final RoleHierarchyImpl roleHierarchy = new RoleHierarchyImpl();
+        final Role[] roles = Role.values();
+        final StringBuilder roleHierarchyBuilder = new StringBuilder();
+
+        Arrays
+            .stream(roles)
+            .filter(r -> r.getSubRoles() != null)
+            .forEach(r -> {
+                final String roleName = r.toString();
+
+                for (Role subRole: r.getSubRoles()) {
+                    roleHierarchyBuilder
+                        .append(roleName)
+                        .append(" > ")
+                        .append(subRole.toString())
+                        .append("\n");
+                }
+            });
+
+        roleHierarchy.setHierarchy(roleHierarchyBuilder.toString());
+        return roleHierarchy;
+    }
+
+    @Bean
+    public DefaultWebSecurityExpressionHandler customWebSecurityExpressionHandler(final RoleHierarchy roleHierarchy) {
+        final DefaultWebSecurityExpressionHandler expressionHandler = new DefaultWebSecurityExpressionHandler();
+        expressionHandler.setRoleHierarchy(roleHierarchy);
+        return expressionHandler;
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource(final CorsPropertiesConfig corsPropertiesConfig) {
+        final CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(corsPropertiesConfig.allowedOrigins());
         configuration.addAllowedMethod("*");
         configuration.setAllowedHeaders(List.of(AUTHORIZATION, ORIGIN, CONTENT_TYPE));
         configuration.setAllowCredentials(true);
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }

@@ -4,53 +4,52 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.Data;
 import org.hibernate.validator.constraints.Length;
 
 import java.time.LocalDate;
 import java.util.Set;
 
-@Data
-public class ProjectDTO {
+public record ProjectDTO(
 
-    private Long id;
+    Long id,
 
     @NotBlank(message = "The project's title cannot be blank.")
-    @Length(max = 50, message = "The project's title cannot be longer than 50 characters.")
-    private String title;
+    @Length(max = 50, message = "The project's title cannot be longer than {max} characters.")
+    String title,
 
     @NotBlank(message = "The project's english description cannot be blank.")
-    @Length(max = 510, message = "The project's english description cannot be longer than 510 characters.")
-    private String descriptionEn;
+    @Length(max = 510, message = "The project's english description cannot be longer than {max} characters.")
+    String descriptionEn,
 
     @NotBlank(message = "The project's french description cannot be blank.")
-    @Length(max = 510, message = "The project's french description cannot be longer than 510 characters.")
-    private String descriptionFr;
+    @Length(max = 510, message = "The project's french description cannot be longer than {max} characters.")
+    String descriptionFr,
 
-    @NotNull(message = "The project's creation date cannot be null.")
-    private LocalDate creationDate;
+    @NotNull(message = "The project's creation date is required.")
+    LocalDate creationDate,
 
     @NotBlank(message = "The project's repository URL cannot be blank.")
-    @Length(max = 255, message = "The project's repository URL cannot be longer than 255 characters.")
-    private String repoUrl;
+    @Length(max = 255, message = "The project's repository URL cannot be longer than {max} characters.")
+    String repoUrl,
 
     @NotBlank(message = "The project's demo URL cannot be blank.")
-    @Length(max = 255, message = "The project's demo URL cannot be longer than 255 characters.")
-    private String demoUrl;
+    @Length(max = 255, message = "The project's demo URL cannot be longer than {max} characters.")
+    String demoUrl,
 
-    @NotNull(message = "The project's featured status cannot be null.")
-    private Boolean featured;
+    @NotNull(message = "The project's featured status is required.")
+    Boolean featured,
 
-    @NotNull(message = "The project's sort cannot be null.")
-    @Min(value = 0, message = "The project's sort cannot be less than 0.")
-    private Integer sort;
+    @Min(value = 0, message = "The project's sort cannot be less than {min}.")
+    Integer sort,
 
-    @NotNull(message = "The project's image cannot be null.")
+    @NotNull(message = "The project's image is required.")
     @Valid
-    private ImageDTO image;
+    ImageDTO image,
 
-    @NotNull(message = "The project's skills cannot be null.")
+    @NotNull(message = "The project's skills is required.")
     @Valid
-    private Set<SkillDTO> skills;
+    Set<SkillDTO> skills
+
+) {
 
 }

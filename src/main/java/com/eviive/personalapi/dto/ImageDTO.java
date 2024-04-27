@@ -1,24 +1,24 @@
 package com.eviive.personalapi.dto;
 
 import jakarta.validation.constraints.NotBlank;
-import lombok.Data;
 import org.hibernate.validator.constraints.Length;
 
 import java.util.UUID;
 
-@Data
-public class ImageDTO {
+public record ImageDTO(
 
-    private Long id;
+    Long id,
 
-    private UUID uuid;
+    UUID uuid,
 
     @NotBlank(message = "The image's english alt cannot be blank.")
-    @Length(max = 255, message = "The image's english alt cannot be longer than 255 characters.")
-    private String altEn;
+    @Length(max = 255, message = "The image's english alt cannot be longer than {max} characters.")
+    String altEn,
 
     @NotBlank(message = "The image's french alt cannot be blank.")
-    @Length(max = 255, message = "The image's french alt cannot be longer than 255 characters.")
-    private String altFr;
+    @Length(max = 255, message = "The image's french alt cannot be longer than {max} characters.")
+    String altFr
+
+) {
 
 }

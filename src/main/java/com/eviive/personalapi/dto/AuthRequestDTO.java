@@ -1,15 +1,15 @@
 package com.eviive.personalapi.dto;
 
 import jakarta.validation.constraints.NotBlank;
-import lombok.Data;
 
-@Data
-public class AuthRequestDTO {
+public record AuthRequestDTO(
 
-    @NotBlank(message = "The username is required.")
-    private String username;
+    @NotBlank(message = "The username cannot be blank.")
+    String username,
 
-    @NotBlank(message = "The password is required.")
-    private String password;
+    @NotBlank(message = "The password cannot be blank.")
+    String password
+
+) {
 
 }

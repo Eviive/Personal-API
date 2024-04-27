@@ -1,17 +1,17 @@
 package com.eviive.personalapi.dto;
 
-import jakarta.validation.constraints.NotBlank;
-import lombok.Data;
+import jakarta.validation.constraints.NotNull;
 
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
-@Data
-public class RevalidateResponseDTO {
+public record RevalidateResponseDTO(
 
-    @NotBlank(message = "The revalidated status is required.")
-    private Boolean revalidated;
+    @NotNull(message = "The revalidated status is required.")
+    Boolean revalidated,
 
-    @NotBlank(message = "The timestamp is required.")
-    private Timestamp timestamp;
+    @NotNull(message = "The timestamp is required.")
+    LocalDateTime timestamp
+
+) {
 
 }

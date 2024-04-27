@@ -4,59 +4,93 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.eviive.personalapi.entity.User;
+import com.eviive.personalapi.properties.JwtPropertiesConfig;
+import com.eviive.personalapi.properties.PersonalApiPropertiesConfig;
 import jakarta.servlet.http.Cookie;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
-import java.util.Date;
 import java.util.List;
 
 @Component
 public final class TokenUtilities {
 
+    public static final String REFRESH_TOKEN_COOKIE = "personal-api_refresh-token";
+
+    public static final String AUTHORITIES_CLAIM = "authorities";
+
     private final Algorithm algorithm;
+
     private final JWTVerifier verifier;
 
-    @Value("${is-production}")
-    private boolean isProduction;
+    private final UriUtilities uriUtilities;
 
-    public TokenUtilities(@Value("${jwt-secret-key}") String secret) {
-        this.algorithm = Algorithm.HMAC256(secret);
+    private final PersonalApiPropertiesConfig personalApiPropertiesConfig;
+
+    private final JwtPropertiesConfig jwtPropertiesConfig;
+
+    public TokenUtilities(
+        final UriUtilities uriUtilities,
+        final PersonalApiPropertiesConfig personalApiPropertiesConfig,
+        final JwtPropertiesConfig jwtPropertiesConfig
+    ) {
+        this.algorithm = Algorithm.HMAC256(jwtPropertiesConfig.secret());
         this.verifier = JWT.require(algorithm).build();
+        this.uriUtilities = uriUtilities;
+        this.personalApiPropertiesConfig = personalApiPropertiesConfig;
+        this.jwtPropertiesConfig = jwtPropertiesConfig;
     }
 
-    public String generateAccessToken(String subject, String issuer, List<String> claims) {
-        int maxAge = 15 * 60; // expires in 15 minutes
+    public String generateAccessToken(final User user) {
+        final List<String> authorities = user.getAuthorities()
+            .stream()
+            .map(GrantedAuthority::getAuthority)
+            .toList();
+
         return JWT.create()
-                  .withSubject(subject)
-                  .withExpiresAt(Date.from(Instant.now().plusSeconds(maxAge)))
-                  .withIssuer(issuer)
-                  .withClaim("roles", claims)
-                  .sign(algorithm);
+            .withSubject(user.getUsername())
+            .withExpiresAt(
+                Instant
+                    .now()
+                    .plusSeconds(jwtPropertiesConfig.token().access().expiration())
+            )
+            .withIssuer(uriUtilities.getCurrentUri().toString())
+            .withClaim(AUTHORITIES_CLAIM, authorities)
+            .sign(algorithm);
     }
 
-    public Cookie generateRefreshTokenCookie(String subject, String issuer) {
-        int maxAge = 7 * 24 * 3600; // expires in 7 days
-        String refreshToken = JWT.create()
-                                 .withSubject(subject)
-                                 .withExpiresAt(Date.from(Instant.now().plusSeconds(maxAge)))
-                                 .withIssuer(issuer)
-                                 .sign(algorithm);
-        return createCookie(refreshToken, maxAge);
+
+    public Cookie generateRefreshTokenCookie(final User user) {
+        final String refreshToken = JWT.create()
+            .withSubject(user.getUsername())
+            .withExpiresAt(
+                Instant
+                    .now()
+                    .plusSeconds(jwtPropertiesConfig.token().refresh().expiration())
+            )
+            .withIssuer(uriUtilities.getCurrentUri().toString())
+            .sign(algorithm);
+
+        return createCookie(refreshToken, jwtPropertiesConfig.token().refresh().expiration());
     }
 
-    public DecodedJWT verifyToken(String token) {
+    public DecodedJWT verifyToken(final String token) {
         return verifier.verify(token);
     }
 
-    public Cookie createCookie(String value, int maxAge) {
-        Cookie cookie = new Cookie("API_refresh-token", value);
+    public Cookie createCookie(final String value, final int maxAge) {
+        final Cookie cookie = new Cookie(REFRESH_TOKEN_COOKIE, value);
         cookie.setMaxAge(maxAge);
-        cookie.setSecure(isProduction);
+        cookie.setSecure(personalApiPropertiesConfig.production());
         cookie.setHttpOnly(true);
         cookie.setPath("/");
         return cookie;
+    }
+
+    public Cookie deleteCookie() {
+        return createCookie(null, 0);
     }
 
 }

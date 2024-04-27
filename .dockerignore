@@ -1,9 +1,12 @@
 Dockerfile
+docker-compose.*.yml
 .dockerignore
 .gradle
 gradle.properties
 build
 logs
 .git
+.gitignore
+.github
 .idea
 .jpb

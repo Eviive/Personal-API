@@ -1,5 +1,6 @@
 package com.eviive.personalapi.filter;
 
+import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.eviive.personalapi.util.TokenUtilities;
@@ -10,7 +11,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -19,17 +19,25 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.util.List;
 
+import static com.eviive.personalapi.util.TokenUtilities.AUTHORITIES_CLAIM;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
 @Component
 @RequiredArgsConstructor
 public class AuthorizationFilter extends OncePerRequestFilter {
 
+    private static final String BEARER_PREFIX = "Bearer ";
+
     private final TokenUtilities tokenUtilities;
 
     @Override
-    protected void doFilterInternal(@NonNull HttpServletRequest req, @NonNull HttpServletResponse res, @NonNull FilterChain filterChain) throws ServletException, IOException {
-        String authorizationHeader = req.getHeader(AUTHORIZATION);
+    protected void doFilterInternal(
+        @NonNull final HttpServletRequest req,
+        @NonNull final HttpServletResponse res,
+        @NonNull final FilterChain filterChain
+    )
+        throws ServletException, IOException {
+        final String authorizationHeader = req.getHeader(AUTHORIZATION);
 
         if (authorizationHeader == null) {
             filterChain.doFilter(req, res);
@@ -37,30 +45,38 @@ public class AuthorizationFilter extends OncePerRequestFilter {
         }
 
         try {
-            if (!authorizationHeader.startsWith("Bearer ")) {
+            if (!authorizationHeader.startsWith(BEARER_PREFIX)) {
                 throw new IllegalStateException("The access token must be a bearer token.");
             }
 
-            String token = authorizationHeader.substring("Bearer ".length());
+            final String token = authorizationHeader.substring(BEARER_PREFIX.length());
 
-            DecodedJWT decodedToken = tokenUtilities.verifyToken(token);
+            final DecodedJWT decodedToken = tokenUtilities.verifyToken(token);
 
-            String username = decodedToken.getSubject();
+            final String username = decodedToken.getSubject();
 
-            Claim claim = decodedToken.getClaim("roles");
+            final Claim claim = decodedToken.getClaim(AUTHORITIES_CLAIM);
 
-            if (claim.isNull() || claim.isMissing()) {
-                throw new IllegalStateException("Roles are missing from the token.");
+            if (claim.isMissing() || claim.isNull()) {
+                throw new IllegalStateException("Authorities are missing from the token.");
             }
 
-            List<SimpleGrantedAuthority> authorities = claim.asList(String.class)
-                                                            .stream()
-                                                            .map(SimpleGrantedAuthority::new)
-                                                            .toList();
+            final List<SimpleGrantedAuthority> authorities = claim
+                .asList(String.class)
+                .stream()
+                .map(SimpleGrantedAuthority::new)
+                .toList();
 
-            Authentication authenticationToken = new UsernamePasswordAuthenticationToken(username, null, authorities);
-            SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-        } catch (Exception e) {
+            SecurityContextHolder
+                .getContext()
+                .setAuthentication(
+                    new UsernamePasswordAuthenticationToken(
+                        username,
+                        null,
+                        authorities
+                    )
+                );
+        } catch (IllegalStateException | JWTVerificationException e) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Authentication failed: %s".formatted(e.getMessage()), e);
             }
