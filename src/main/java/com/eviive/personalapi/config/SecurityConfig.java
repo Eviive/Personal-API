@@ -25,17 +25,17 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.eviive.personalapi.entity.Authority.CREATE_PROJECTS;
-import static com.eviive.personalapi.entity.Authority.CREATE_SKILLS;
-import static com.eviive.personalapi.entity.Authority.DELETE_PROJECTS;
-import static com.eviive.personalapi.entity.Authority.DELETE_SKILLS;
-import static com.eviive.personalapi.entity.Authority.READ_ACTUATOR;
-import static com.eviive.personalapi.entity.Authority.READ_PROJECTS;
-import static com.eviive.personalapi.entity.Authority.READ_SKILLS;
-import static com.eviive.personalapi.entity.Authority.REVALIDATE_PORTFOLIO;
-import static com.eviive.personalapi.entity.Authority.UPDATE_PROJECTS;
-import static com.eviive.personalapi.entity.Authority.UPDATE_SKILLS;
 import static com.eviive.personalapi.entity.Role.ANONYMOUS;
+import static com.eviive.personalapi.entity.Scope.CREATE_PROJECT;
+import static com.eviive.personalapi.entity.Scope.CREATE_SKILL;
+import static com.eviive.personalapi.entity.Scope.DELETE_PROJECT;
+import static com.eviive.personalapi.entity.Scope.DELETE_SKILL;
+import static com.eviive.personalapi.entity.Scope.READ_ACTUATOR;
+import static com.eviive.personalapi.entity.Scope.READ_PROJECT;
+import static com.eviive.personalapi.entity.Scope.READ_SKILL;
+import static com.eviive.personalapi.entity.Scope.REVALIDATE_PORTFOLIO;
+import static com.eviive.personalapi.entity.Scope.UPDATE_PROJECT;
+import static com.eviive.personalapi.entity.Scope.UPDATE_SKILL;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 import static org.springframework.http.HttpHeaders.ORIGIN;
@@ -82,35 +82,39 @@ public class SecurityConfig {
                     )
                     .permitAll()
 
+                    .requestMatchers(GET, "/user/current")
+                    .permitAll()
                     .requestMatchers(POST, "/user/login", "/user/logout", "/user/refresh")
                     .permitAll()
 
                     .requestMatchers(GET, "/project/**")
-                    .hasAuthority(READ_PROJECTS.getName())
+                    .hasAuthority(READ_PROJECT.getName())
                     .requestMatchers(POST, "/project/**")
-                    .hasAuthority(CREATE_PROJECTS.getName())
+                    .hasAuthority(CREATE_PROJECT.getName())
                     .requestMatchers(PUT, "/project/**")
-                    .hasAuthority(UPDATE_PROJECTS.getName())
+                    .hasAuthority(UPDATE_PROJECT.getName())
                     .requestMatchers(PATCH, "/project/**")
-                    .hasAuthority(UPDATE_PROJECTS.getName())
+                    .hasAuthority(UPDATE_PROJECT.getName())
                     .requestMatchers(DELETE, "/project/**")
-                    .hasAuthority(DELETE_PROJECTS.getName())
+                    .hasAuthority(DELETE_PROJECT.getName())
 
                     .requestMatchers(GET, "/skill/**")
-                    .hasAuthority(READ_SKILLS.getName())
+                    .hasAuthority(READ_SKILL.getName())
                     .requestMatchers(POST, "/skill/**")
-                    .hasAuthority(CREATE_SKILLS.getName())
+                    .hasAuthority(CREATE_SKILL.getName())
                     .requestMatchers(PUT, "/skill/**")
-                    .hasAuthority(UPDATE_SKILLS.getName())
+                    .hasAuthority(UPDATE_SKILL.getName())
                     .requestMatchers(PATCH, "/skill/**")
-                    .hasAuthority(UPDATE_SKILLS.getName())
+                    .hasAuthority(UPDATE_SKILL.getName())
                     .requestMatchers(DELETE, "/skill/**")
-                    .hasAuthority(DELETE_SKILLS.getName())
+                    .hasAuthority(DELETE_SKILL.getName())
 
                     .requestMatchers(POST, "/portfolio/revalidate")
                     .hasAuthority(REVALIDATE_PORTFOLIO.getName())
 
-                    .requestMatchers("/actuator/**")
+                    .requestMatchers(GET, "/actuator/info", "/actuator/health")
+                    .permitAll()
+                    .requestMatchers(GET, "/actuator/**")
                     .hasAuthority(READ_ACTUATOR.getName())
 
                     // deny-by-default policy
