@@ -8,9 +8,9 @@ public interface CollectionsMapper<E, D> {
 
     // to Entity
 
-    List<E> toListEntity(Collection<D> DTOs);
+    List<E> toListEntity(Collection<D> dtos);
 
-    Set<E> toSetEntity(Collection<D> DTOs);
+    Set<E> toSetEntity(Collection<D> dtos);
 
     // to DTO
 

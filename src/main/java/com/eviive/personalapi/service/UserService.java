@@ -71,7 +71,8 @@ public class UserService implements UserDetailsService {
         final HttpServletResponse res
     ) {
         try {
-            final AbstractAuthenticationToken abstractAuthenticationToken = new UsernamePasswordAuthenticationToken(username, password);
+            final AbstractAuthenticationToken abstractAuthenticationToken =
+                new UsernamePasswordAuthenticationToken(username, password);
 
             abstractAuthenticationToken.setDetails(new WebAuthenticationDetails(req));
 
