@@ -10,31 +10,31 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import static com.eviive.personalapi.entity.Authority.CREATE_PROJECTS;
-import static com.eviive.personalapi.entity.Authority.CREATE_SKILLS;
-import static com.eviive.personalapi.entity.Authority.DELETE_PROJECTS;
-import static com.eviive.personalapi.entity.Authority.DELETE_SKILLS;
-import static com.eviive.personalapi.entity.Authority.READ_ACTUATOR;
-import static com.eviive.personalapi.entity.Authority.READ_PROJECTS;
-import static com.eviive.personalapi.entity.Authority.READ_SKILLS;
-import static com.eviive.personalapi.entity.Authority.REVALIDATE_PORTFOLIO;
-import static com.eviive.personalapi.entity.Authority.UPDATE_PROJECTS;
-import static com.eviive.personalapi.entity.Authority.UPDATE_SKILLS;
+import static com.eviive.personalapi.entity.Scope.CREATE_PROJECT;
+import static com.eviive.personalapi.entity.Scope.CREATE_SKILL;
+import static com.eviive.personalapi.entity.Scope.DELETE_PROJECT;
+import static com.eviive.personalapi.entity.Scope.DELETE_SKILL;
+import static com.eviive.personalapi.entity.Scope.READ_ACTUATOR;
+import static com.eviive.personalapi.entity.Scope.READ_PROJECT;
+import static com.eviive.personalapi.entity.Scope.READ_SKILL;
+import static com.eviive.personalapi.entity.Scope.REVALIDATE_PORTFOLIO;
+import static com.eviive.personalapi.entity.Scope.UPDATE_PROJECT;
+import static com.eviive.personalapi.entity.Scope.UPDATE_SKILL;
 
 @RequiredArgsConstructor
 public enum Role {
 
     ANONYMOUS(
         Set.of(
-            READ_PROJECTS,
-            READ_SKILLS
+            READ_PROJECT,
+            READ_SKILL
         ),
         null
     ),
     ADMIN(
         Set.of(
-            CREATE_PROJECTS, UPDATE_PROJECTS, DELETE_PROJECTS,
-            CREATE_SKILLS, UPDATE_SKILLS, DELETE_SKILLS,
+            CREATE_PROJECT, UPDATE_PROJECT, DELETE_PROJECT,
+            CREATE_SKILL, UPDATE_SKILL, DELETE_SKILL,
             REVALIDATE_PORTFOLIO,
             READ_ACTUATOR
         ),
@@ -43,7 +43,7 @@ public enum Role {
         )
     );
 
-    private final Set<Authority> authorities;
+    private final Set<Scope> scopes;
 
     @Nullable
     @Getter
@@ -53,7 +53,7 @@ public enum Role {
         final Stream<GrantedAuthority> grantedAuthorities = Stream
             .concat(
                 Stream.of(toString()),
-                authorities.stream().map(Authority::getName)
+                scopes.stream().map(Scope::getName)
             )
             .map(SimpleGrantedAuthority::new)
             .map(GrantedAuthority.class::cast);

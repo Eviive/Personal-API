@@ -2,34 +2,28 @@ package com.eviive.personalapi.mapper;
 
 import com.eviive.personalapi.dto.SkillDTO;
 import com.eviive.personalapi.entity.Skill;
+import com.eviive.personalapi.mapper.util.CollectionsMapper;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
-
 import static org.mapstruct.InjectionStrategy.CONSTRUCTOR;
+import static org.mapstruct.MappingConstants.ComponentModel.SPRING;
 import static org.mapstruct.ReportingPolicy.ERROR;
 
 @Mapper(
     unmappedTargetPolicy = ERROR,
-    componentModel = "spring",
+    componentModel = SPRING,
     injectionStrategy = CONSTRUCTOR,
     uses = ImageMapper.class
 )
-public interface SkillMapper {
+public interface SkillMapper extends CollectionsMapper<Skill, SkillDTO> {
 
     // to Entity
 
     @Mapping(target = "projects", ignore = true)
     Skill toEntity(SkillDTO skill);
-
-    List<Skill> toListEntity(Collection<SkillDTO> skillsDTO);
-
-    Set<Skill> toSetEntity(Collection<SkillDTO> skillsDTO);
 
     @AfterMapping
     default void afterMapping(@MappingTarget Skill skill) {
@@ -44,9 +38,5 @@ public interface SkillMapper {
     // to DTO
 
     SkillDTO toDTO(Skill skill);
-
-    List<SkillDTO> toListDTO(Collection<Skill> skills);
-
-    Set<SkillDTO> toSetDTO(Collection<Skill> skills);
 
 }

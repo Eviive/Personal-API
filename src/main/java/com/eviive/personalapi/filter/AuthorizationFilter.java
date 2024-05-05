@@ -10,9 +10,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.lang.NonNull;
+import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -67,15 +69,18 @@ public class AuthorizationFilter extends OncePerRequestFilter {
                 .map(SimpleGrantedAuthority::new)
                 .toList();
 
+            final AbstractAuthenticationToken abstractAuthenticationToken =
+                new UsernamePasswordAuthenticationToken(
+                    username,
+                    null,
+                    authorities
+                );
+
+            abstractAuthenticationToken.setDetails(new WebAuthenticationDetails(req));
+
             SecurityContextHolder
                 .getContext()
-                .setAuthentication(
-                    new UsernamePasswordAuthenticationToken(
-                        username,
-                        null,
-                        authorities
-                    )
-                );
+                .setAuthentication(abstractAuthenticationToken);
         } catch (IllegalStateException | JWTVerificationException e) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Authentication failed: %s".formatted(e.getMessage()), e);

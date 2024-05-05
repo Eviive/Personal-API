@@ -19,7 +19,7 @@ public enum PersonalApiErrorsEnum {
 
     // 400 Bad Request
 
-    API400_REFRESH_TOKEN_NOT_FOUND("No refresh token was found in the request.", BAD_REQUEST),
+    API400_REFRESH_TOKEN_NOT_FOUND("No refresh token was found in the request.", BAD_REQUEST, false),
     API400_FILE_EMPTY("The received file is empty.", BAD_REQUEST),
     API400_IMAGE_NO_NAME("The received image has no name.", BAD_REQUEST),
     API400_MISSING_SERVLET_REQUEST_PARAMETER("The request parameter %s of type %s is missing.", BAD_REQUEST),
@@ -60,5 +60,13 @@ public enum PersonalApiErrorsEnum {
     private final String message;
 
     private final HttpStatus httpStatus;
+
+    private final boolean logException;
+
+    PersonalApiErrorsEnum(final String message, final HttpStatus httpStatus) {
+        this.message = message;
+        this.httpStatus = httpStatus;
+        this.logException = true;
+    }
 
 }
