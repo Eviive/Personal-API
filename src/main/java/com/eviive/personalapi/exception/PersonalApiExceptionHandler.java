@@ -63,6 +63,7 @@ public class PersonalApiExceptionHandler extends ResponseEntityExceptionHandler
 
         if (e instanceof PersonalApiException personalApiException) {
             errorResponse = errorUtilities.buildError(personalApiException);
+            logException = personalApiException.isLogException();
 
         } else if (e instanceof JpaSystemException jpaSystemException) {
             errorResponse = errorUtilities.buildError(

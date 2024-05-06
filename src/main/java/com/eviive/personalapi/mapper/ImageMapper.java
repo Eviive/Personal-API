@@ -2,34 +2,28 @@ package com.eviive.personalapi.mapper;
 
 import com.eviive.personalapi.dto.ImageDTO;
 import com.eviive.personalapi.entity.Image;
+import com.eviive.personalapi.mapper.util.CollectionsMapper;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
-
 import static org.mapstruct.InjectionStrategy.CONSTRUCTOR;
+import static org.mapstruct.MappingConstants.ComponentModel.SPRING;
 import static org.mapstruct.ReportingPolicy.ERROR;
 
 @Mapper(
     unmappedTargetPolicy = ERROR,
-    componentModel = "spring",
+    componentModel = SPRING,
     injectionStrategy = CONSTRUCTOR
 )
-public interface ImageMapper {
+public interface ImageMapper extends CollectionsMapper<Image, ImageDTO> {
 
     // to Entity
 
     @Mapping(target = "project", ignore = true)
     @Mapping(target = "skill", ignore = true)
     Image toEntity(ImageDTO projectDTO);
-
-    List<Image> toListEntity(Collection<ImageDTO> projectsDTO);
-
-    Set<Image> toSetEntity(Collection<ImageDTO> projectsDTO);
 
     @AfterMapping
     default void afterMapping(@MappingTarget Image image) {
@@ -44,9 +38,5 @@ public interface ImageMapper {
     // to DTO
 
     ImageDTO toDTO(Image project);
-
-    List<ImageDTO> toListDTO(Collection<Image> projects);
-
-    Set<ImageDTO> toSetDTO(Collection<Image> projects);
 
 }

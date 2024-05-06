@@ -2,15 +2,20 @@ package com.eviive.personalapi.controller;
 
 import com.eviive.personalapi.dto.AuthRequestDTO;
 import com.eviive.personalapi.dto.AuthResponseDTO;
+import com.eviive.personalapi.dto.CurrentUserDTO;
 import com.eviive.personalapi.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.CurrentSecurityContext;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.web.bind.annotation.CookieValue;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,6 +31,20 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 public class UserController {
 
     private final UserService userService;
+
+    // GET
+
+    @GetMapping(path = "current", produces = APPLICATION_JSON_VALUE)
+    @Operation(
+        summary = "Current user",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "404", description = "Not Found")
+        }
+    )
+    public ResponseEntity<CurrentUserDTO> current(@CurrentSecurityContext final SecurityContext securityContext) {
+        return ResponseEntity.ok(userService.getCurrentUser(securityContext));
+    }
 
     // POST
 
@@ -44,12 +63,14 @@ public class UserController {
     )
     public ResponseEntity<AuthResponseDTO> login(
         @RequestBody @Valid final AuthRequestDTO loginForm,
+        final HttpServletRequest req,
         final HttpServletResponse res
     ) {
         return ResponseEntity.ok(
             userService.login(
                 loginForm.username(),
                 loginForm.password(),
+                req,
                 res
             )
         );
@@ -71,7 +92,8 @@ public class UserController {
         responses = {
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "400", description = "Bad Request"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized")
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "404", description = "Not Found")
         }
     )
     public ResponseEntity<AuthResponseDTO> refreshToken(
